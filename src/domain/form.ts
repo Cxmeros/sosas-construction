@@ -115,6 +115,19 @@ function depositOf(
   }
 }
 
+export function toLenientItem(item: FormItem): LineItem {
+  const lump = item.unit === 'lump sum';
+  return {
+    id: item.id,
+    description: item.description.trim(),
+    unit: item.unit,
+    otherUnit: item.otherUnit.trim(),
+    qtyHundredths: lump ? 0 : (parseQtyToHundredths(item.qty) ?? 0),
+    unitPriceCents: lump ? 0 : (parseMoneyToCents(item.unitPrice) ?? 0),
+    lumpSumCents: lump ? (parseMoneyToCents(item.lumpSum) ?? 0) : 0,
+  };
+}
+
 /** Best-effort conversion for the live total and live preview: anything unparseable counts as 0. */
 export function toLenientDocument(values: FormValues): DocumentData {
   return {

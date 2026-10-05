@@ -1,0 +1,256 @@
+import { expect, test } from '@playwright/test';
+import {
+  addItem,
+  expectNoErrors,
+  fillSample,
+  isMobile,
+  item,
+  pdfText,
+  watchConsole,
+} from './helpers';
+
+const today = () => {
+  const d = new Date();
+  return `${String(d.getFullYear())}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
+};
+
+test.beforeEach(async ({ page }) => {
+  await page.goto('/');
+});
+
+test('full flow: estimate → PDF → convert to invoice → new document', async ({ page }, info) => {
+  const mobile = isMobile(info);
+  const errors = watchConsole(page);
+  const number = `EST-${today()}-01`;
+  await expect(page.getByLabel('Número')).toHaveValue(number);
+
+  await fillSample(page, mobile);
+  // SPEC §6: total, 30 % deposit (the default) and balance.
+  await expect(page.getByText('$18,356.75').first()).toBeVisible();
+  await expect(page.getByText('$5,507.03').first()).toBeAttached();
+  await expect(page.getByText('$12,849.72').first()).toBeAttached();
+
+  // 20 % deposit.
+  await page.getByText('20 %', { exact: true }).click();
+  await expect(page.getByText('$14,685.40').first()).toBeAttached();
+  await page.getByText('30 %', { exact: true }).click();
+
+  if (mobile) {
+    await page.getByRole('button', { name: 'Ver PDF' }).click();
+    await expect(page.getByText(`Estimate_${number}_Margaret-Kelly.pdf`)).toBeVisible();
+  }
+  const preview = page.getByLabel('Vista previa del PDF');
+  await expect(preview.getByText('WORK ESTIMATE')).toBeVisible();
+  await expect(preview.getByText('CUSTOMER INFORMATION')).toBeVisible();
+  await expect(preview.getByText('Page 1 of 1')).toBeVisible();
+
+  // Download the real PDF and check its text.
+  const download = page.waitForEvent('download');
+  await page.getByRole('button', { name: mobile ? 'Descargar' : 'Descargar PDF' }).click();
+  const file = await download;
+  expect(file.suggestedFilename()).toBe(`Estimate_${number}_Margaret-Kelly.pdf`);
+  const path = info.outputPath('estimate.pdf');
+  await file.saveAs(path);
+  const text = pdfText(path);
+  for (const s of [
+    'WORKESTIMATE',
+    number,
+    'MargaretKelly',
+    '$18,356.75',
+    'Depositrequired(30%)',
+    '$5,507.03',
+    '$12,849.72',
+    'Page1of1',
+  ]) {
+    expect(text).toContain(s);
+  }
+
+  // Convert: keeps customer and items; new INV number, invoice terms, estimate reference.
+  await page.getByRole('button', { name: 'Convertir en Invoice' }).click();
+  await expect(page.getByRole('status').getByText(`INV-${today()}-01`)).toBeVisible();
+  await expect(preview.getByText('INVOICE', { exact: true })).toBeVisible();
+  await expect(preview.getByText('ESTIMATE REF.')).toBeVisible();
+  await expect(preview.getByText(number).first()).toBeVisible();
+  await expect(
+    preview.getByText('Payment is due upon receipt. Thank you for your business.'),
+  ).toBeVisible();
+  await expect(preview.getByText('Deposit received (30%)')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Convertir en Invoice' })).toHaveCount(0);
+  if (mobile) await page.getByRole('button', { name: 'Editar' }).click();
+  await expect(page.getByLabel('Nombre')).toHaveValue('Margaret Kelly');
+  await expect(page.getByLabel('Número')).toHaveValue(`INV-${today()}-01`);
+
+  // New document asks first, then clears.
+  if (mobile) await page.getByRole('button', { name: 'Ver PDF' }).click();
+  await page.getByRole('button', { name: 'Nuevo documento' }).click();
+  await page.getByRole('dialog').getByRole('button', { name: 'Cancelar' }).click();
+  await expect(page.getByRole('dialog')).toBeHidden();
+  await page.getByRole('button', { name: 'Nuevo documento' }).click();
+  await page.getByRole('button', { name: 'Sí, empezar nuevo' }).click();
+  await expect(page.getByLabel('Nombre')).toHaveValue('');
+  await expect(page.getByLabel('Número')).toHaveValue(`EST-${today()}-02`);
+  await expect(page.getByText('Aún no hay partidas')).toBeVisible();
+
+  await expectNoErrors(errors);
+});
+
+test('validation errors appear next to each field, in Spanish', async ({ page }, info) => {
+  const mobile = isMobile(info);
+  await page.getByRole('button', { name: mobile ? 'Ver PDF' : 'Compartir' }).click();
+  await expect(page.getByRole('alert')).toContainText('Faltan 2 datos para crear el PDF');
+  await expect(page.getByText('Escribe el nombre del cliente.')).toBeVisible();
+  await expect(page.getByText('Agrega al menos una partida.')).toBeVisible();
+  await expect(page.getByLabel('Nombre')).toHaveAttribute('aria-invalid', 'true');
+  await expect(page.getByLabel('Nombre')).toBeFocused();
+
+  await page.getByLabel('Nombre').fill('Ana');
+  await page.getByLabel('Teléfono').fill('610 555');
+  await expect(page.getByText('Escribe el nombre del cliente.')).toBeHidden();
+  await expect(page.getByText('Faltan dígitos: usa 10 números.')).toBeVisible();
+
+  await addItem(page);
+  const it = item(page, 1, mobile);
+  await it.description.fill('Install and refinish');
+  await it.qty.fill('1625');
+  await expect(page.getByText('Falta el precio por sq ft.')).toBeVisible();
+});
+
+test('items: lump sum, other, delete with undo, reorder', async ({ page }, info) => {
+  const mobile = isMobile(info);
+  await addItem(page);
+  await addItem(page);
+  const first = item(page, 1, mobile);
+  const second = item(page, 2, mobile);
+  await first.description.fill('Stairs');
+  await first.unit.selectOption('lump sum');
+  await expect(first.amount).toBeVisible();
+  if (mobile) await expect(first.qty).toHaveCount(0);
+  else await expect(page.getByLabel('Cantidad', { exact: true })).toBeDisabled();
+  await first.amount.fill('3000');
+
+  await second.description.fill('Furniture moving');
+  await second.unit.selectOption('other');
+  await second.otherUnit.fill('rooms');
+  await second.qty.fill('3');
+  await second.price.fill('75');
+  await expect(page.getByText('$225.00').first()).toBeVisible();
+  if (!mobile)
+    await expect(page.getByLabel('Vista previa del PDF').getByText('rooms')).toBeAttached();
+
+  // Reorder: arrows on mobile, keyboard on the drag handle on desktop.
+  if (mobile) await page.getByRole('button', { name: 'Bajar partida 1' }).click();
+  else {
+    await page.getByRole('button', { name: /Mover partida 1/ }).focus();
+    await page.keyboard.press('ArrowDown');
+  }
+  await expect(item(page, 1, mobile).description).toHaveValue('Furniture moving');
+  await expect(item(page, 2, mobile).description).toHaveValue('Stairs');
+
+  await page.getByRole('button', { name: 'Eliminar partida 1' }).click();
+  await expect(page.getByText('Partida #1 eliminada')).toBeVisible();
+  await expect(item(page, 1, mobile).description).toHaveValue('Stairs');
+  await page.getByRole('button', { name: 'Deshacer' }).click();
+  await expect(item(page, 1, mobile).description).toHaveValue('Furniture moving');
+  await expect(item(page, 2, mobile).description).toHaveValue('Stairs');
+});
+
+test('draft survives a reload and can be discarded', async ({ page }, info) => {
+  const mobile = isMobile(info);
+  await page.getByLabel('Nombre').fill('Margaret Kelly');
+  await addItem(page);
+  await item(page, 1, mobile).description.fill('Install and refinish');
+  await expect(page.getByText('Borrador guardado')).toBeVisible();
+
+  await page.reload();
+  await expect(page.getByText('Recuperamos tu borrador')).toBeVisible();
+  await expect(page.getByText(/Estimate EST-\d{8}-01 · Margaret Kelly · hoy/)).toBeVisible();
+  await page.getByRole('button', { name: 'Seguir editando' }).click();
+  await expect(page.getByLabel('Nombre')).toHaveValue('Margaret Kelly');
+  await expect(item(page, 1, mobile).description).toHaveValue('Install and refinish');
+
+  await page.reload();
+  await page.getByRole('button', { name: 'Descartar' }).click();
+  await page.getByRole('button', { name: 'Sí, descartar' }).click();
+  await expect(page.getByLabel('Nombre')).toHaveValue('');
+  await page.reload();
+  await expect(page.getByText('Recuperamos tu borrador')).toBeHidden();
+});
+
+test('corrupt saved data is ignored', async ({ page }) => {
+  await page.evaluate(() => {
+    window.localStorage.setItem('sosa.draft.v1', '{"savedAt":1,"values":{"type":"hack"}}');
+    window.localStorage.setItem('sosa.counters.v1', 'not json');
+  });
+  await page.reload();
+  await expect(page.getByLabel('Nombre')).toHaveValue('');
+  await expect(page.getByLabel('Número')).toHaveValue(/^EST-\d{8}-01$/);
+});
+
+test('share uses the Web Share API with the PDF file', async ({ page }, info) => {
+  const mobile = isMobile(info);
+  await page.addInitScript(() => {
+    const w = window as unknown as { shared: { name: string; type: string }[] };
+    w.shared = [];
+    Object.defineProperty(navigator, 'canShare', { value: () => true });
+    Object.defineProperty(navigator, 'share', {
+      value: (data: { files: File[] }) => {
+        w.shared.push(...data.files.map((f) => ({ name: f.name, type: f.type })));
+        return Promise.resolve();
+      },
+    });
+  });
+  await page.reload();
+  await fillSample(page, mobile);
+  if (mobile) await page.getByRole('button', { name: 'Ver PDF' }).click();
+  await page.getByRole('button', { name: 'Compartir' }).click();
+  await expect
+    .poll(() => page.evaluate(() => (window as unknown as { shared: unknown[] }).shared))
+    .toEqual([
+      {
+        name: expect.stringMatching(/^Estimate_EST-\d{8}-01_Margaret-Kelly\.pdf$/),
+        type: 'application/pdf',
+      },
+    ]);
+});
+
+test('without file sharing, the panel offers WhatsApp, email and download', async ({
+  page,
+}, info) => {
+  const mobile = isMobile(info);
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'canShare', { value: undefined });
+  });
+  await page.reload();
+  await fillSample(page, mobile);
+  if (mobile) await page.getByRole('button', { name: 'Ver PDF' }).click();
+  await page.getByRole('button', { name: 'Compartir' }).click();
+  const dialog = page.getByRole('dialog', { name: 'Enviar a Margaret Kelly' });
+  await expect(dialog).toBeVisible();
+  await expect(dialog.getByRole('button', { name: /WhatsApp · \(610\) 555-0142/ })).toBeVisible();
+  await expect(
+    dialog.getByRole('button', { name: /Correo · mkelly.home@gmail.com/ }),
+  ).toBeVisible();
+  const download = page.waitForEvent('download');
+  await dialog.getByRole('button', { name: 'Descargar PDF' }).click();
+  expect((await download).suggestedFilename()).toMatch(
+    /^Estimate_EST-\d{8}-01_Margaret-Kelly\.pdf$/,
+  );
+  await dialog.getByRole('button', { name: 'Cancelar' }).click();
+  await expect(dialog).toBeHidden();
+});
+
+test('touch targets are at least 48 px', async ({ page }, info) => {
+  const mobile = isMobile(info);
+  await fillSample(page, mobile);
+  const small = await page.evaluate(() =>
+    [
+      ...document.querySelectorAll(
+        'button, input:not([type=radio]), select, [role=radio], fieldset label',
+      ),
+    ]
+      .filter((el) => (el as HTMLElement).offsetParent !== null)
+      .map((el) => ({ el: el.outerHTML.slice(0, 80), h: el.getBoundingClientRect().height }))
+      .filter((x) => x.h < 47.5),
+  );
+  expect(small).toEqual([]);
+});
