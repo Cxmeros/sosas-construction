@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/industry-f1167009-4538-4574-a0f0-5283778e251b/styles.css">
+</helmet>
+<div style="width:816px;height:1056px;background:#FFFFFF;color:#1F1712;font-family:Barlow, system-ui, sans-serif;padding:48px 56px 0;box-sizing:border-box;position:relative;display:flex;flex-direction:column;gap:22px;font-size:13.5px;line-height:1.4;overflow:hidden">
+
+  <sc-if value="{{ isFull }}" hint-placeholder-val="{{ true }}">
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:24px;padding-bottom:14px;border-bottom:3px solid #E06A1F">
+      <img src="assets/logo.png" alt="Sosa's Constructions" style="height:92px;display:block">
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+        <div style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:44px;line-height:.95;color:#B5470F;letter-spacing:.02em">{{ d.title }}</div>
+        <div style="display:grid;grid-template-columns:auto auto;gap:2px 14px;font-size:13px;text-align:right">
+          <span style="font-weight:700;letter-spacing:.06em;color:#5C4A3D">NO.</span><span style="font-weight:600;font-variant-numeric:tabular-nums">{{ d.number }}</span>
+          <span style="font-weight:700;letter-spacing:.06em;color:#5C4A3D">DATE</span><span style="font-weight:600;font-variant-numeric:tabular-nums">{{ d.date }}</span>
+          <sc-if value="{{ hasRef }}" hint-placeholder-val="{{ false }}"><span style="font-weight:700;letter-spacing:.06em;color:#5C4A3D">ESTIMATE REF.</span><span style="font-weight:600;font-variant-numeric:tabular-nums">{{ d.ref }}</span></sc-if>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+      <div style="display:flex;flex-direction:column;gap:6px;padding:12px 14px;border:1px solid #CDBBA7">
+        <span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:14px;letter-spacing:.1em;color:#B5470F">FROM</span>
+        <strong style="font-size:15px">Danilo Sosa · Sosa's Constructions</strong>
+        <span>29 E Providence Rd<br>Lansdowne, PA 19050</span>
+        <span style="font-variant-numeric:tabular-nums">435-512-4801 · 208-600-7776</span>
+      </div>
+      <div class="blueprint" style="display:flex;flex-direction:column;gap:6px;padding:12px 14px;border:1.5px solid #1F1712"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+        <span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:14px;letter-spacing:.1em;color:#B5470F">CUSTOMER INFORMATION</span>
+        <strong style="font-size:15px">{{ d.client.name }}</strong>
+        <span>{{ d.client.address }}</span>
+        <span style="font-variant-numeric:tabular-nums">{{ d.client.phone }} · {{ d.client.email }}</span>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:14px;letter-spacing:.1em;color:#B5470F;border-bottom:1px solid #CDBBA7;padding-bottom:4px">JOB DESCRIPTION</span>
+      <p style="margin:0;font-size:14px;text-wrap:pretty">{{ d.desc }}</p>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isCompact }}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:10px;border-bottom:3px solid #E06A1F">
+      <img src="assets/logo.png" alt="Sosa's Constructions" style="height:48px;display:block">
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
+        <span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:24px;line-height:1;color:#B5470F;letter-spacing:.02em">{{ d.title }} <span style="color:#5C4A3D;font-weight:600">(continued)</span></span>
+        <span style="font-size:13px;font-weight:600;font-variant-numeric:tabular-nums">No. {{ d.number }} · {{ d.date }} · {{ d.client.name }}</span>
+      </div>
+    </div>
+  </sc-if>
+
+  <div style="display:flex;flex-direction:column">
+    <span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:14px;letter-spacing:.1em;color:#B5470F;padding-bottom:6px">SERVICES AND MATERIALS</span>
+    <div style="display:grid;grid-template-columns:minmax(0,1fr) 64px 76px 88px 104px;border-top:2px solid #1F1712;border-bottom:1px solid #1F1712;font-weight:700;font-size:11.5px;letter-spacing:.08em;color:#1F1712">
+      <span style="padding:7px 8px 7px 0">DESCRIPTION</span><span style="padding:7px 6px;text-align:right">QTY</span><span style="padding:7px 6px">UNIT</span><span style="padding:7px 6px;text-align:right">UNIT PRICE</span><span style="padding:7px 0 7px 6px;text-align:right">AMOUNT</span>
+    </div>
+    <sc-for list="{{ rows }}" as="r" hint-placeholder-count="4">
+      <div style="display:grid;grid-template-columns:minmax(0,1fr) 64px 76px 88px 104px;border-bottom:1px solid #D8CBBB;font-variant-numeric:tabular-nums;align-items:baseline">
+        <span style="padding:7px 8px 7px 0;display:flex;flex-direction:column"><span style="font-weight:500">{{ r.desc }}</span><sc-if value="{{ r.hasNote }}" hint-placeholder-val="{{ false }}"><span style="font-size:12.5px;color:#5C4A3D">{{ r.note }}</span></sc-if></span>
+        <span style="padding:7px 6px;text-align:right">{{ r.qty }}</span><span style="padding:7px 6px">{{ r.unit }}</span><span style="padding:7px 6px;text-align:right">{{ r.price }}</span><span style="padding:7px 0 7px 6px;text-align:right;font-weight:600">{{ r.amount }}</span>
+      </div>
+    </sc-for>
+    <sc-if value="{{ isFirst }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;justify-content:space-between;padding-top:8px;font-size:12.5px;color:#5C4A3D;font-variant-numeric:tabular-nums"><span>Subtotal this page: <strong style="color:#1F1712">{{ pageSubtotal }}</strong></span><strong style="color:#1F1712">Continued on page {{ nextPage }} →</strong></div>
+    </sc-if>
+  </div>
+
+  <sc-if value="{{ showTotals }}" hint-placeholder-val="{{ true }}">
+    <div class="blueprint" style="align-self:flex-end;width:340px;display:flex;flex-direction:column;border:1.5px solid #1F1712;font-variant-numeric:tabular-nums"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+      <div style="display:flex;justify-content:space-between;padding:9px 14px;font-size:15px;font-weight:700"><span>Total</span><span>{{ d.total }}</span></div>
+      <sc-if value="{{ d.hasDeposit }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;justify-content:space-between;padding:9px 14px;border-top:1px solid #CDBBA7;font-size:14px"><span>{{ d.depLabel }}</span><span style="font-weight:600">{{ d.dep }}</span></div>
+      </sc-if>
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:11px 14px;border-top:2px solid #1F1712;background:#FCEBDF"><span style="font-weight:700;font-size:14px">{{ d.balLabel }}</span><span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:26px;line-height:1">{{ d.balance }}</span></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:14px;letter-spacing:.1em;color:#B5470F;border-bottom:1px solid #CDBBA7;padding-bottom:4px">TERMS AND CONDITIONS</span>
+      <p style="margin:0;font-size:12.5px;color:#3A2416;text-wrap:pretty">{{ d.terms }}</p>
+    </div>
+  </sc-if>
+
+  <div style="position:absolute;left:56px;right:56px;bottom:30px;display:flex;justify-content:space-between;gap:16px;font-size:11.5px;color:#5C4A3D;border-top:1px solid #CDBBA7;padding-top:8px;font-variant-numeric:tabular-nums">
+    <span>Sosa's Constructions · Hardwood floors · Lansdowne, PA</span><span>{{ d.number }}</span><strong style="color:#1F1712">Page {{ pageNo }} of {{ pageCount }}</strong>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:816,&quot;height&quot;:1056},&quot;doc&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;object&quot;},&quot;rows&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;array&quot;},&quot;part&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;single&quot;,&quot;first&quot;,&quot;last&quot;],&quot;default&quot;:&quot;single&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;pageNo&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:1,&quot;tsType&quot;:&quot;number&quot;},&quot;pageCount&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:1,&quot;tsType&quot;:&quot;number&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const d = this.props.doc || { client: {} };
+    const part = this.props.part || 'single';
+    const src = this.props.rows || d.rows || [];
+    const rows = src.map(r => {
+      const [desc, note] = String(r.desc || '').split(' — ');
+      return { ...r, desc, note: note || '', hasNote: !!note };
+    });
+    const sub = src.reduce((a, r) => a + (parseFloat(String(r.amount).replace(/[$,]/g, '')) || 0), 0);
+    const pageNo = this.props.pageNo || 1;
+    return {
+      d, rows, hasRef: !!d.ref,
+      isFull: part !== 'last', isCompact: part === 'last', showTotals: part !== 'first', isFirst: part === 'first',
+      pageNo, pageCount: this.props.pageCount || 1, nextPage: pageNo + 1,
+      pageSubtotal: '$' + sub.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+    };
+  }
+}
+</script>
+</body>
+</html>
