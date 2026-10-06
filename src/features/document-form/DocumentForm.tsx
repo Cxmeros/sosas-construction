@@ -104,11 +104,7 @@ export function DocumentForm({
   );
   const customer = (
     <>
-      <Field
-        label={desktop ? 'Nombre' : 'Nombre'}
-        path="customer.name"
-        error={err('customer.name')}
-      >
+      <Field label="Nombre" path="customer.name" error={err('customer.name')}>
         <input
           autoComplete="name"
           maxLength={LIMITS.customerName}

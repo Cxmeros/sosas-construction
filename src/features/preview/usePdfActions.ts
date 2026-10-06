@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 import type { DocumentData } from '../../domain/types';
 import { downloadBlob, shareFile } from '../../lib/share';
 import { renderPdf } from '../../pdf/generate';
@@ -16,33 +16,32 @@ export function usePdfActions() {
   /** Set when the device can't share files: opens the fallback panel. */
   const [fallback, setFallback] = useState<PdfFile | null>(null);
 
-  const share = useCallback(async (doc: DocumentData) => {
-    setBusy('share');
+  const run = async (
+    kind: 'share' | 'download',
+    doc: DocumentData,
+    then: (pdf: { blob: Blob; fileName: string }) => Promise<void> | void,
+  ) => {
+    setBusy(kind);
     setError(null);
     try {
-      const { blob, fileName } = await renderPdf(doc);
-      const file = new File([blob], fileName, { type: 'application/pdf' });
-      const result = await shareFile(file, fileName);
-      if (result === 'unsupported') setFallback({ blob, fileName, doc });
+      await then(await renderPdf(doc));
     } catch {
       setError('No se pudo crear el PDF. Inténtalo otra vez.');
     } finally {
       setBusy(null);
     }
-  }, []);
+  };
 
-  const download = useCallback(async (doc: DocumentData) => {
-    setBusy('download');
-    setError(null);
-    try {
-      const { blob, fileName } = await renderPdf(doc);
+  const share = (doc: DocumentData) =>
+    run('share', doc, async ({ blob, fileName }) => {
+      const file = new File([blob], fileName, { type: 'application/pdf' });
+      if ((await shareFile(file, fileName)) === 'unsupported') setFallback({ blob, fileName, doc });
+    });
+
+  const download = (doc: DocumentData) =>
+    run('download', doc, ({ blob, fileName }) => {
       downloadBlob(blob, fileName);
-    } catch {
-      setError('No se pudo crear el PDF. Inténtalo otra vez.');
-    } finally {
-      setBusy(null);
-    }
-  }, []);
+    });
 
   return {
     busy,

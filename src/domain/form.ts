@@ -56,13 +56,9 @@ export const formValuesSchema = z.object({
 export type FormValues = z.infer<typeof formValuesSchema>;
 export type FormItem = FormValues['items'][number];
 
-export function newItemId(): string {
-  return crypto.randomUUID();
-}
-
 export function emptyItem(): FormItem {
   return {
-    id: newItemId(),
+    id: crypto.randomUUID(),
     description: '',
     unit: 'sq ft',
     otherUnit: '',
@@ -142,15 +138,7 @@ export function toLenientDocument(values: FormValues): DocumentData {
       email: values.customer.email.trim(),
     },
     jobDescription: values.jobDescription.trim(),
-    items: values.items.map((item): LineItem => ({
-      id: item.id,
-      description: item.description.trim(),
-      unit: item.unit,
-      otherUnit: item.otherUnit.trim(),
-      qtyHundredths: item.unit === 'lump sum' ? 0 : (parseQtyToHundredths(item.qty) ?? 0),
-      unitPriceCents: item.unit === 'lump sum' ? 0 : (parseMoneyToCents(item.unitPrice) ?? 0),
-      lumpSumCents: item.unit === 'lump sum' ? (parseMoneyToCents(item.lumpSum) ?? 0) : 0,
-    })),
+    items: values.items.map(toLenientItem),
     deposit: depositOf(values),
     terms: values.terms.trim(),
   };
@@ -165,7 +153,7 @@ function isRealDate(iso: string): boolean {
   return date.getFullYear() === y && date.getMonth() === m - 1 && date.getDate() === d;
 }
 
-const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+export const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 type Issue = { path: (string | number)[]; message: string };
 

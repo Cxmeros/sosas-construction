@@ -45,10 +45,6 @@ export function splitDescription(description: string): { description: string; no
   };
 }
 
-function percentLabel(percentHundredths: number): string {
-  return `${formatQty(percentHundredths)}%`;
-}
-
 export function buildPdfModel(doc: DocumentData): PdfModel {
   const invoice = doc.type === 'invoice';
   const totals = computeTotals(doc.items, doc.deposit);
@@ -70,7 +66,7 @@ export function buildPdfModel(doc: DocumentData): PdfModel {
   let deposit: PdfModel['deposit'] = null;
   if (doc.deposit.mode !== 'none') {
     const pct =
-      doc.deposit.mode === 'percent' ? ` (${percentLabel(doc.deposit.percentHundredths)})` : '';
+      doc.deposit.mode === 'percent' ? ` (${formatQty(doc.deposit.percentHundredths)}%)` : '';
     deposit = {
       label: (invoice ? 'Deposit received' : 'Deposit required') + pct,
       value: (invoice && totals.depositCents > 0 ? '−' : '') + formatCents(totals.depositCents),

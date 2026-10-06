@@ -1,3 +1,5 @@
+import { EMAIL } from '../domain/form';
+
 /** Web Share API with a file (WhatsApp, Messages, Mail…), when the device supports it. */
 export function canShareFile(file: File): boolean {
   try {
@@ -49,6 +51,6 @@ export function whatsappUrl(phone: string, text: string): string | null {
 
 export function mailtoUrl(email: string, subject: string, body: string): string | null {
   const address = email.trim();
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(address)) return null;
+  if (!EMAIL.test(address)) return null;
   return `mailto:${encodeURIComponent(address)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }

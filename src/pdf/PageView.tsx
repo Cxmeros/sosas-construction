@@ -2,6 +2,7 @@ import type { CSSProperties, ReactNode } from 'react';
 import { COLORS as C, COMPANY } from '../config/company';
 import { formatCents } from '../domain/money';
 import logoUrl from '../assets/logo-placeholder.png';
+import { Corners } from '../ui/Corners';
 import { COLS, PAGE, TYPE } from './layout';
 import type { PdfPage } from './layout';
 import type { PdfModel, PdfRow } from './model';
@@ -31,17 +32,6 @@ const cell = (align: 'left' | 'right', first = false, last = false): CSSProperti
   textAlign: align,
   ...(first ? { paddingRight: 8 } : {}),
 });
-
-function Corners() {
-  return (
-    <>
-      <i className="corner tl" />
-      <i className="corner tr" />
-      <i className="corner bl" />
-      <i className="corner br" />
-    </>
-  );
-}
 
 function FullHeader({ model }: { model: PdfModel }) {
   const meta: [string, string][] = [
