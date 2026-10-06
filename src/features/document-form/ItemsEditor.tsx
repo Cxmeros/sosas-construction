@@ -5,7 +5,6 @@ import { emptyItem, toLenientItem, type FormItem, type FormValues } from '../../
 import { LIMITS } from '../../domain/limits';
 import { formatCents } from '../../domain/money';
 import { UNITS, type DocumentData } from '../../domain/types';
-import { Corners } from '../../ui/Corners';
 import { DownIcon, GripIcon, PlusIcon, TrashIcon, UndoIcon, UpIcon } from '../../ui/Icons';
 import { errorAt, Field, FieldError, invalidProps, SectionTitle } from './fields';
 
@@ -148,8 +147,7 @@ export function ItemsEditor({
             {undo && <div className="self-start">{undoToast}</div>}
           </>
         ) : (
-          <div className="blueprint border border-line bg-surface">
-            <Corners />
+          <div className="overflow-hidden rounded-[4px] border border-line bg-surface">
             <div className="items-grid h-10 items-center bg-walnut-900 px-2 text-[13px] font-bold tracking-[0.06em] text-white uppercase">
               <span />
               {/* Each label sits where the text inside its box starts (field padding + border). */}
@@ -204,7 +202,10 @@ export function ItemsEditor({
   }
 
   return (
-    <section className="flex flex-col gap-3" aria-labelledby="items-title-m">
+    <section
+      className="flex flex-col gap-3 border-t-[3px] border-walnut-700 pt-3"
+      aria-labelledby="items-title-m"
+    >
       <div id="items-title-m">
         <SectionTitle n="04" aside={fields.length > 0 ? countLabel : undefined}>
           Partidas
@@ -266,10 +267,9 @@ function MobileCard({ form, index, count, item, onMove, onDelete }: RowProps) {
 
   return (
     <li
-      className={`blueprint flex flex-col bg-surface ${hasError ? 'border-2 border-error' : 'border border-line'}`}
+      className={`flex flex-col overflow-hidden rounded-[4px] bg-surface ${hasError ? 'border-2 border-error' : 'border border-line'}`}
       aria-label={`Partida ${String(index + 1)}`}
     >
-      <Corners />
       <div
         className={`flex items-center gap-1 border-b border-line-faint pl-3 ${hasError ? 'bg-error-bg' : 'bg-paper'}`}
       >

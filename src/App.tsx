@@ -237,7 +237,7 @@ export function App() {
             type="button"
             onClick={share}
             disabled={actions.busy !== null}
-            className="blueprint btn-cond min-h-12 bg-orange-700 px-[22px] text-xl text-white hover:bg-orange-800 disabled:opacity-70"
+            className="btn-cond min-h-12 rounded-field bg-orange-700 px-[22px] text-xl text-white hover:bg-orange-800 disabled:opacity-70"
           >
             {actions.busy === 'share' ? 'Creando…' : 'Compartir'}
           </button>
