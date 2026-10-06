@@ -147,7 +147,7 @@ export function ItemsEditor({
             {undo && <div className="self-start">{undoToast}</div>}
           </>
         ) : (
-          <div className="overflow-hidden rounded-[4px] border border-line bg-surface">
+          <div className="border border-line bg-surface">
             <div className="items-grid h-10 items-center bg-walnut-900 px-2 text-[13px] font-bold tracking-[0.06em] text-white uppercase">
               <span />
               {/* Each label sits where the text inside its box starts (field padding + border). */}
@@ -264,7 +264,7 @@ function MobileCard({ form, index, count, item, onMove, onDelete }: RowProps) {
 
   return (
     <li
-      className={`flex flex-col overflow-hidden rounded-[4px] bg-surface ${hasError ? 'border-2 border-error' : 'border border-line'}`}
+      className={`flex flex-col bg-surface ${hasError ? 'border-2 border-error' : 'border border-line'}`}
       aria-label={`Trabajo ${String(index + 1)}`}
     >
       <div

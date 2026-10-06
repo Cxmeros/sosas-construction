@@ -81,7 +81,7 @@ export function SectionTitle({
 export function Section({ desktop, children }: { desktop: boolean; children: ReactNode }) {
   if (desktop) return <section className="flex flex-col gap-3">{children}</section>;
   return (
-    <section className="flex flex-col gap-3.5 rounded-[4px] border border-line p-4">
+    <section className="flex flex-col gap-3.5 border border-line p-4">
       {children}
     </section>
   );
