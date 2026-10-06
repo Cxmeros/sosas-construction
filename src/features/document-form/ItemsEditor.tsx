@@ -90,7 +90,7 @@ export function ItemsEditor({
 
   const listError = errorAt(errors, 'items.root') ?? errorAt(errors, 'items');
   const full = fields.length >= LIMITS.maxItems;
-  const countLabel = fields.length === 1 ? '1 partida' : `${String(fields.length)} partidas`;
+  const countLabel = fields.length === 1 ? '1 trabajo' : `${String(fields.length)} trabajos`;
 
   const undoToast = undo && (
     <div
@@ -103,8 +103,8 @@ export function ItemsEditor({
     >
       <span className="min-w-0 truncate text-base">
         {undo.item.description.trim()
-          ? `“${undo.item.description.trim()}” eliminada`
-          : `Partida #${String(undo.index + 1)} eliminada`}
+          ? `“${undo.item.description.trim()}” eliminado`
+          : `Trabajo #${String(undo.index + 1)} eliminado`}
       </span>
       <button
         ref={undoButton}
@@ -120,7 +120,7 @@ export function ItemsEditor({
 
   const empty = fields.length === 0 && (
     <div className="flex flex-col items-center gap-3 border-[1.5px] border-dashed border-field px-4 py-6 text-center">
-      <span className="text-[17px] font-semibold">Aún no hay partidas</span>
+      <span className="text-[17px] font-semibold">Aún no hay trabajos</span>
       <span className="text-[15px] text-ink-muted">
         Agrega lo que vas a cobrar: piso, escaleras, material.
       </span>
@@ -129,7 +129,7 @@ export function ItemsEditor({
         onClick={add}
         className="btn-cond flex min-h-[52px] items-center justify-center gap-2 self-stretch bg-orange-700 text-xl text-white hover:bg-orange-800"
       >
-        <PlusIcon /> Agregar primera partida
+        <PlusIcon /> Agregar primer trabajo
       </button>
     </div>
   );
@@ -138,7 +138,7 @@ export function ItemsEditor({
     return (
       <section className="flex flex-col gap-3" aria-labelledby="items-title">
         <div id="items-title">
-          <SectionTitle n="04">Partidas</SectionTitle>
+          <SectionTitle n="04">Trabajos</SectionTitle>
         </div>
         <FieldError path="items" message={listError} />
         {fields.length === 0 ? (
@@ -187,7 +187,7 @@ export function ItemsEditor({
                 className="min-h-12 flex-none rounded-field border-[1.5px] border-walnut-700 bg-surface px-4 text-base font-semibold text-walnut-700 hover:bg-cream disabled:opacity-50"
               >
                 <span className="flex items-center gap-1.5">
-                  <PlusIcon size={20} /> Agregar partida
+                  <PlusIcon size={20} /> Agregar trabajo
                 </span>
               </button>
               {undoToast}
@@ -202,13 +202,10 @@ export function ItemsEditor({
   }
 
   return (
-    <section
-      className="flex flex-col gap-3 border-t-[3px] border-walnut-700 pt-3"
-      aria-labelledby="items-title-m"
-    >
+    <section className="flex flex-col gap-3" aria-labelledby="items-title-m">
       <div id="items-title-m">
         <SectionTitle n="04" aside={fields.length > 0 ? countLabel : undefined}>
-          Partidas
+          Trabajos
         </SectionTitle>
       </div>
       <FieldError path="items" message={listError} />
@@ -238,10 +235,10 @@ export function ItemsEditor({
           disabled={full}
           className="btn-cond flex min-h-[52px] items-center justify-center gap-2 rounded-field border-[1.5px] border-walnut-700 bg-surface text-xl text-walnut-700 hover:bg-cream disabled:opacity-50"
         >
-          <PlusIcon /> Agregar partida
+          <PlusIcon /> Agregar trabajo
         </button>
       )}
-      {full && <span className="text-sm text-ink-muted">Máximo {LIMITS.maxItems} partidas.</span>}
+      {full && <span className="text-sm text-ink-muted">Máximo {LIMITS.maxItems} trabajos.</span>}
       {undoToast}
     </section>
   );
@@ -268,7 +265,7 @@ function MobileCard({ form, index, count, item, onMove, onDelete }: RowProps) {
   return (
     <li
       className={`flex flex-col overflow-hidden rounded-[4px] bg-surface ${hasError ? 'border-2 border-error' : 'border border-line'}`}
-      aria-label={`Partida ${String(index + 1)}`}
+      aria-label={`Trabajo ${String(index + 1)}`}
     >
       <div
         className={`flex items-center gap-1 border-b border-line-faint pl-3 ${hasError ? 'bg-error-bg' : 'bg-paper'}`}
@@ -280,7 +277,7 @@ function MobileCard({ form, index, count, item, onMove, onDelete }: RowProps) {
         </span>
         <button
           type="button"
-          aria-label={`Subir partida ${String(index + 1)}`}
+          aria-label={`Subir trabajo ${String(index + 1)}`}
           onClick={() => {
             onMove(index - 1);
           }}
@@ -291,7 +288,7 @@ function MobileCard({ form, index, count, item, onMove, onDelete }: RowProps) {
         </button>
         <button
           type="button"
-          aria-label={`Bajar partida ${String(index + 1)}`}
+          aria-label={`Bajar trabajo ${String(index + 1)}`}
           onClick={() => {
             onMove(index + 1);
           }}
@@ -302,7 +299,7 @@ function MobileCard({ form, index, count, item, onMove, onDelete }: RowProps) {
         </button>
         <button
           type="button"
-          aria-label={`Eliminar partida ${String(index + 1)}`}
+          aria-label={`Eliminar trabajo ${String(index + 1)}`}
           onClick={onDelete}
           className="grid size-12 place-items-center border-l border-line-faint text-error"
         >
@@ -439,14 +436,14 @@ function DesktopRow({
             e.dataTransfer.setData('text/plain', String(index));
           }}
           onKeyDown={onHandleKey}
-          aria-label={`Mover partida ${String(index + 1)} (flechas arriba y abajo)`}
+          aria-label={`Mover trabajo ${String(index + 1)} (flechas arriba y abajo)`}
           title="Arrastra para reordenar"
           className="grid h-12 cursor-grab place-items-center text-field"
         >
           <GripIcon size={20} />
         </button>
         <textarea
-          aria-label={`Descripción partida ${String(index + 1)}`}
+          aria-label={`Descripción trabajo ${String(index + 1)}`}
           rows={1}
           maxLength={200}
           className="field min-h-12 resize-none px-2.5 text-base field-sizing-content"
@@ -455,14 +452,14 @@ function DesktopRow({
         />
         {lump ? (
           <input
-            aria-label={`Cantidad partida ${String(index + 1)}`}
+            aria-label={`Cantidad trabajo ${String(index + 1)}`}
             value="—"
             disabled
             className="field num px-2.5 text-base"
           />
         ) : (
           <input
-            aria-label={`Cantidad partida ${String(index + 1)}`}
+            aria-label={`Cantidad trabajo ${String(index + 1)}`}
             inputMode="decimal"
             autoComplete="off"
             maxLength={20}
@@ -473,7 +470,7 @@ function DesktopRow({
         )}
         <div className="flex min-w-0 flex-col gap-1">
           <select
-            aria-label={`Unidad partida ${String(index + 1)}`}
+            aria-label={`Unidad trabajo ${String(index + 1)}`}
             className="field px-1.5 text-base"
             {...register(p('unit'))}
           >
@@ -481,7 +478,7 @@ function DesktopRow({
           </select>
           {item.unit === 'other' && (
             <input
-              aria-label={`Unidad escrita partida ${String(index + 1)}`}
+              aria-label={`Unidad escrita trabajo ${String(index + 1)}`}
               placeholder="ej. rooms"
               maxLength={15}
               className="field px-2.5 text-base"
@@ -492,14 +489,14 @@ function DesktopRow({
         </div>
         {lump ? (
           <input
-            aria-label={`Precio partida ${String(index + 1)}`}
+            aria-label={`Precio trabajo ${String(index + 1)}`}
             value="—"
             disabled
             className="field num px-2.5 text-base"
           />
         ) : (
           <input
-            aria-label={`Precio partida ${String(index + 1)}`}
+            aria-label={`Precio trabajo ${String(index + 1)}`}
             inputMode="decimal"
             autoComplete="off"
             maxLength={20}
@@ -510,7 +507,7 @@ function DesktopRow({
         )}
         {lump ? (
           <input
-            aria-label={`Monto partida ${String(index + 1)}`}
+            aria-label={`Monto trabajo ${String(index + 1)}`}
             inputMode="decimal"
             autoComplete="off"
             maxLength={20}
@@ -523,7 +520,7 @@ function DesktopRow({
         )}
         <button
           type="button"
-          aria-label={`Eliminar partida ${String(index + 1)}`}
+          aria-label={`Eliminar trabajo ${String(index + 1)}`}
           onClick={onDelete}
           className="grid size-12 place-items-center text-error hover:bg-error-bg"
         >

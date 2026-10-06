@@ -181,7 +181,7 @@ export function validateForm(values: FormValues): Issue[] {
   if (values.customer.email.trim() && !EMAIL.test(values.customer.email.trim()))
     add(['customer', 'email'], 'Revisa el correo, ej. nombre@correo.com');
 
-  if (values.items.length < LIMITS.minItems) add(['items'], 'Agrega al menos una partida.');
+  if (values.items.length < LIMITS.minItems) add(['items'], 'Agrega al menos un trabajo.');
 
   values.items.forEach((item, i) => {
     const at = (field: string) => ['items', i, field];

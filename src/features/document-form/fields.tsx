@@ -77,11 +77,11 @@ export function SectionTitle({
   );
 }
 
-/** Mobile sections open with a heavy rule (like the PDF); on desktop they sit directly on the page. */
+/** Mobile section card; on desktop sections sit directly on the page. */
 export function Section({ desktop, children }: { desktop: boolean; children: ReactNode }) {
   if (desktop) return <section className="flex flex-col gap-3">{children}</section>;
   return (
-    <section className="flex flex-col gap-3.5 border-t-[3px] border-walnut-700 pt-3">
+    <section className="flex flex-col gap-3.5 rounded-[4px] border border-line p-4">
       {children}
     </section>
   );

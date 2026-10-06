@@ -320,8 +320,8 @@ export function App() {
           <span className="text-[13px] text-oak-300">
             {totals.totalCents === 0
               ? doc.items.length > 0
-                ? 'Completa las partidas'
-                : 'Agrega partidas'
+                ? 'Completa los trabajos'
+                : 'Agrega trabajos'
               : doc.deposit.mode === 'none'
                 ? 'Sin anticipo'
                 : `${labels.balance}: ${formatCents(totals.balanceCents)}`}

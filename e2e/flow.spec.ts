@@ -99,7 +99,7 @@ test('full flow: estimate → PDF → convert to invoice → new document', asyn
   await page.getByRole('button', { name: 'Sí, empezar nuevo' }).click();
   await expect(page.getByLabel('Nombre')).toHaveValue('');
   await expect(page.getByLabel('Número')).toHaveValue(`EST-${today()}-02`);
-  await expect(page.getByText('Aún no hay partidas')).toBeVisible();
+  await expect(page.getByText('Aún no hay trabajos')).toBeVisible();
 
   await expectNoErrors(errors);
 });
@@ -109,7 +109,7 @@ test('validation errors appear next to each field, in Spanish', async ({ page },
   await page.getByRole('button', { name: mobile ? 'Ver PDF' : 'Compartir' }).click();
   await expect(page.getByRole('alert')).toContainText('Faltan 2 datos para crear el PDF');
   await expect(page.getByText('Escribe el nombre del cliente.')).toBeVisible();
-  await expect(page.getByText('Agrega al menos una partida.')).toBeVisible();
+  await expect(page.getByText('Agrega al menos un trabajo.')).toBeVisible();
   await expect(page.getByLabel('Nombre')).toHaveAttribute('aria-invalid', 'true');
   await expect(page.getByLabel('Nombre')).toBeFocused();
 
@@ -138,7 +138,7 @@ test('items: lump sum, other, delete with undo, reorder', async ({ page }, info)
   await first.unit.selectOption('lump sum');
   await expect(first.amount).toBeVisible();
   if (mobile) await expect(first.qty).toHaveCount(0);
-  else await expect(page.getByLabel('Cantidad partida 1')).toBeDisabled();
+  else await expect(page.getByLabel('Cantidad trabajo 1')).toBeDisabled();
   await first.amount.fill('3000');
 
   await second.description.fill('Furniture moving');
@@ -151,16 +151,16 @@ test('items: lump sum, other, delete with undo, reorder', async ({ page }, info)
     await expect(page.getByLabel('Vista previa del PDF').getByText('rooms')).toBeAttached();
 
   // Reorder: arrows on mobile, keyboard on the drag handle on desktop.
-  if (mobile) await page.getByRole('button', { name: 'Bajar partida 1' }).click();
+  if (mobile) await page.getByRole('button', { name: 'Bajar trabajo 1' }).click();
   else {
-    await page.getByRole('button', { name: /Mover partida 1/ }).focus();
+    await page.getByRole('button', { name: /Mover trabajo 1/ }).focus();
     await page.keyboard.press('ArrowDown');
   }
   await expect(item(page, 1, mobile).description).toHaveValue('Furniture moving');
   await expect(item(page, 2, mobile).description).toHaveValue('Stairs');
 
-  await page.getByRole('button', { name: 'Eliminar partida 1' }).click();
-  await expect(page.getByText('“Furniture moving” eliminada')).toBeVisible();
+  await page.getByRole('button', { name: 'Eliminar trabajo 1' }).click();
+  await expect(page.getByText('“Furniture moving” eliminado')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Deshacer' })).toBeFocused();
   await expect(item(page, 1, mobile).description).toHaveValue('Stairs');
   await page.getByRole('button', { name: 'Deshacer' }).click();

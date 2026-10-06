@@ -31,6 +31,4 @@ export const COLORS = {
   error: '#B3261E',
   errorBg: '#FBE9E7',
   success: '#2F6B3A',
-  /** Registration "+" marks: ink at 55 % over white. */
-  corner: '#847F7D',
 } as const;

@@ -84,44 +84,6 @@ const col = (width: number, align: 'left' | 'right', last = false): Style => ({
   textAlign: align,
 });
 
-/** "+" registration marks outside the corners of a box. */
-function Corners() {
-  const arm = pt(11);
-  const off = -pt(6);
-  const mark = (pos: Style) => (
-    <View style={{ position: 'absolute', width: arm, height: arm, ...pos }}>
-      <View
-        style={{
-          position: 'absolute',
-          left: pt(5),
-          top: 0,
-          width: pt(1),
-          height: arm,
-          backgroundColor: C.corner,
-        }}
-      />
-      <View
-        style={{
-          position: 'absolute',
-          top: pt(5),
-          left: 0,
-          height: pt(1),
-          width: arm,
-          backgroundColor: C.corner,
-        }}
-      />
-    </View>
-  );
-  return (
-    <>
-      {mark({ top: off, left: off })}
-      {mark({ top: off, right: off })}
-      {mark({ bottom: off, left: off })}
-      {mark({ bottom: off, right: off })}
-    </>
-  );
-}
-
 function FullHeader({ model, logoSrc }: { model: PdfModel; logoSrc: string }) {
   const meta: [string, string][] = [
     ['NO.', model.number],
@@ -282,7 +244,6 @@ function PdfPageView({
               gap: pt(6),
             }}
           >
-            <Corners />
             <Text style={s.sectionLabel}>CUSTOMER INFORMATION</Text>
             <Text style={{ fontSize: pt(TYPE.customerName), fontWeight: 700 }}>
               {model.customer.name}
@@ -364,7 +325,6 @@ function PdfPageView({
             }}
             wrap={false}
           >
-            <Corners />
             <View
               style={{
                 flexDirection: 'row',

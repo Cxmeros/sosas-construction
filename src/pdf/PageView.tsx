@@ -2,7 +2,6 @@ import type { CSSProperties, ReactNode } from 'react';
 import { COLORS as C, COMPANY } from '../config/company';
 import { formatCents } from '../domain/money';
 import logoUrl from '../assets/logo-placeholder.png';
-import { Corners } from '../ui/Corners';
 import { COLS, PAGE, TYPE } from './layout';
 import type { PdfPage } from './layout';
 import type { PdfModel, PdfRow } from './model';
@@ -193,7 +192,6 @@ export function PageView({ model, page }: { model: PdfModel; page: PdfPage }) {
         <>
           <FullHeader model={model} />
           <div
-            className="blueprint"
             style={{
               display: 'flex',
               flexDirection: 'column',
@@ -202,7 +200,6 @@ export function PageView({ model, page }: { model: PdfModel; page: PdfPage }) {
               border: `1.5px solid ${C.ink}`,
             }}
           >
-            <Corners />
             <span style={sectionLabel}>CUSTOMER INFORMATION</span>
             <strong style={{ fontSize: TYPE.customerName }}>{model.customer.name}</strong>
             {model.customer.address && <span>{model.customer.address}</span>}
@@ -269,7 +266,6 @@ export function PageView({ model, page }: { model: PdfModel; page: PdfPage }) {
       {page.showTotals && (
         <>
           <div
-            className="blueprint"
             style={{
               alignSelf: 'flex-end',
               width: 340,
@@ -278,7 +274,6 @@ export function PageView({ model, page }: { model: PdfModel; page: PdfPage }) {
               border: `1.5px solid ${C.ink}`,
             }}
           >
-            <Corners />
             <div
               style={{
                 display: 'flex',
