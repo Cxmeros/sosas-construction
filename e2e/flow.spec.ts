@@ -37,7 +37,7 @@ test('full flow: estimate → PDF → convert to invoice → new document', asyn
 
   if (mobile) {
     await page.getByRole('button', { name: 'Ver PDF' }).click();
-    await expect(page.getByText(`Estimate_${number}_Margaret-Kelly.pdf`)).toBeVisible();
+    await expect(page.getByText('Para Margaret Kelly')).toBeVisible();
   }
   const preview = page.getByLabel('Vista previa del PDF');
   await expect(preview.getByText('WORK ESTIMATE')).toBeVisible();
@@ -66,23 +66,33 @@ test('full flow: estimate → PDF → convert to invoice → new document', asyn
   }
 
   // Convert: keeps customer and items; new INV number, invoice terms, estimate reference.
+  // The requested deposit is never carried over as money received: it asks, with a hint.
   await page.getByRole('button', { name: 'Convertir en Invoice' }).click();
   await expect(page.getByRole('status').getByText(`INV-${today()}-01`)).toBeVisible();
+  // "Deshacer" brings the estimate back untouched.
+  await page.getByRole('button', { name: 'Deshacer' }).click();
+  await expect(page.getByLabel('Número')).toHaveValue(number);
+  if (mobile) await page.getByRole('button', { name: 'Ver PDF' }).click();
+  await page.getByRole('button', { name: 'Convertir en Invoice' }).click();
+  await expect(page.getByRole('status').getByText(`INV-${today()}-02`)).toBeVisible();
+  await expect(page.getByLabel('¿Cuánto te pagó de anticipo? $')).toBeFocused();
+  await page.getByRole('button', { name: /Usar \$5,507\.03/ }).click();
+  await expect(page.getByLabel('¿Cuánto te pagó de anticipo? $')).toHaveValue('5507.03');
+  await expect(page.getByLabel('Nombre')).toHaveValue('Margaret Kelly');
+  await expect(page.getByLabel('Número')).toHaveValue(`INV-${today()}-02`);
+  if (mobile) await page.getByRole('button', { name: 'Ver PDF' }).click();
   await expect(preview.getByText('INVOICE', { exact: true })).toBeVisible();
   await expect(preview.getByText('ESTIMATE REF.')).toBeVisible();
   await expect(preview.getByText(number).first()).toBeVisible();
   await expect(
     preview.getByText('Payment is due upon receipt. Thank you for your business.'),
   ).toBeVisible();
-  await expect(preview.getByText('Deposit received (30%)')).toBeVisible();
+  await expect(preview.getByText('Deposit received', { exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Convertir en Invoice' })).toHaveCount(0);
-  if (mobile) await page.getByRole('button', { name: 'Editar' }).click();
-  await expect(page.getByLabel('Nombre')).toHaveValue('Margaret Kelly');
-  await expect(page.getByLabel('Número')).toHaveValue(`INV-${today()}-01`);
 
-  // New document asks first, then clears.
-  if (mobile) await page.getByRole('button', { name: 'Ver PDF' }).click();
+  // New document asks first (focus on the safe choice), then clears.
   await page.getByRole('button', { name: 'Nuevo documento' }).click();
+  await expect(page.getByRole('dialog').getByRole('button', { name: 'Cancelar' })).toBeFocused();
   await page.getByRole('dialog').getByRole('button', { name: 'Cancelar' }).click();
   await expect(page.getByRole('dialog')).toBeHidden();
   await page.getByRole('button', { name: 'Nuevo documento' }).click();
@@ -112,6 +122,9 @@ test('validation errors appear next to each field, in Spanish', async ({ page },
   const it = item(page, 1, mobile);
   await it.description.fill('Install and refinish');
   await it.qty.fill('1625');
+  // A new item isn't flagged while it's being filled in; the next attempt names what's missing.
+  await expect(page.getByText('Falta el precio por sq ft.')).toBeHidden();
+  await page.getByRole('button', { name: mobile ? 'Ver PDF' : 'Compartir' }).click();
   await expect(page.getByText('Falta el precio por sq ft.')).toBeVisible();
 });
 
@@ -125,7 +138,7 @@ test('items: lump sum, other, delete with undo, reorder', async ({ page }, info)
   await first.unit.selectOption('lump sum');
   await expect(first.amount).toBeVisible();
   if (mobile) await expect(first.qty).toHaveCount(0);
-  else await expect(page.getByLabel('Cantidad', { exact: true })).toBeDisabled();
+  else await expect(page.getByLabel('Cantidad partida 1')).toBeDisabled();
   await first.amount.fill('3000');
 
   await second.description.fill('Furniture moving');
@@ -147,7 +160,8 @@ test('items: lump sum, other, delete with undo, reorder', async ({ page }, info)
   await expect(item(page, 2, mobile).description).toHaveValue('Stairs');
 
   await page.getByRole('button', { name: 'Eliminar partida 1' }).click();
-  await expect(page.getByText('Partida #1 eliminada')).toBeVisible();
+  await expect(page.getByText('“Furniture moving” eliminada')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Deshacer' })).toBeFocused();
   await expect(item(page, 1, mobile).description).toHaveValue('Stairs');
   await page.getByRole('button', { name: 'Deshacer' }).click();
   await expect(item(page, 1, mobile).description).toHaveValue('Furniture moving');
@@ -159,7 +173,7 @@ test('draft survives a reload and can be discarded', async ({ page }, info) => {
   await page.getByLabel('Nombre').fill('Margaret Kelly');
   await addItem(page);
   await item(page, 1, mobile).description.fill('Install and refinish');
-  await expect(page.getByText('Borrador guardado')).toBeVisible();
+  await expect(page.getByText(/guardado/i)).toBeVisible();
 
   await page.reload();
   await expect(page.getByText('Recuperamos tu borrador')).toBeVisible();

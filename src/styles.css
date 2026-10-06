@@ -65,7 +65,7 @@
   --color-line-soft: #d8cbbb;
   --color-line-faint: #e4d8ca;
   --color-field: #7a6656;
-  --color-placeholder: #8a7868;
+  --color-placeholder: #76604f;
   --color-ink: #1f1712;
   --color-ink-muted: #5c4a3d;
   --color-error: #b3261e;
@@ -208,8 +208,9 @@
     letter-spacing: 0.02em;
     color: var(--color-walnut-700);
   }
+  /* Darker than the brand orange so it holds up in sunlight (7:1 on paper). */
   .section-title > .n {
-    color: var(--color-orange-700);
+    color: var(--color-orange-800);
   }
   .btn-cond {
     font-family: var(--font-cond);

@@ -15,7 +15,11 @@ export function Dialog({ open, onClose, labelledBy, children }: DialogProps) {
   useEffect(() => {
     const dialog = ref.current;
     if (!dialog) return;
-    if (open && !dialog.open) dialog.showModal();
+    if (open && !dialog.open) {
+      dialog.showModal();
+      // showModal() focuses the first button, overriding autoFocus; put focus on the safe choice.
+      dialog.querySelector<HTMLElement>('[data-autofocus]')?.focus();
+    }
     if (!open && dialog.open) dialog.close();
   }, [open]);
 
@@ -61,19 +65,19 @@ export function ConfirmDialog({
         {title}
       </h2>
       <p className="m-0 text-base text-ink-muted">{message}</p>
-      <div className="mt-2 grid grid-cols-[1.2fr_1fr] gap-2">
+      <div className="mt-2 grid grid-cols-[1fr_1.2fr] gap-2">
         <button
           type="button"
           onClick={onConfirm}
-          className="min-h-12 rounded-field bg-orange-700 text-base font-bold text-white hover:bg-orange-800"
+          className="min-h-12 rounded-field border-2 border-error bg-surface text-base font-bold text-error hover:bg-error-bg"
         >
           {confirmLabel}
         </button>
         <button
           type="button"
           onClick={onCancel}
-          autoFocus
-          className="min-h-12 rounded-field border-[1.5px] border-walnut-700 bg-surface text-base font-semibold text-walnut-700 hover:bg-cream"
+          data-autofocus
+          className="min-h-12 rounded-field bg-walnut-700 text-base font-bold text-white hover:bg-walnut-900"
         >
           Cancelar
         </button>

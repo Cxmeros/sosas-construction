@@ -1,4 +1,7 @@
 import { execFileSync } from 'node:child_process';
+import { copyFileSync, mkdtempSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { expect, type Page, type TestInfo } from '@playwright/test';
 
 export const isMobile = (info: TestInfo) => info.project.name === 'mobile-375';
@@ -36,7 +39,7 @@ export function item(page: Page, n: number, mobile: boolean) {
       unit: card.getByRole('combobox'),
       otherUnit: card.getByLabel('Escribe la unidad'),
       qty: card.getByLabel('Cantidad'),
-      price: card.getByLabel('Precio $'),
+      price: card.getByLabel(/^Precio por/),
       amount: card.getByLabel('Monto total $'),
     };
   }
@@ -79,7 +82,10 @@ export async function fillSample(page: Page, mobile: boolean) {
 
 /** Text of a downloaded PDF, via poppler (whitespace removed: labels are letter-spaced). */
 export function pdfText(file: string): string {
-  return execFileSync('pdftotext', [file, '-'], { encoding: 'utf8' }).replace(/\s+/g, '');
+  // Poppler on Windows can't open paths with non-ASCII characters (test titles contain "→").
+  const plain = join(mkdtempSync(join(tmpdir(), 'pdf-')), 'doc.pdf');
+  copyFileSync(file, plain);
+  return execFileSync('pdftotext', [plain, '-'], { encoding: 'utf8' }).replace(/\s+/g, '');
 }
 
 export async function expectNoErrors(errors: string[]) {

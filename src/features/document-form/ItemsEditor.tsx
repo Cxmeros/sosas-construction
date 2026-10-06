@@ -11,7 +11,7 @@ import { errorAt, Field, FieldError, invalidProps, SectionTitle } from './fields
 
 type Form = UseFormReturn<FormValues, unknown, DocumentData>;
 
-const UNDO_MS = 6000;
+const UNDO_MS = 10_000;
 
 function amountOf(item: FormItem): string {
   return formatCents(lineAmountCents(toLenientItem(item)));
@@ -38,7 +38,7 @@ export function ItemsEditor({
   desktop: boolean;
   totalLabel: string;
 }) {
-  const { control, watch, formState, setFocus } = form;
+  const { control, watch, formState, setFocus, clearErrors } = form;
   const { fields, append, remove, move, insert } = useFieldArray({
     control,
     name: 'items',
@@ -48,6 +48,8 @@ export function ItemsEditor({
   const errors = formState.errors;
   const [undo, setUndo] = useState<{ item: FormItem; index: number } | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const undoButton = useRef<HTMLButtonElement>(null);
+  const addButton = useRef<HTMLButtonElement>(null);
 
   useEffect(
     () => () => {
@@ -57,10 +59,12 @@ export function ItemsEditor({
   );
 
   const add = () => {
+    const n = fields.length;
     append(emptyItem(), { shouldFocus: false });
-    // Focus the new item's description.
     setTimeout(() => {
-      setFocus(`items.${fields.length}.description`);
+      // A new, untouched item is not an error yet, even after a failed "Ver PDF".
+      clearErrors(`items.${n}`);
+      setFocus(`items.${n}.description`);
     }, 0);
   };
 
@@ -70,7 +74,10 @@ export function ItemsEditor({
     remove(index);
     clearTimeout(timer.current);
     setUndo({ item, index });
+    // Keep keyboard and screen-reader users in place: focus moves to "Deshacer".
+    setTimeout(() => undoButton.current?.focus(), 0);
     timer.current = setTimeout(() => {
+      if (document.activeElement === undoButton.current) addButton.current?.focus();
       setUndo(null);
     }, UNDO_MS);
   };
@@ -91,15 +98,20 @@ export function ItemsEditor({
       role="status"
       className={
         desktop
-          ? 'flex items-center gap-1 bg-ink pl-3.5 text-white'
-          : 'fixed right-3 bottom-[calc(96px+env(safe-area-inset-bottom))] left-3 z-20 flex items-center justify-between bg-ink pr-1 pl-4 text-white shadow-[0_12px_32px_rgba(31,23,18,0.3)]'
+          ? 'flex min-w-0 items-center gap-1 bg-ink pl-3.5 text-white'
+          : 'fixed right-3 bottom-[calc(96px+env(safe-area-inset-bottom))] left-3 z-20 flex items-center justify-between border-2 border-walnut-900 bg-surface pr-1 pl-4 text-ink shadow-[0_12px_32px_rgba(31,23,18,0.35)]'
       }
     >
-      <span className="text-base">Partida #{undo.index + 1} eliminada</span>
+      <span className="min-w-0 truncate text-base">
+        {undo.item.description.trim()
+          ? `“${undo.item.description.trim()}” eliminada`
+          : `Partida #${String(undo.index + 1)} eliminada`}
+      </span>
       <button
+        ref={undoButton}
         type="button"
         onClick={doUndo}
-        className="flex min-h-12 items-center gap-1.5 px-3.5 text-base font-bold tracking-[0.04em] text-orange-400 uppercase"
+        className={`flex min-h-12 flex-none items-center gap-1.5 px-3.5 text-base font-bold tracking-[0.04em] uppercase ${desktop ? 'text-orange-400' : 'text-orange-800'}`}
       >
         <UndoIcon size={20} />
         Deshacer
@@ -142,7 +154,7 @@ export function ItemsEditor({
               <span />
               <span>Descripción</span>
               <span className="text-right">Cant.</span>
-              <span>Unidad</span>
+              <span className="pl-2">Unidad</span>
               <span className="text-right">Precio</span>
               <span className="text-right">Monto</span>
               <span />
@@ -169,10 +181,11 @@ export function ItemsEditor({
             </ol>
             <div className="flex items-center justify-between gap-3 p-2">
               <button
+                ref={addButton}
                 type="button"
                 onClick={add}
                 disabled={full}
-                className="min-h-12 rounded-field border-[1.5px] border-walnut-700 bg-surface px-4 text-base font-semibold text-walnut-700 hover:bg-cream disabled:opacity-50"
+                className="min-h-12 flex-none rounded-field border-[1.5px] border-walnut-700 bg-surface px-4 text-base font-semibold text-walnut-700 hover:bg-cream disabled:opacity-50"
               >
                 + Agregar partida
               </button>
@@ -215,6 +228,7 @@ export function ItemsEditor({
       </ol>
       {fields.length > 0 && (
         <button
+          ref={addButton}
           type="button"
           onClick={add}
           disabled={full}
@@ -257,7 +271,7 @@ function MobileCard({ form, index, count, item, onMove, onDelete }: RowProps) {
         className={`flex items-center gap-1 border-b border-line-faint pl-3 ${hasError ? 'bg-error-bg' : 'bg-paper'}`}
       >
         <span
-          className={`flex-1 font-cond text-xl font-bold ${hasError ? 'text-error' : 'text-orange-700'}`}
+          className={`flex-1 font-cond text-xl font-bold ${hasError ? 'text-error' : 'text-orange-800'}`}
         >
           #{index + 1}
         </span>
@@ -342,7 +356,11 @@ function MobileCard({ form, index, count, item, onMove, onDelete }: RowProps) {
                   {...register(p('qty'))}
                 />
               </Field>
-              <Field label="Precio $" path={p('unitPrice')} error={err('unitPrice')}>
+              <Field
+                label={`Precio por ${item.unit === 'other' ? item.otherUnit.trim() || 'unidad' : item.unit} $`}
+                path={p('unitPrice')}
+                error={err('unitPrice')}
+              >
                 <input
                   inputMode="decimal"
                   autoComplete="off"
@@ -433,7 +451,12 @@ function DesktopRow({
           {...register(p('description'))}
         />
         {lump ? (
-          <input aria-label="Cantidad" value="—" disabled className="field num px-2.5 text-base" />
+          <input
+            aria-label={`Cantidad partida ${String(index + 1)}`}
+            value="—"
+            disabled
+            className="field num px-2.5 text-base"
+          />
         ) : (
           <input
             aria-label={`Cantidad partida ${String(index + 1)}`}
@@ -465,7 +488,12 @@ function DesktopRow({
           )}
         </div>
         {lump ? (
-          <input aria-label="Precio" value="—" disabled className="field num px-2.5 text-base" />
+          <input
+            aria-label={`Precio partida ${String(index + 1)}`}
+            value="—"
+            disabled
+            className="field num px-2.5 text-base"
+          />
         ) : (
           <input
             aria-label={`Precio partida ${String(index + 1)}`}

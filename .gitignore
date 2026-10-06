@@ -6,3 +6,7 @@ playwright-report
 test-results
 *.tsbuildinfo
 .DS_Store
+
+# Machine-local tool config
+.claude/settings.local.json
+.impeccable/config.local.json

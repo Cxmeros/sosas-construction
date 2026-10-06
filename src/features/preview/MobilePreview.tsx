@@ -1,12 +1,16 @@
-import type { DocumentData } from '../../domain/types';
-import { buildPdfModel } from '../../pdf/model';
+import { formatCents } from '../../domain/money';
+import type { DocumentData, Totals } from '../../domain/types';
+import { NoticeToast, type Notice } from '../../ui/NoticeToast';
 import { BackIcon, ConvertIcon, DownloadIcon, FilePlusIcon, ShareIcon } from '../../ui/Icons';
+import { depositLabels } from '../document-form/DepositSection';
 import { PdfPreview } from './PdfPreview';
 
 interface Props {
   doc: DocumentData;
+  totals: Totals;
   busy: 'share' | 'download' | null;
-  notice: string | null;
+  notice: Notice | null;
+  onNoticeDone: () => void;
   onBack: () => void;
   onShare: () => void;
   onDownload: () => void;
@@ -14,23 +18,30 @@ interface Props {
   onNew: () => void;
 }
 
-/** Design 4a: full-screen PDF with Compartir, Descargar, Convertir en Invoice, Nuevo documento. */
+/**
+ * Design 4a: the PDF, with what matters before sending (who, how much) readable at a glance —
+ * the page itself is too small to read on a phone.
+ */
 export function MobilePreview({
   doc,
+  totals,
   busy,
   notice,
+  onNoticeDone,
   onBack,
   onShare,
   onDownload,
   onConvert,
   onNew,
 }: Props) {
-  const fileName = buildPdfModel(doc).fileName;
+  const invoice = doc.type === 'invoice';
+  const labels = depositLabels(invoice, doc);
   const secondary =
-    'flex min-h-16 flex-1 flex-col items-center justify-center gap-1 rounded-field border-[1.5px] border-oak-300 px-1 text-center text-sm font-semibold text-white disabled:opacity-60';
+    'flex min-h-14 flex-1 items-center justify-center gap-2 rounded-field border-[1.5px] border-oak-300 px-2 text-[15px] font-semibold text-white disabled:opacity-60';
+
   return (
     <div className="on-dark flex h-dvh flex-col bg-walnut-900">
-      <header className="flex h-16 flex-none items-center gap-1 pr-3 pl-1 text-white">
+      <header className="flex h-16 flex-none items-center gap-2 pr-1 pl-1 text-white">
         <button
           type="button"
           onClick={onBack}
@@ -38,16 +49,19 @@ export function MobilePreview({
         >
           <BackIcon /> Editar
         </button>
-        <span className="min-w-0 flex-1 truncate text-right text-sm text-oak-300">{fileName}</span>
-      </header>
-      {notice && (
-        <div
-          role="status"
-          className="flex-none bg-success px-4 py-2 text-[15px] font-semibold text-white"
+        <h1 className="m-0 min-w-0 flex-1 truncate text-right font-cond text-lg font-bold tracking-[0.02em] text-oak-300 uppercase">
+          {invoice ? 'Invoice' : 'Work Estimate'} {doc.number}
+        </h1>
+        <button
+          type="button"
+          onClick={onNew}
+          aria-label="Nuevo documento"
+          className="flex min-h-12 flex-none items-center gap-1.5 px-2.5 text-[15px] font-semibold text-oak-300"
         >
-          {notice}
-        </div>
-      )}
+          <FilePlusIcon size={20} /> Nuevo
+        </button>
+      </header>
+      <NoticeToast notice={notice} onDone={onNoticeDone} className="flex-none" />
       <main className="flex-1 overflow-auto bg-walnut-400 p-3">
         <PdfPreview
           doc={doc}
@@ -56,31 +70,51 @@ export function MobilePreview({
           }
         />
       </main>
-      <div className="flex flex-none flex-col gap-2.5 border-t-[3px] border-orange-500 p-3 pb-[calc(12px+env(safe-area-inset-bottom))]">
+      <div className="flex flex-none flex-col gap-3 border-t-[3px] border-orange-500 p-3 pb-[calc(12px+env(safe-area-inset-bottom))]">
+        {/* What the customer will see, readable in sunlight before sending. */}
+        <dl className="m-0 grid grid-cols-[1fr_auto] items-baseline gap-x-3 gap-y-0.5 px-1 tabular-nums">
+          <dt className="sr-only">Para</dt>
+          <dd className="col-span-2 m-0 truncate text-[17px] font-semibold text-white">
+            Para {doc.customer.name}
+          </dd>
+          <dt className="text-[15px] text-oak-300">Total</dt>
+          <dd className="m-0 text-right font-cond text-[22px] font-bold text-white">
+            {formatCents(totals.totalCents)}
+          </dd>
+          {doc.deposit.mode !== 'none' && (
+            <>
+              <dt className="text-[15px] text-oak-300">{labels.balance}</dt>
+              <dd className="m-0 text-right font-cond text-[22px] font-bold text-orange-300">
+                {formatCents(totals.balanceCents)}
+              </dd>
+            </>
+          )}
+        </dl>
         <button
           type="button"
           onClick={onShare}
           disabled={busy !== null}
-          className="btn-cond flex min-h-14 items-center justify-center gap-2.5 rounded-field bg-orange-400 text-[22px] text-ink hover:bg-orange-300 disabled:opacity-70"
+          className="btn-cond flex min-h-16 flex-col items-center justify-center rounded-field bg-orange-400 text-ink hover:bg-orange-300 disabled:opacity-70"
         >
-          <ShareIcon strokeWidth={1.75} />
-          {busy === 'share' ? 'Creando PDF…' : 'Compartir'}
+          <span className="flex items-center gap-2.5 text-[22px]">
+            <ShareIcon strokeWidth={1.75} />
+            {busy === 'share' ? 'Creando PDF…' : 'Compartir'}
+          </span>
+          <span className="font-sans text-[13px] font-semibold tracking-normal normal-case">
+            WhatsApp, Mensajes o correo
+          </span>
         </button>
         <div className="flex gap-2">
           <button type="button" onClick={onDownload} disabled={busy !== null} className={secondary}>
             <DownloadIcon />
             {busy === 'download' ? 'Creando…' : 'Descargar'}
           </button>
-          {doc.type === 'estimate' && (
-            <button type="button" onClick={onConvert} className={`${secondary} flex-[1.3]`}>
+          {!invoice && (
+            <button type="button" onClick={onConvert} className={secondary}>
               <ConvertIcon />
               Convertir en Invoice
             </button>
           )}
-          <button type="button" onClick={onNew} className={secondary}>
-            <FilePlusIcon />
-            Nuevo documento
-          </button>
         </div>
       </div>
     </div>
