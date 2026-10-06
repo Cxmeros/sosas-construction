@@ -2,6 +2,7 @@ import type { FieldErrors } from 'react-hook-form';
 import type { FormValues } from '../../domain/form';
 import { LIMITS } from '../../domain/limits';
 import { formatCents } from '../../domain/money';
+import { formatDateUS } from '../../domain/numbering';
 import type { DocType, Totals } from '../../domain/types';
 import { AlertIcon } from '../../ui/Icons';
 import type { DocumentState } from './useDocument';
@@ -93,6 +94,12 @@ export function DocumentForm({
         {...invalidProps('date', err('date'))}
         {...register('date')}
       />
+      {/* The phone may show the date as day/month; the PDF always prints month-day. */}
+      {values.date && (
+        <span className="text-sm font-normal text-ink-muted">
+          En el PDF: {formatDateUS(values.date)}
+        </span>
+      )}
     </Field>
   );
   const customer = (
@@ -166,11 +173,17 @@ export function DocumentForm({
     return (
       <div className="flex flex-col gap-6">
         <ErrorSummary count={errorCount} />
-        <div className="grid grid-cols-[280px_1fr_1fr] items-end gap-4">
-          {typeSwitch}
-          {numberField}
-          {dateField}
-        </div>
+        <Section desktop>
+          <SectionTitle n="01">Documento</SectionTitle>
+          <div className="grid grid-cols-[280px_1fr_1fr] items-start gap-4">
+            <div className="label">
+              <span aria-hidden="true">Tipo</span>
+              {typeSwitch}
+            </div>
+            {numberField}
+            {dateField}
+          </div>
+        </Section>
         <Section desktop>
           <SectionTitle n="02">Cliente</SectionTitle>
           <div className="grid grid-cols-2 gap-x-4 gap-y-3">{customer}</div>

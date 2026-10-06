@@ -28,8 +28,15 @@ function freshForm(): FormValues {
   );
 }
 
+/** Something the user actually typed; a blank item row alone doesn't count. */
 function hasContent(values: FormValues): boolean {
-  return values.customer.name.trim() !== '' || values.items.length > 0;
+  return (
+    values.customer.name.trim() !== '' ||
+    values.jobDescription.trim() !== '' ||
+    values.items.some((i) =>
+      [i.description, i.qty, i.unitPrice, i.lumpSum].some((v) => v.trim() !== ''),
+    )
+  );
 }
 
 interface Initial {

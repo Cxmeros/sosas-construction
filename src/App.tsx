@@ -164,21 +164,22 @@ export function App() {
             </span>
             <SavedIndicator savedAt={savedAt} />
           </div>
-          <div className="flex-1" />
-          {notice && (
-            <span role="status" className="text-[15px] font-semibold text-success">
-              {notice}
-            </span>
-          )}
+          {/* Starting over wipes the draft, so it sits apart from the export actions. */}
           <button
             type="button"
-            className={outline}
+            className="min-h-12 rounded-field px-3 text-[15px] font-semibold text-walnut-700 underline underline-offset-4 hover:bg-cream"
             onClick={() => {
               setConfirm('new');
             }}
           >
             Nuevo documento
           </button>
+          <div className="flex-1" />
+          {notice && (
+            <span role="status" className="text-[15px] font-semibold text-success">
+              {notice}
+            </span>
+          )}
           {doc.type === 'estimate' && (
             <button type="button" className={outline} onClick={convert}>
               Convertir en Invoice
@@ -265,9 +266,11 @@ export function App() {
             {formatCents(totals.totalCents)}
           </span>
           <span className="text-[13px] text-oak-300">
-            {doc.deposit.mode === 'none'
-              ? 'Sin anticipo'
-              : `${labels.balance}: ${formatCents(totals.balanceCents)}`}
+            {totals.totalCents === 0
+              ? 'Agrega partidas'
+              : doc.deposit.mode === 'none'
+                ? 'Sin anticipo'
+                : `${labels.balance}: ${formatCents(totals.balanceCents)}`}
           </span>
         </div>
         <button

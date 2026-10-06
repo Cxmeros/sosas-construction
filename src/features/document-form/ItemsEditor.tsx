@@ -424,10 +424,11 @@ function DesktopRow({
         >
           <GripIcon size={20} />
         </button>
-        <input
+        <textarea
           aria-label={`Descripción partida ${String(index + 1)}`}
+          rows={1}
           maxLength={200}
-          className="field px-2.5 text-base"
+          className="field min-h-12 resize-none px-2.5 text-base field-sizing-content"
           {...invalidProps(p('description'), err('description'))}
           {...register(p('description'))}
         />
