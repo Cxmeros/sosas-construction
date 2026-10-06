@@ -150,11 +150,11 @@ export function ItemsEditor({
           <div className="border border-line bg-surface">
             <div className="items-grid h-10 items-center bg-walnut-900 px-2 text-[13px] font-bold tracking-[0.06em] text-white uppercase">
               <span />
-              {/* Each label sits where the text inside its box starts (field padding + border). */}
+              {/* Labels over boxes are centered on the box; free text and amounts line up with their text. */}
               <span className="pl-[11.5px]">Descripción</span>
-              <span className="pr-[11.5px] text-right">Cant.</span>
-              <span className="pl-[7.5px]">Unidad</span>
-              <span className="pr-[11.5px] text-right">Precio</span>
+              <span className="text-center">Cant.</span>
+              <span className="text-center">Unidad</span>
+              <span className="text-center">Precio</span>
               <span className="text-right">Monto</span>
               <span />
             </div>
