@@ -42,10 +42,11 @@ export default defineConfig({
     react(),
     tailwindcss(),
     VitePWA({
-      // Updates install silently; the next launch uses the new version.
-      registerType: 'autoUpdate',
-      // External /registerSW.js (no inline script, CSP-safe).
-      injectRegister: 'script-defer',
+      // A new version waits until Danilo taps "Actualizar" (UpdateBar). Swapping it in silently
+      // under an open page could delete the old react-pdf chunk the page still needs.
+      registerType: 'prompt',
+      // Registered from the bundle (src/ui/UpdateBar.tsx): no inline script, CSP-safe.
+      injectRegister: false,
       // Behind Cloudflare Access the manifest request must carry the Access cookie.
       useCredentials: true,
       includeAssets: ['favicon.png', 'apple-touch-icon.png'],

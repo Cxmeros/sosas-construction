@@ -12,9 +12,11 @@ import { pageCountOf, PdfPreview } from './features/preview/PdfPreview';
 import { SharePanel } from './features/preview/SharePanel';
 import { usePdfActions } from './features/preview/usePdfActions';
 import { formatSavedAt } from './lib/format';
+import { saveDraft } from './lib/storage';
 import { ConfirmDialog } from './ui/Dialog';
 import { CheckIcon, FileIcon, FilePlusIcon, UndoIcon } from './ui/Icons';
 import { NoticeToast, type Notice } from './ui/NoticeToast';
+import { UpdateBar } from './ui/UpdateBar';
 import { useIsDesktop } from './ui/useMediaQuery';
 
 function SavedIndicator({ savedAt, short = false }: { savedAt: number | null; short?: boolean }) {
@@ -170,6 +172,11 @@ export function App() {
         }}
       />
       <SharePanel file={actions.fallback} onClose={actions.closeFallback} />
+      <UpdateBar
+        beforeUpdate={() => {
+          saveDraft(form.getValues());
+        }}
+      />
       {actions.error && (
         <div
           role="alert"
