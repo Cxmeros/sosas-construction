@@ -1,25 +1,59 @@
-# CODING AGENTS: READ THIS FIRST
+# Sosa's Constructions — Estimates e Invoices
 
-This is a **handoff bundle** from Claude Design (claude.ai/design).
+PWA 100 % client-side para llenar un formulario y obtener un PDF de **Work Estimate** o
+**Invoice**. Requisitos en [`SPEC.md`](SPEC.md), reglas del proyecto en [`CLAUDE.md`](CLAUDE.md)
+y el diseño original de Claude Design en [`design/`](design/).
 
-A user mocked up designs in HTML/CSS/JS using an AI design tool, then exported this bundle so a coding agent can implement the designs for real.
+## Comandos
 
-## What you should do — IMPORTANT
+```sh
+pnpm install
+pnpm dev          # desarrollo
+pnpm build        # build de producción (dist/)
+pnpm preview      # sirve dist/ con los mismos headers que producción (public/_headers)
+pnpm test         # unit (Vitest) — los tests de PDF necesitan pdftotext (poppler-utils)
+pnpm test:e2e     # e2e (Playwright, 375 px y 1280 px) contra el build de producción
+pnpm lint
+pnpm typecheck
+```
 
-**Read the chat transcripts first.** There are 1 chat transcript(s) in `chats/`. The transcripts show the full back-and-forth between the user and the design assistant — they tell you **what the user actually wants** and **where they landed** after iterating. Don't skip them. The final HTML files are the output, but the chat is where the intent lives.
+Si el Chromium instalado no coincide con la versión de Playwright, usa
+`PLAYWRIGHT_CHROMIUM_PATH=/ruta/a/chrome pnpm test:e2e`.
 
-**Read `project/Sosa PDF Templates.dc.html` in full.** The user had this file open when they triggered the handoff, so it's almost certainly the primary design they want built. Read it top to bottom — don't skim. Then **follow its imports**: open every file it pulls in (shared components, CSS, scripts) so you understand how the pieces fit together before you start implementing.
+## Estructura
 
-**If anything is ambiguous, ask the user to confirm before you start implementing.** It's much cheaper to clarify scope up front than to build the wrong thing.
+| Carpeta                      | Qué hay                                                                    |
+| ---------------------------- | -------------------------------------------------------------------------- |
+| `src/config/company.ts`      | Datos fijos de la empresa y colores de marca                               |
+| `src/domain/`                | Tipos, schema zod del formulario, cálculos en centavos, numeración (puro)  |
+| `src/pdf/`                   | Modelo del PDF, paginación, `DocumentPdf.tsx` (react-pdf) y su gemelo HTML |
+| `src/features/document-form` | Formulario, partidas, anticipo, borrador automático                        |
+| `src/features/preview/`      | Vista previa, compartir / descargar                                        |
+| `src/lib/storage.ts`         | Único módulo que toca localStorage (borrador, contador, preferencias)      |
+| `src/assets/`                | Logo (`logo-placeholder.png`, reemplazable) y fuentes Barlow (SIL OFL)     |
 
-## About the design files
+## Notas de implementación
 
-The design medium is **HTML/CSS/JS** — these are prototypes, not production code. Your job is to **recreate them pixel-perfectly** in whatever technology makes sense for the target codebase (React, Vue, native, whatever fits). Match the visual output; don't copy the prototype's internal structure unless it happens to fit.
+- **Vista previa = PDF.** `src/pdf/layout.ts` decide los saltos de página una sola vez; la vista
+  previa en HTML (`PageView.tsx`) y el PDF real (`DocumentPdf.tsx`) usan las mismas páginas.
+  Nunca se parte una fila, el encabezado de la tabla se repite y totales + términos van juntos.
+- **Nota gris en partidas:** en la descripción, lo que va después de `—` (o `--`) se imprime
+  debajo en gris, p. ej. `Refinish steps and handrails — 15 steps, 10 sticks`.
+- **Compartir:** Web Share API con el archivo. Si el aparato no puede compartir archivos, se abre un
+  panel con WhatsApp / correo del cliente (descarga el PDF para adjuntarlo) y "Descargar PDF".
+- **CSP:** `script-src` incluye `'wasm-unsafe-eval'` porque react-pdf usa Yoga (WebAssembly).
+  Yoga intenta cargar su WASM con `fetch()` de una URL `data:`; `connect-src 'self'` lo bloquea
+  (verás ese error en la consola) y Yoga cae automáticamente a decodificarlo en memoria, así que no
+  hace falta abrir `connect-src`. Nada requiere `'unsafe-inline'`: los estilos dinámicos de React
+  se aplican por CSSOM, que la CSP no restringe.
+- **Numeración:** `EST|INV-YYYYMMDD-NN`, secuencia diaria por dispositivo. El número se reserva al
+  crear el documento y se guarda con el borrador, así reabrir la app no gasta números.
 
-**Don't render these files in a browser or take screenshots unless the user asks you to.** Everything you need — dimensions, colors, layout rules — is spelled out in the source. Read the HTML and CSS directly; a screenshot won't tell you anything they don't.
+- **PWA:** vite-plugin-pwa precachea todo (incluido react-pdf y las fuentes), así que tras la
+  primera visita funciona offline. El service worker se registra con `/registerSW.js` (sin
+  scripts inline) y el manifiesto se pide con credenciales para funcionar detrás de Cloudflare
+  Access. Íconos en `public/`, generados a partir del emblema del logo sobre blanco.
 
-## Bundle contents
+## Despliegue
 
-- `README.md` — this file
-- `chats/` — conversation transcripts (read these!)
-- `project/` — the `Sosa's Constructions PWA` project files (HTML prototypes, assets, components)
+Pasos para Cloudflare Pages y Cloudflare Access en [`docs/DEPLOY.md`](docs/DEPLOY.md).

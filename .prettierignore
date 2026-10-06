@@ -1,0 +1,8 @@
+design
+pnpm-lock.yaml
+dist
+dev-dist
+playwright-report
+test-results
+CLAUDE.md
+SPEC.md
