@@ -7,6 +7,7 @@ test-results
 *.tsbuildinfo
 .DS_Store
 
-# Machine-local tool config
-.claude/settings.local.json
-.impeccable/config.local.json
+# Local AI tooling (not part of the app)
+.claude/
+.impeccable/
+graphify-out/
