@@ -1,6 +1,8 @@
 import { defineConfig, devices } from '@playwright/test';
 
 const executablePath = process.env.PLAYWRIGHT_CHROMIUM_PATH;
+/** Run against another server (e.g. `npx wrangler dev`) instead of `pnpm preview`. */
+const externalBaseURL = process.env.E2E_BASE_URL;
 
 export default defineConfig({
   testDir: './e2e',
@@ -10,7 +12,7 @@ export default defineConfig({
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? 'github' : 'list',
   use: {
-    baseURL: 'http://localhost:4173',
+    baseURL: externalBaseURL ?? 'http://localhost:4173',
     trace: 'retain-on-failure',
     launchOptions: executablePath ? { executablePath } : {},
   },
@@ -24,11 +26,13 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'], viewport: { width: 1280, height: 860 } },
     },
   ],
-  webServer: {
-    // Production build with production headers, so the CSP is exercised by every e2e run.
-    command: 'pnpm build && pnpm preview --port 4173 --strictPort',
-    url: 'http://localhost:4173',
-    reuseExistingServer: !process.env.CI,
-    timeout: 180_000,
-  },
+  // Production build with production headers, so the CSP is exercised by every e2e run.
+  webServer: externalBaseURL
+    ? undefined
+    : {
+        command: 'pnpm build && pnpm preview --port 4173 --strictPort',
+        url: 'http://localhost:4173',
+        reuseExistingServer: !process.env.CI,
+        timeout: 180_000,
+      },
 });
