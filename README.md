@@ -49,6 +49,11 @@ Si el Chromium instalado no coincide con la versión de Playwright, usa
 - **Numeración:** `EST|INV-YYYYMMDD-NN`, secuencia diaria por dispositivo. El número se reserva al
   crear el documento y se guarda con el borrador, así reabrir la app no gasta números.
 
-## Pendiente (M5)
+- **PWA:** vite-plugin-pwa precachea todo (incluido react-pdf y las fuentes), así que tras la
+  primera visita funciona offline. El service worker se registra con `/registerSW.js` (sin
+  scripts inline) y el manifiesto se pide con credenciales para funcionar detrás de Cloudflare
+  Access. Íconos en `public/`, generados a partir del emblema del logo sobre blanco.
 
-vite-plugin-pwa (offline + ícono), despliegue a Cloudflare Pages y Cloudflare Access.
+## Despliegue
+
+Pasos para Cloudflare Pages y Cloudflare Access en [`docs/DEPLOY.md`](docs/DEPLOY.md).
