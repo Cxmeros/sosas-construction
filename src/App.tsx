@@ -213,7 +213,7 @@ export function App() {
           {/* Starting over wipes the draft, so it sits apart from the export actions. */}
           <button
             type="button"
-            className="flex min-h-12 items-center gap-2 rounded-field border-[1.5px] border-line bg-paper px-4 text-base font-semibold text-walnut-700 hover:border-walnut-700 hover:bg-cream"
+            className="flex min-h-12 items-center gap-2 rounded-field border-[1.5px] border-walnut-700 bg-surface px-4 text-base font-semibold text-walnut-700 hover:bg-cream"
             onClick={askNew}
           >
             <FilePlusIcon size={20} />

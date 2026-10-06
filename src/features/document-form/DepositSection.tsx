@@ -127,7 +127,7 @@ export function DepositSection({
         )}
         {mode !== 'none' && (
           <div
-            className={`flex justify-between text-base ${desktop ? 'border-b border-dashed border-line py-2' : 'border-t border-dashed border-line py-2.5'}`}
+            className={`flex justify-between text-base ${desktop ? 'py-2' : 'border-t border-dashed border-line py-2.5'}`}
           >
             <span>{labels.deposit}</span>
             <span className="font-semibold">
