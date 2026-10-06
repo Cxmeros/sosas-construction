@@ -17,8 +17,8 @@ const OPTIONS: readonly { value: DepositMode; label: string; span: number }[] = 
 
 /** On an invoice the deposit is money already received: an amount, never a percentage to ask for. */
 const INVOICE_OPTIONS: readonly { value: DepositMode; label: string; span: number }[] = [
-  { value: 'fixed', label: 'Sí, me pagó', span: 3 },
-  { value: 'none', label: 'No me pagó', span: 3 },
+  { value: 'fixed', label: 'Con anticipo', span: 3 },
+  { value: 'none', label: 'Sin anticipo', span: 3 },
 ];
 
 export function depositLabels(invoice: boolean, doc: DocumentData) {
@@ -89,7 +89,7 @@ export function DepositSection({
       )}
       {mode === 'fixed' && (
         <Field
-          label={invoice ? '¿Cuánto te pagó de anticipo? $' : 'Monto del anticipo $'}
+          label={invoice ? 'Monto recibido $' : 'Monto del anticipo $'}
           path="depositFixed"
           error={fixedError}
         >
@@ -115,7 +115,7 @@ export function DepositSection({
           }}
           className="min-h-12 self-start rounded-field border-[1.5px] border-dashed border-walnut-700 px-3 text-left text-[15px] font-semibold text-walnut-700 hover:bg-cream"
         >
-          Usar {formatCents(hintCents)}: lo que pediste en el estimate
+          Usar {formatCents(hintCents)} (anticipo solicitado en el estimate)
         </button>
       )}
       <div className={`flex flex-col tabular-nums ${desktop ? '' : 'border-t border-line'}`}>

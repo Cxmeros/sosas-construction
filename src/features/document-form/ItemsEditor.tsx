@@ -152,10 +152,11 @@ export function ItemsEditor({
             <Corners />
             <div className="items-grid h-10 items-center bg-walnut-900 px-2 text-[13px] font-bold tracking-[0.06em] text-white uppercase">
               <span />
-              <span>Descripción</span>
-              <span className="text-right">Cant.</span>
-              <span className="pl-2">Unidad</span>
-              <span className="text-right">Precio</span>
+              {/* Each label sits where the text inside its box starts (field padding + border). */}
+              <span className="pl-[11.5px]">Descripción</span>
+              <span className="pr-[11.5px] text-right">Cant.</span>
+              <span className="pl-[7.5px]">Unidad</span>
+              <span className="pr-[11.5px] text-right">Precio</span>
               <span className="text-right">Monto</span>
               <span />
             </div>
@@ -179,7 +180,7 @@ export function ItemsEditor({
                 />
               ))}
             </ol>
-            <div className="flex items-center justify-between gap-3 p-2">
+            <div className="flex items-center justify-between gap-4 px-4 py-3.5">
               <button
                 ref={addButton}
                 type="button"
@@ -187,7 +188,9 @@ export function ItemsEditor({
                 disabled={full}
                 className="min-h-12 flex-none rounded-field border-[1.5px] border-walnut-700 bg-surface px-4 text-base font-semibold text-walnut-700 hover:bg-cream disabled:opacity-50"
               >
-                + Agregar partida
+                <span className="flex items-center gap-1.5">
+                  <PlusIcon size={20} /> Agregar partida
+                </span>
               </button>
               {undoToast}
               <span className="font-cond text-[26px] font-bold tabular-nums">

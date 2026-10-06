@@ -87,7 +87,7 @@ export function App() {
     const { number, askDeposit } = state.convertToInvoice();
     setNotice({
       text: askDeposit
-        ? `Ahora es el Invoice ${number}. Escribe cuánto te pagó de anticipo.`
+        ? `Ahora es el Invoice ${number}. Indica el monto del anticipo recibido.`
         : `Ahora es el Invoice ${number}.`,
       action: { label: 'Deshacer', run: state.undoConvert },
     });
@@ -213,9 +213,10 @@ export function App() {
           {/* Starting over wipes the draft, so it sits apart from the export actions. */}
           <button
             type="button"
-            className="min-h-12 rounded-field px-3 text-[15px] font-semibold text-walnut-700 underline underline-offset-4 hover:bg-cream"
+            className="flex min-h-12 items-center gap-2 rounded-field border-[1.5px] border-line bg-paper px-4 text-base font-semibold text-walnut-700 hover:border-walnut-700 hover:bg-cream"
             onClick={askNew}
           >
+            <FilePlusIcon size={20} />
             Nuevo documento
           </button>
           <div className="flex-1" />

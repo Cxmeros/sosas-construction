@@ -75,9 +75,9 @@ test('full flow: estimate → PDF → convert to invoice → new document', asyn
   if (mobile) await page.getByRole('button', { name: 'Ver PDF' }).click();
   await page.getByRole('button', { name: 'Convertir en Invoice' }).click();
   await expect(page.getByRole('status').getByText(`INV-${today()}-02`)).toBeVisible();
-  await expect(page.getByLabel('¿Cuánto te pagó de anticipo? $')).toBeFocused();
+  await expect(page.getByLabel('Monto recibido $')).toBeFocused();
   await page.getByRole('button', { name: /Usar \$5,507\.03/ }).click();
-  await expect(page.getByLabel('¿Cuánto te pagó de anticipo? $')).toHaveValue('5507.03');
+  await expect(page.getByLabel('Monto recibido $')).toHaveValue('5507.03');
   await expect(page.getByLabel('Nombre')).toHaveValue('Margaret Kelly');
   await expect(page.getByLabel('Número')).toHaveValue(`INV-${today()}-02`);
   if (mobile) await page.getByRole('button', { name: 'Ver PDF' }).click();
