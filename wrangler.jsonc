@@ -1,0 +1,19 @@
+// Cloudflare Workers (static assets only, no Worker script). Deploy: `pnpm build && npx wrangler deploy`.
+// `name` must match the Worker name in the Cloudflare dashboard (Workers Builds requirement).
+{
+  "$schema": "https://unpkg.com/wrangler/config-schema.json",
+  "name": "sosas-construction",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    // Vite build output; public/_headers is copied here and applied by Cloudflare.
+    "directory": "./dist",
+    "not_found_handling": "single-page-application",
+    // Serve /index.html as is (no 307 to "/"): the service worker precaches it for offline use.
+    "html_handling": "none",
+  },
+  "workers_dev": true,
+  // Required by `npx wrangler preview`, the command Workers Builds runs for each branch / PR.
+  // Empty: assets and compatibility settings at the top level apply to previews too.
+  "previews": {},
+  "observability": { "enabled": false },
+}

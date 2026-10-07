@@ -56,4 +56,5 @@ Si el Chromium instalado no coincide con la versión de Playwright, usa
 
 ## Despliegue
 
-Pasos para Cloudflare Pages y Cloudflare Access en [`docs/DEPLOY.md`](docs/DEPLOY.md).
+Cloudflare Workers (archivos estáticos, configuración en `wrangler.jsonc`) detrás de Cloudflare
+Access. Pasos en [`docs/DEPLOY.md`](docs/DEPLOY.md).

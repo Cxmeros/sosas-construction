@@ -5,7 +5,7 @@ import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
-/** Headers of the global `/*` block of public/_headers (Cloudflare Pages format). */
+/** Headers of the global `/*` block of public/_headers (Cloudflare format). */
 function readHeaders(): Record<string, string> {
   const lines = readFileSync(new URL('./public/_headers', import.meta.url), 'utf8').split('\n');
   const headers: Record<string, string> = {};

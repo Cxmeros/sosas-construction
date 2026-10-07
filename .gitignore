@@ -6,6 +6,7 @@ playwright-report
 test-results
 *.tsbuildinfo
 .DS_Store
+.wrangler
 
 # Local AI tooling (not part of the app)
 .claude/
