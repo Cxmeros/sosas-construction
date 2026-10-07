@@ -31,7 +31,7 @@ computadora y obtenga un PDF de Work Estimate o Invoice listo para enviar.
 - vite-plugin-pwa (instalable, funciona offline)
 - Vitest (unit) + Playwright (e2e, viewports 375px y 1280px)
 - ESLint + Prettier
-- Deploy: Cloudflare Pages detrás de Cloudflare Access
+- Deploy: Cloudflare Workers (solo archivos estáticos, `wrangler.jsonc`) detrás de Cloudflare Access
 
 No agregues dependencias fuera de esta lista sin explicar por qué y pedir confirmación.
 
@@ -45,7 +45,7 @@ src/
   features/preview/        vista previa + compartir/descargar
   lib/storage.ts           borrador, contador, preferencias
   assets/                  logo (PNG alta resolución o SVG), fuentes .ttf
-public/_headers            headers de seguridad para Cloudflare Pages
+public/_headers            headers de seguridad (Cloudflare los aplica a dist/)
 ```
 
 ## Comandos
