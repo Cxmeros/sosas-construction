@@ -5,13 +5,12 @@ import { emptyItem, toLenientItem, type FormItem, type FormValues } from '../../
 import { LIMITS } from '../../domain/limits';
 import { formatCents } from '../../domain/money';
 import { UNITS, type DocumentData } from '../../domain/types';
-import { Corners } from '../../ui/Corners';
 import { DownIcon, GripIcon, PlusIcon, TrashIcon, UndoIcon, UpIcon } from '../../ui/Icons';
 import { errorAt, Field, FieldError, invalidProps, SectionTitle } from './fields';
 
 type Form = UseFormReturn<FormValues, unknown, DocumentData>;
 
-const UNDO_MS = 6000;
+const UNDO_MS = 10_000;
 
 function amountOf(item: FormItem): string {
   return formatCents(lineAmountCents(toLenientItem(item)));
@@ -38,7 +37,7 @@ export function ItemsEditor({
   desktop: boolean;
   totalLabel: string;
 }) {
-  const { control, watch, formState, setFocus } = form;
+  const { control, watch, formState, setFocus, clearErrors } = form;
   const { fields, append, remove, move, insert } = useFieldArray({
     control,
     name: 'items',
@@ -48,6 +47,8 @@ export function ItemsEditor({
   const errors = formState.errors;
   const [undo, setUndo] = useState<{ item: FormItem; index: number } | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const undoButton = useRef<HTMLButtonElement>(null);
+  const addButton = useRef<HTMLButtonElement>(null);
 
   useEffect(
     () => () => {
@@ -57,10 +58,12 @@ export function ItemsEditor({
   );
 
   const add = () => {
+    const n = fields.length;
     append(emptyItem(), { shouldFocus: false });
-    // Focus the new item's description.
     setTimeout(() => {
-      setFocus(`items.${fields.length}.description`);
+      // A new, untouched item is not an error yet, even after a failed "Ver PDF".
+      clearErrors(`items.${n}`);
+      setFocus(`items.${n}.description`);
     }, 0);
   };
 
@@ -70,7 +73,10 @@ export function ItemsEditor({
     remove(index);
     clearTimeout(timer.current);
     setUndo({ item, index });
+    // Keep keyboard and screen-reader users in place: focus moves to "Deshacer".
+    setTimeout(() => undoButton.current?.focus(), 0);
     timer.current = setTimeout(() => {
+      if (document.activeElement === undoButton.current) addButton.current?.focus();
       setUndo(null);
     }, UNDO_MS);
   };
@@ -84,22 +90,27 @@ export function ItemsEditor({
 
   const listError = errorAt(errors, 'items.root') ?? errorAt(errors, 'items');
   const full = fields.length >= LIMITS.maxItems;
-  const countLabel = fields.length === 1 ? '1 partida' : `${String(fields.length)} partidas`;
+  const countLabel = fields.length === 1 ? '1 trabajo' : `${String(fields.length)} trabajos`;
 
   const undoToast = undo && (
     <div
       role="status"
       className={
         desktop
-          ? 'flex items-center gap-1 bg-ink pl-3.5 text-white'
-          : 'fixed right-3 bottom-[calc(96px+env(safe-area-inset-bottom))] left-3 z-20 flex items-center justify-between bg-ink pr-1 pl-4 text-white shadow-[0_12px_32px_rgba(31,23,18,0.3)]'
+          ? 'flex min-w-0 items-center gap-1 bg-ink pl-3.5 text-white'
+          : 'fixed right-3 bottom-[calc(96px+env(safe-area-inset-bottom))] left-3 z-20 flex items-center justify-between border-2 border-walnut-900 bg-surface pr-1 pl-4 text-ink shadow-[0_12px_32px_rgba(31,23,18,0.35)]'
       }
     >
-      <span className="text-base">Partida #{undo.index + 1} eliminada</span>
+      <span className="min-w-0 truncate text-base">
+        {undo.item.description.trim()
+          ? `“${undo.item.description.trim()}” eliminado`
+          : `Trabajo #${String(undo.index + 1)} eliminado`}
+      </span>
       <button
+        ref={undoButton}
         type="button"
         onClick={doUndo}
-        className="flex min-h-12 items-center gap-1.5 px-3.5 text-base font-bold tracking-[0.04em] text-orange-400 uppercase"
+        className={`flex min-h-12 flex-none items-center gap-1.5 px-3.5 text-base font-bold tracking-[0.04em] uppercase ${desktop ? 'text-orange-400' : 'text-orange-800'}`}
       >
         <UndoIcon size={20} />
         Deshacer
@@ -109,7 +120,7 @@ export function ItemsEditor({
 
   const empty = fields.length === 0 && (
     <div className="flex flex-col items-center gap-3 border-[1.5px] border-dashed border-field px-4 py-6 text-center">
-      <span className="text-[17px] font-semibold">Aún no hay partidas</span>
+      <span className="text-[17px] font-semibold">Aún no hay trabajos</span>
       <span className="text-[15px] text-ink-muted">
         Agrega lo que vas a cobrar: piso, escaleras, material.
       </span>
@@ -118,7 +129,7 @@ export function ItemsEditor({
         onClick={add}
         className="btn-cond flex min-h-[52px] items-center justify-center gap-2 self-stretch bg-orange-700 text-xl text-white hover:bg-orange-800"
       >
-        <PlusIcon /> Agregar primera partida
+        <PlusIcon /> Agregar primer trabajo
       </button>
     </div>
   );
@@ -127,7 +138,7 @@ export function ItemsEditor({
     return (
       <section className="flex flex-col gap-3" aria-labelledby="items-title">
         <div id="items-title">
-          <SectionTitle n="04">Partidas</SectionTitle>
+          <SectionTitle n="04">Trabajos</SectionTitle>
         </div>
         <FieldError path="items" message={listError} />
         {fields.length === 0 ? (
@@ -136,14 +147,14 @@ export function ItemsEditor({
             {undo && <div className="self-start">{undoToast}</div>}
           </>
         ) : (
-          <div className="blueprint border border-line bg-surface">
-            <Corners />
+          <div className="border border-line bg-surface">
             <div className="items-grid h-10 items-center bg-walnut-900 px-2 text-[13px] font-bold tracking-[0.06em] text-white uppercase">
               <span />
-              <span>Descripción</span>
-              <span className="text-right">Cant.</span>
-              <span>Unidad</span>
-              <span className="text-right">Precio</span>
+              {/* Labels over boxes are centered on the box; free text and amounts line up with their text. */}
+              <span className="pl-[11.5px]">Descripción</span>
+              <span className="text-center">Cant.</span>
+              <span className="text-center">Unidad</span>
+              <span className="text-center">Precio</span>
               <span className="text-right">Monto</span>
               <span />
             </div>
@@ -167,14 +178,17 @@ export function ItemsEditor({
                 />
               ))}
             </ol>
-            <div className="flex items-center justify-between gap-3 p-2">
+            <div className="flex items-center justify-between gap-4 px-4 py-3.5">
               <button
+                ref={addButton}
                 type="button"
                 onClick={add}
                 disabled={full}
-                className="min-h-12 rounded-field border-[1.5px] border-walnut-700 bg-surface px-4 text-base font-semibold text-walnut-700 hover:bg-cream disabled:opacity-50"
+                className="min-h-12 flex-none rounded-field border-[1.5px] border-walnut-700 bg-surface px-4 text-base font-semibold text-walnut-700 hover:bg-cream disabled:opacity-50"
               >
-                + Agregar partida
+                <span className="flex items-center gap-1.5">
+                  <PlusIcon size={20} /> Agregar trabajo
+                </span>
               </button>
               {undoToast}
               <span className="font-cond text-[26px] font-bold tabular-nums">
@@ -191,7 +205,7 @@ export function ItemsEditor({
     <section className="flex flex-col gap-3" aria-labelledby="items-title-m">
       <div id="items-title-m">
         <SectionTitle n="04" aside={fields.length > 0 ? countLabel : undefined}>
-          Partidas
+          Trabajos
         </SectionTitle>
       </div>
       <FieldError path="items" message={listError} />
@@ -215,15 +229,16 @@ export function ItemsEditor({
       </ol>
       {fields.length > 0 && (
         <button
+          ref={addButton}
           type="button"
           onClick={add}
           disabled={full}
           className="btn-cond flex min-h-[52px] items-center justify-center gap-2 rounded-field border-[1.5px] border-walnut-700 bg-surface text-xl text-walnut-700 hover:bg-cream disabled:opacity-50"
         >
-          <PlusIcon /> Agregar partida
+          <PlusIcon /> Agregar trabajo
         </button>
       )}
-      {full && <span className="text-sm text-ink-muted">Máximo {LIMITS.maxItems} partidas.</span>}
+      {full && <span className="text-sm text-ink-muted">Máximo {LIMITS.maxItems} trabajos.</span>}
       {undoToast}
     </section>
   );
@@ -249,21 +264,20 @@ function MobileCard({ form, index, count, item, onMove, onDelete }: RowProps) {
 
   return (
     <li
-      className={`blueprint flex flex-col bg-surface ${hasError ? 'border-2 border-error' : 'border border-line'}`}
-      aria-label={`Partida ${String(index + 1)}`}
+      className={`flex flex-col bg-surface ${hasError ? 'border-2 border-error' : 'border border-line'}`}
+      aria-label={`Trabajo ${String(index + 1)}`}
     >
-      <Corners />
       <div
         className={`flex items-center gap-1 border-b border-line-faint pl-3 ${hasError ? 'bg-error-bg' : 'bg-paper'}`}
       >
         <span
-          className={`flex-1 font-cond text-xl font-bold ${hasError ? 'text-error' : 'text-orange-700'}`}
+          className={`flex-1 font-cond text-xl font-bold ${hasError ? 'text-error' : 'text-orange-800'}`}
         >
           #{index + 1}
         </span>
         <button
           type="button"
-          aria-label={`Subir partida ${String(index + 1)}`}
+          aria-label={`Subir trabajo ${String(index + 1)}`}
           onClick={() => {
             onMove(index - 1);
           }}
@@ -274,7 +288,7 @@ function MobileCard({ form, index, count, item, onMove, onDelete }: RowProps) {
         </button>
         <button
           type="button"
-          aria-label={`Bajar partida ${String(index + 1)}`}
+          aria-label={`Bajar trabajo ${String(index + 1)}`}
           onClick={() => {
             onMove(index + 1);
           }}
@@ -285,7 +299,7 @@ function MobileCard({ form, index, count, item, onMove, onDelete }: RowProps) {
         </button>
         <button
           type="button"
-          aria-label={`Eliminar partida ${String(index + 1)}`}
+          aria-label={`Eliminar trabajo ${String(index + 1)}`}
           onClick={onDelete}
           className="grid size-12 place-items-center border-l border-line-faint text-error"
         >
@@ -342,7 +356,11 @@ function MobileCard({ form, index, count, item, onMove, onDelete }: RowProps) {
                   {...register(p('qty'))}
                 />
               </Field>
-              <Field label="Precio $" path={p('unitPrice')} error={err('unitPrice')}>
+              <Field
+                label={`Precio por ${item.unit === 'other' ? item.otherUnit.trim() || 'unidad' : item.unit} $`}
+                path={p('unitPrice')}
+                error={err('unitPrice')}
+              >
                 <input
                   inputMode="decimal"
                   autoComplete="off"
@@ -418,24 +436,30 @@ function DesktopRow({
             e.dataTransfer.setData('text/plain', String(index));
           }}
           onKeyDown={onHandleKey}
-          aria-label={`Mover partida ${String(index + 1)} (flechas arriba y abajo)`}
+          aria-label={`Mover trabajo ${String(index + 1)} (flechas arriba y abajo)`}
           title="Arrastra para reordenar"
           className="grid h-12 cursor-grab place-items-center text-field"
         >
           <GripIcon size={20} />
         </button>
-        <input
-          aria-label={`Descripción partida ${String(index + 1)}`}
+        <textarea
+          aria-label={`Descripción trabajo ${String(index + 1)}`}
+          rows={1}
           maxLength={200}
-          className="field px-2.5 text-base"
+          className="field min-h-12 resize-none px-2.5 text-base field-sizing-content"
           {...invalidProps(p('description'), err('description'))}
           {...register(p('description'))}
         />
         {lump ? (
-          <input aria-label="Cantidad" value="—" disabled className="field num px-2.5 text-base" />
+          <input
+            aria-label={`Cantidad trabajo ${String(index + 1)}`}
+            value="—"
+            disabled
+            className="field num px-2.5 text-base"
+          />
         ) : (
           <input
-            aria-label={`Cantidad partida ${String(index + 1)}`}
+            aria-label={`Cantidad trabajo ${String(index + 1)}`}
             inputMode="decimal"
             autoComplete="off"
             maxLength={20}
@@ -446,7 +470,7 @@ function DesktopRow({
         )}
         <div className="flex min-w-0 flex-col gap-1">
           <select
-            aria-label={`Unidad partida ${String(index + 1)}`}
+            aria-label={`Unidad trabajo ${String(index + 1)}`}
             className="field px-1.5 text-base"
             {...register(p('unit'))}
           >
@@ -454,7 +478,7 @@ function DesktopRow({
           </select>
           {item.unit === 'other' && (
             <input
-              aria-label={`Unidad escrita partida ${String(index + 1)}`}
+              aria-label={`Unidad escrita trabajo ${String(index + 1)}`}
               placeholder="ej. rooms"
               maxLength={15}
               className="field px-2.5 text-base"
@@ -464,10 +488,15 @@ function DesktopRow({
           )}
         </div>
         {lump ? (
-          <input aria-label="Precio" value="—" disabled className="field num px-2.5 text-base" />
+          <input
+            aria-label={`Precio trabajo ${String(index + 1)}`}
+            value="—"
+            disabled
+            className="field num px-2.5 text-base"
+          />
         ) : (
           <input
-            aria-label={`Precio partida ${String(index + 1)}`}
+            aria-label={`Precio trabajo ${String(index + 1)}`}
             inputMode="decimal"
             autoComplete="off"
             maxLength={20}
@@ -478,7 +507,7 @@ function DesktopRow({
         )}
         {lump ? (
           <input
-            aria-label={`Monto partida ${String(index + 1)}`}
+            aria-label={`Monto trabajo ${String(index + 1)}`}
             inputMode="decimal"
             autoComplete="off"
             maxLength={20}
@@ -491,7 +520,7 @@ function DesktopRow({
         )}
         <button
           type="button"
-          aria-label={`Eliminar partida ${String(index + 1)}`}
+          aria-label={`Eliminar trabajo ${String(index + 1)}`}
           onClick={onDelete}
           className="grid size-12 place-items-center text-error hover:bg-error-bg"
         >

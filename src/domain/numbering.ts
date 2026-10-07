@@ -4,7 +4,7 @@ const PREFIX: Record<DocType, string> = { estimate: 'EST', invoice: 'INV' };
 
 /** `EST-YYYYMMDD-NN` / `INV-YYYYMMDD-NN` (SPEC §5). */
 export function formatDocNumber(type: DocType, isoDate: string, sequence: number): string {
-  return `${PREFIX[type]}-${isoDate.replace(/-/g, '')}-${String(sequence).padStart(2, '0')}`;
+  return `${counterKey(type, isoDate)}-${String(sequence).padStart(2, '0')}`;
 }
 
 export function counterKey(type: DocType, isoDate: string): string {

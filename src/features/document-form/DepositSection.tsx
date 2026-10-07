@@ -15,6 +15,12 @@ const OPTIONS: readonly { value: DepositMode; label: string; span: number }[] = 
   { value: 'none', label: 'Sin anticipo', span: 3 },
 ];
 
+/** On an invoice the deposit is money already received: an amount, never a percentage to ask for. */
+const INVOICE_OPTIONS: readonly { value: DepositMode; label: string; span: number }[] = [
+  { value: 'fixed', label: 'Con anticipo', span: 3 },
+  { value: 'none', label: 'Sin anticipo', span: 3 },
+];
+
 export function depositLabels(invoice: boolean, doc: DocumentData) {
   const pct =
     doc.deposit.mode === 'percent' ? ` (${formatQty(doc.deposit.percentHundredths)} %)` : '';
@@ -30,11 +36,14 @@ export function DepositSection({
   doc,
   totals,
   desktop,
+  hintCents = null,
 }: {
   form: Form;
   doc: DocumentData;
   totals: Totals;
   desktop: boolean;
+  /** Deposit the estimate asked for, offered as a one-tap answer on the invoice. */
+  hintCents?: number | null;
 }) {
   const { register, setValue, watch, formState, getValues } = form;
   const mode = watch('depositMode');
@@ -56,7 +65,7 @@ export function DepositSection({
       <Segmented
         name="depositMode"
         legend={labels.title}
-        options={OPTIONS}
+        options={invoice ? INVOICE_OPTIONS : OPTIONS}
         value={mode}
         onChange={choose}
         className="grid grid-cols-6 gap-2"
@@ -79,7 +88,11 @@ export function DepositSection({
         </Field>
       )}
       {mode === 'fixed' && (
-        <Field label="Monto del anticipo $" path="depositFixed" error={fixedError}>
+        <Field
+          label={invoice ? 'Monto recibido $' : 'Monto del anticipo $'}
+          path="depositFixed"
+          error={fixedError}
+        >
           <input
             inputMode="decimal"
             autoComplete="off"
@@ -90,6 +103,21 @@ export function DepositSection({
           />
         </Field>
       )}
+      {/* Outside the label so the hint isn't read as part of the field's name. */}
+      {mode === 'fixed' && invoice && hintCents !== null && !watch('depositFixed').trim() && (
+        <button
+          type="button"
+          onClick={() => {
+            setValue('depositFixed', (hintCents / 100).toFixed(2), {
+              shouldDirty: true,
+              shouldValidate: formState.isSubmitted,
+            });
+          }}
+          className="min-h-12 self-start rounded-field border-[1.5px] border-dashed border-walnut-700 px-3 text-left text-[15px] font-semibold text-walnut-700 hover:bg-cream"
+        >
+          Usar {formatCents(hintCents)} (anticipo solicitado en el estimate)
+        </button>
+      )}
       <div className={`flex flex-col tabular-nums ${desktop ? '' : 'border-t border-line'}`}>
         {!desktop && (
           <div className="flex justify-between py-2.5 text-base">
@@ -99,7 +127,7 @@ export function DepositSection({
         )}
         {mode !== 'none' && (
           <div
-            className={`flex justify-between text-base ${desktop ? 'border-b border-dashed border-line py-2' : 'border-t border-dashed border-line py-2.5'}`}
+            className={`flex justify-between text-base ${desktop ? 'py-2' : 'border-t border-dashed border-line py-2.5'}`}
           >
             <span>{labels.deposit}</span>
             <span className="font-semibold">

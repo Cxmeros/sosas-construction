@@ -1,7 +1,6 @@
 import { get, type FieldErrors } from 'react-hook-form';
 import type { ReactNode } from 'react';
 import type { FormValues } from '../../domain/form';
-import { Corners } from '../../ui/Corners';
 
 export function errorAt(errors: FieldErrors<FormValues>, path: string): string | undefined {
   const error: unknown = get(errors, path);
@@ -78,15 +77,10 @@ export function SectionTitle({
   );
 }
 
-/** Mobile section card (blueprint frame); on desktop sections sit directly on the page. */
+/** Mobile section card; on desktop sections sit directly on the page. */
 export function Section({ desktop, children }: { desktop: boolean; children: ReactNode }) {
   if (desktop) return <section className="flex flex-col gap-3">{children}</section>;
-  return (
-    <section className="blueprint flex flex-col gap-3.5 border border-line p-4">
-      <Corners />
-      {children}
-    </section>
-  );
+  return <section className="flex flex-col gap-3.5 border border-line p-4">{children}</section>;
 }
 
 /** Segmented control built on native radios (arrow keys, screen readers). */

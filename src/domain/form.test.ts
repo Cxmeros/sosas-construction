@@ -66,7 +66,7 @@ describe('documentSchema', () => {
     const values = { ...valid(), customer: { ...valid().customer, name: ' ' }, items: [] };
     expect(messages(values)).toMatchObject({
       'customer.name': 'Escribe el nombre del cliente.',
-      items: 'Agrega al menos una partida.',
+      items: 'Agrega al menos un trabajo.',
     });
   });
 

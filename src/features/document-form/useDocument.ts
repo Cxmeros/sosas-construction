@@ -1,6 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { computeTotals } from '../../domain/calc';
 import { emptyForm, documentSchema, toLenientDocument, type FormValues } from '../../domain/form';
 import { counterKey, formatDocNumber, toIsoDate } from '../../domain/numbering';
 import { DEFAULT_TERMS } from '../../domain/terms';
@@ -28,8 +29,22 @@ function freshForm(): FormValues {
   );
 }
 
+/** The deposit the estimate asked for, in cents, or null when there is none. */
+function requestedDeposit(values: FormValues): number | null {
+  const doc = toLenientDocument(values);
+  const { depositCents } = computeTotals(doc.items, doc.deposit);
+  return depositCents > 0 ? depositCents : null;
+}
+
+/** Something the user actually typed; a blank item row alone doesn't count. */
 function hasContent(values: FormValues): boolean {
-  return values.customer.name.trim() !== '' || values.items.length > 0;
+  return (
+    values.customer.name.trim() !== '' ||
+    values.jobDescription.trim() !== '' ||
+    values.items.some((i) =>
+      [i.description, i.qty, i.unitPrice, i.lumpSum].some((v) => v.trim() !== ''),
+    )
+  );
 }
 
 interface Initial {
@@ -90,6 +105,12 @@ export function useDocument() {
     setSavedAt(now);
   }, []);
 
+  /**
+   * The estimate's deposit was only requested, not received. On an invoice it is never carried over
+   * as money received: Danilo types what he actually got, with the requested amount as a hint.
+   */
+  const [depositHint, setDepositHint] = useState<number | null>(null);
+
   const setType = useCallback(
     (type: DocType) => {
       const current = getValues();
@@ -103,18 +124,33 @@ export function useDocument() {
       }
       if (current.terms.trim() === DEFAULT_TERMS[current.type])
         setValue('terms', DEFAULT_TERMS[type], opts);
-      if (type === 'estimate') setValue('estimateRef', '', opts);
+      if (type === 'estimate') {
+        setValue('estimateRef', '', opts);
+        setDepositHint(null);
+      } else if (current.depositMode !== 'none' && current.depositMode !== 'fixed') {
+        setDepositHint(requestedDeposit(current));
+        setValue('depositMode', 'fixed', opts);
+        setValue('depositFixed', '', opts);
+      }
       setValue('type', type, opts);
     },
     [getValues, setValue, form.formState.isSubmitted],
   );
 
+  /** The estimate as it was before the last conversion, so "Deshacer" can bring it back. */
+  const beforeConvert = useRef<{ values: FormValues; numbers: typeof numbers.current } | null>(
+    null,
+  );
+
   /** SPEC §3.9: keeps customer and items; changes number, type, date and terms. */
   const convertToInvoice = useCallback(() => {
     const current = getValues();
+    beforeConvert.current = { values: current, numbers: { ...numbers.current } };
     const today = toIsoDate(new Date());
     const number = allocateNumber('invoice', today);
     numbers.current = { invoice: number };
+    const asked = current.depositMode !== 'none';
+    setDepositHint(asked ? requestedDeposit(current) : null);
     const values: FormValues = {
       ...current,
       type: 'invoice',
@@ -122,17 +158,31 @@ export function useDocument() {
       date: today,
       estimateRef: current.type === 'estimate' ? current.number : current.estimateRef,
       terms: DEFAULT_TERMS.invoice,
+      depositMode: asked ? 'fixed' : 'none',
+      depositFixed: '',
     };
     reset(values);
     persist(values);
-    return number;
+    return { number, askDeposit: asked };
   }, [getValues, reset, persist]);
+
+  const undoConvert = useCallback(() => {
+    const before = beforeConvert.current;
+    if (!before) return;
+    beforeConvert.current = null;
+    numbers.current = before.numbers;
+    setDepositHint(null);
+    reset(before.values);
+    persist(before.values);
+  }, [reset, persist]);
 
   const newDocument = useCallback(() => {
     clearDraft();
     const values = freshForm();
     saveDraft(values);
     numbers.current = { [values.type]: values.number };
+    beforeConvert.current = null;
+    setDepositHint(null);
     reset(values);
     setRecovered(null);
     setSavedAt(null);
@@ -152,6 +202,8 @@ export function useDocument() {
     },
     setType,
     convertToInvoice,
+    undoConvert,
+    depositHint,
     newDocument,
   };
 }

@@ -2,6 +2,7 @@ import type { FieldErrors } from 'react-hook-form';
 import type { FormValues } from '../../domain/form';
 import { LIMITS } from '../../domain/limits';
 import { formatCents } from '../../domain/money';
+import { formatDateUS } from '../../domain/numbering';
 import type { DocType, Totals } from '../../domain/types';
 import { AlertIcon } from '../../ui/Icons';
 import type { DocumentState } from './useDocument';
@@ -55,7 +56,7 @@ export function DocumentForm({
   totals: Totals;
   desktop: boolean;
 }) {
-  const { form, values, doc, setType } = state;
+  const { form, values, doc, setType, depositHint } = state;
   const { register, formState } = form;
   const errors = formState.errors;
   const err = (path: string) => errorAt(errors, path);
@@ -93,15 +94,17 @@ export function DocumentForm({
         {...invalidProps('date', err('date'))}
         {...register('date')}
       />
+      {/* The phone may show the date as day/month; the PDF always prints month-day. */}
+      {values.date && (
+        <span className="text-sm font-normal text-ink-muted">
+          En el PDF: {formatDateUS(values.date)}
+        </span>
+      )}
     </Field>
   );
   const customer = (
     <>
-      <Field
-        label={desktop ? 'Nombre' : 'Nombre'}
-        path="customer.name"
-        error={err('customer.name')}
-      >
+      <Field label="Nombre" path="customer.name" error={err('customer.name')}>
         <input
           autoComplete="name"
           maxLength={LIMITS.customerName}
@@ -166,11 +169,17 @@ export function DocumentForm({
     return (
       <div className="flex flex-col gap-6">
         <ErrorSummary count={errorCount} />
-        <div className="grid grid-cols-[280px_1fr_1fr] items-end gap-4">
-          {typeSwitch}
-          {numberField}
-          {dateField}
-        </div>
+        <Section desktop>
+          <SectionTitle n="01">Documento</SectionTitle>
+          <div className="grid grid-cols-[280px_1fr_1fr] items-start gap-4">
+            <div className="label">
+              <span aria-hidden="true">Tipo</span>
+              {typeSwitch}
+            </div>
+            {numberField}
+            {dateField}
+          </div>
+        </Section>
         <Section desktop>
           <SectionTitle n="02">Cliente</SectionTitle>
           <div className="grid grid-cols-2 gap-x-4 gap-y-3">{customer}</div>
@@ -183,7 +192,7 @@ export function DocumentForm({
         </label>
         <ItemsEditor form={form} desktop totalLabel={formatCents(totals.totalCents)} />
         <div className="grid grid-cols-2 gap-6">
-          <DepositSection form={form} doc={doc} totals={totals} desktop />
+          <DepositSection form={form} doc={doc} totals={totals} desktop hintCents={depositHint} />
           <label className="label gap-3">
             <span className="section-title">
               <span className="n">06</span>Términos
@@ -201,6 +210,11 @@ export function DocumentForm({
   return (
     <div className="flex flex-col gap-5">
       <ErrorSummary count={errorCount} />
+      {!isBlank && (
+        <h1 className="sr-only">
+          {values.type === 'invoice' ? 'Invoice' : 'Work Estimate'} {values.number}
+        </h1>
+      )}
       {isBlank && (
         <div className="flex flex-col gap-1">
           <h1 className="btn-cond m-0 text-[28px] leading-[1.1] text-walnut-900">
@@ -229,7 +243,13 @@ export function DocumentForm({
         </label>
       </Section>
       <ItemsEditor form={form} desktop={false} totalLabel={formatCents(totals.totalCents)} />
-      <DepositSection form={form} doc={doc} totals={totals} desktop={false} />
+      <DepositSection
+        form={form}
+        doc={doc}
+        totals={totals}
+        desktop={false}
+        hintCents={depositHint}
+      />
       <Section desktop={false}>
         <SectionTitle n="06">Términos</SectionTitle>
         {terms}

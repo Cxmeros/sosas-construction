@@ -45,28 +45,41 @@ const lh = (size: number) => size * TYPE.lineHeight;
 /** Content must end above the footer. */
 const CONTENT_BOTTOM = PAGE.height - PAGE.footerBottom - 26 - 18;
 
+/**
+ * Section style from Danilo's original estimate: a solid orange bar with the label, then a pale
+ * orange box with the content.
+ */
+export const BAR = { padY: 4, padX: 10 } as const;
+export const BOX = { padY: 10, padX: 12, gap: 4 } as const;
+/** Light grid around the items table; cell padding inside each column. */
+export const CELL = { padY: 7, padX: 8 } as const;
+
 const FULL_HEADER = 92 + 14 + 3;
 const COMPACT_HEADER = 48 + 10 + 3;
-const SECTION_LABEL = lh(TYPE.label) + 4 + 1 + 6;
-const TABLE_LABEL = lh(TYPE.label) + 6;
-const TABLE_HEAD = 2 + 14 + lh(TYPE.tableHead) + 1;
+const BAR_HEIGHT = lh(TYPE.label) + 2 * BAR.padY;
+const BOX_TEXT_WIDTH = PAGE.contentWidth - 2 * BOX.padX;
+const TABLE_LABEL = BAR_HEIGHT + 6;
+const TABLE_HEAD = 1 + 2 * CELL.padY + lh(TYPE.tableHead) + 1;
 const CONTINUED = 8 + lh(TYPE.note);
 
+/** Bar + box with `lines` lines of text at `size`. */
+const sectionHeight = (lines: number, size: number) => BAR_HEIGHT + 2 * BOX.padY + lines * lh(size);
+
 export function customerHeight(model: PdfModel): number {
-  const width = PAGE.contentWidth - 28 - 3;
-  let h = 24 + 3 + lh(TYPE.label) + 6 + lh(TYPE.customerName);
+  let h = BAR_HEIGHT + 2 * BOX.padY + lh(TYPE.customerName);
   if (model.customer.address)
-    h += 6 + countLines(model.customer.address, width, TYPE.body) * lh(TYPE.body);
+    h += BOX.gap + countLines(model.customer.address, BOX_TEXT_WIDTH, TYPE.body) * lh(TYPE.body);
   if (model.customer.contact)
-    h += 6 + countLines(model.customer.contact, width, TYPE.body) * lh(TYPE.body);
+    h += BOX.gap + countLines(model.customer.contact, BOX_TEXT_WIDTH, TYPE.body) * lh(TYPE.body);
   return h;
 }
 
 export function rowHeight(row: PdfRow): number {
-  const width = DESC_COL_WIDTH - 8;
+  // Table side borders (2) and the description cell's own padding.
+  const width = DESC_COL_WIDTH - 2 - 2 * CELL.padX;
   const main = Math.max(1, countLines(row.description, width, TYPE.body, true)) * lh(TYPE.body);
   const note = countLines(row.note, width, TYPE.note) * lh(TYPE.note);
-  return 14 + main + note + 1;
+  return 2 * CELL.padY + main + note + 1;
 }
 
 function totalsAndTermsHeight(model: PdfModel): number {
@@ -75,8 +88,8 @@ function totalsAndTermsHeight(model: PdfModel): number {
     (18 + lh(TYPE.totalsTotal)) +
     (model.deposit ? 1 + 18 + lh(TYPE.totalsRow) : 0) +
     (2 + 22 + 30);
-  const termsLines = countLines(model.terms, PAGE.contentWidth, TYPE.terms);
-  const terms = termsLines ? PAGE.gap + SECTION_LABEL + termsLines * lh(TYPE.terms) : 0;
+  const termsLines = countLines(model.terms, BOX_TEXT_WIDTH, TYPE.terms);
+  const terms = termsLines ? PAGE.gap + sectionHeight(termsLines, TYPE.terms) : 0;
   return PAGE.gap + totals + terms;
 }
 
@@ -102,8 +115,8 @@ export function paginate(model: PdfModel): PdfPage[] {
   const drafts: Draft[] = [];
 
   let y = PAGE.padTop + FULL_HEADER + PAGE.gap + customerHeight(model) + PAGE.gap;
-  const descLines = countLines(model.jobDescription, PAGE.contentWidth, TYPE.jobDescription);
-  if (descLines) y += SECTION_LABEL + descLines * lh(TYPE.jobDescription) + PAGE.gap;
+  const descLines = countLines(model.jobDescription, BOX_TEXT_WIDTH, TYPE.jobDescription);
+  if (descLines) y += sectionHeight(descLines, TYPE.jobDescription) + PAGE.gap;
   y += TABLE_LABEL + TABLE_HEAD;
   let page: Draft = { fullHeader: true, showTable: true, rows: [] };
 

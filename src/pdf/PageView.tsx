@@ -2,7 +2,7 @@ import type { CSSProperties, ReactNode } from 'react';
 import { COLORS as C, COMPANY } from '../config/company';
 import { formatCents } from '../domain/money';
 import logoUrl from '../assets/logo-placeholder.png';
-import { COLS, PAGE, TYPE } from './layout';
+import { BAR, BOX, CELL, COLS, PAGE, TYPE } from './layout';
 import type { PdfPage } from './layout';
 import type { PdfModel, PdfRow } from './model';
 
@@ -15,33 +15,34 @@ const cond: CSSProperties = {
   fontFamily: "'Barlow Condensed', Barlow, sans-serif",
   fontWeight: 700,
 };
-const sectionLabel: CSSProperties = {
+/** Solid orange bar + pale orange box, as in Danilo's original estimate (mirrors DocumentPdf). */
+const bar: CSSProperties = {
   ...cond,
   fontSize: TYPE.label,
   letterSpacing: '0.1em',
-  color: C.orange700,
+  color: '#FFFFFF',
+  background: C.orange600,
   lineHeight: TYPE.lineHeight,
+  padding: `${String(BAR.padY)}px ${String(BAR.padX)}px`,
 };
+const box: CSSProperties = {
+  background: C.orange100,
+  padding: `${String(BOX.padY)}px ${String(BOX.padX)}px`,
+  display: 'flex',
+  flexDirection: 'column',
+  gap: BOX.gap,
+};
+const gridLine = `1px solid ${C.orange200}`;
 const grid: CSSProperties = {
   display: 'grid',
   gridTemplateColumns: `minmax(0,1fr) ${String(COLS.qty)}px ${String(COLS.unit)}px ${String(COLS.unitPrice)}px ${String(COLS.amount)}px`,
 };
-const cell = (align: 'left' | 'right', first = false, last = false): CSSProperties => ({
-  padding: `7px ${last ? 0 : 6}px 7px ${first ? 0 : 6}px`,
+const cell = (align: 'left' | 'right', first = false): CSSProperties => ({
+  padding: `${String(CELL.padY)}px ${String(CELL.padX)}px`,
   textAlign: align,
-  ...(first ? { paddingRight: 8 } : {}),
+  boxSizing: 'border-box',
+  ...(first ? {} : { borderLeft: gridLine }),
 });
-
-function Corners() {
-  return (
-    <>
-      <i className="corner tl" />
-      <i className="corner tr" />
-      <i className="corner bl" />
-      <i className="corner br" />
-    </>
-  );
-}
 
 function FullHeader({ model }: { model: PdfModel }) {
   const meta: [string, string][] = [
@@ -87,7 +88,7 @@ function FullHeader({ model }: { model: PdfModel }) {
             ...cond,
             fontSize: TYPE.title,
             lineHeight: 0.95,
-            color: C.orange700,
+            color: C.orange600,
             letterSpacing: '0.02em',
           }}
         >
@@ -138,7 +139,7 @@ function CompactHeader({ model }: { model: PdfModel }) {
             ...cond,
             fontSize: TYPE.compactTitle,
             lineHeight: 1,
-            color: C.orange700,
+            color: C.orange600,
             letterSpacing: '0.02em',
           }}
         >
@@ -154,18 +155,24 @@ function CompactHeader({ model }: { model: PdfModel }) {
 
 function Section({ label, children }: { label: string; children: ReactNode }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-      <span style={{ ...sectionLabel, borderBottom: `1px solid ${C.line}`, paddingBottom: 4 }}>
-        {label}
-      </span>
-      {children}
+    <div style={{ display: 'flex', flexDirection: 'column' }}>
+      <span style={bar}>{label}</span>
+      <div style={box}>{children}</div>
     </div>
   );
 }
 
 function Row({ row }: { row: PdfRow }) {
   return (
-    <div style={{ ...grid, borderBottom: `1px solid ${C.lineSoft}`, alignItems: 'baseline' }}>
+    <div
+      style={{
+        ...grid,
+        borderLeft: gridLine,
+        borderRight: gridLine,
+        borderBottom: gridLine,
+        alignItems: 'stretch',
+      }}
+    >
       <span style={{ ...cell('left', true), display: 'flex', flexDirection: 'column' }}>
         <span style={{ fontWeight: 500 }}>{row.description}</span>
         {row.note && <span style={{ fontSize: TYPE.note, color: C.inkMuted }}>{row.note}</span>}
@@ -173,7 +180,7 @@ function Row({ row }: { row: PdfRow }) {
       <span style={cell('right')}>{row.qty}</span>
       <span style={cell('left')}>{row.unit}</span>
       <span style={cell('right')}>{row.unitPrice}</span>
-      <span style={{ ...cell('right', false, true), fontWeight: 600 }}>{row.amount}</span>
+      <span style={{ ...cell('right'), fontWeight: 600 }}>{row.amount}</span>
     </div>
   );
 }
@@ -202,22 +209,11 @@ export function PageView({ model, page }: { model: PdfModel; page: PdfPage }) {
       {page.fullHeader ? (
         <>
           <FullHeader model={model} />
-          <div
-            className="blueprint"
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 6,
-              padding: '12px 14px',
-              border: `1.5px solid ${C.ink}`,
-            }}
-          >
-            <Corners />
-            <span style={sectionLabel}>CUSTOMER INFORMATION</span>
+          <Section label="CUSTOMER INFORMATION">
             <strong style={{ fontSize: TYPE.customerName }}>{model.customer.name}</strong>
             {model.customer.address && <span>{model.customer.address}</span>}
             {model.customer.contact && <span>{model.customer.contact}</span>}
-          </div>
+          </Section>
           {model.jobDescription && (
             <Section label="JOB DESCRIPTION">
               <p style={{ margin: 0, fontSize: TYPE.jobDescription, whiteSpace: 'pre-wrap' }}>
@@ -232,12 +228,13 @@ export function PageView({ model, page }: { model: PdfModel; page: PdfPage }) {
 
       {page.showTable && (
         <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <span style={{ ...sectionLabel, paddingBottom: 6 }}>SERVICES AND MATERIALS</span>
+          <span style={{ ...bar, marginBottom: 6 }}>SERVICES AND MATERIALS</span>
           <div
             style={{
               ...grid,
-              borderTop: `2px solid ${C.ink}`,
-              borderBottom: `1px solid ${C.ink}`,
+              border: gridLine,
+              background: C.orange100,
+              color: C.orange800,
               fontWeight: 700,
               fontSize: TYPE.tableHead,
               letterSpacing: '0.08em',
@@ -247,7 +244,7 @@ export function PageView({ model, page }: { model: PdfModel; page: PdfPage }) {
             <span style={cell('right')}>QTY</span>
             <span style={cell('left')}>UNIT</span>
             <span style={cell('right')}>UNIT PRICE</span>
-            <span style={cell('right', false, true)}>AMOUNT</span>
+            <span style={cell('right')}>AMOUNT</span>
           </div>
           {page.rows.map((row) => (
             <Row key={row.key} row={row} />
@@ -279,16 +276,14 @@ export function PageView({ model, page }: { model: PdfModel; page: PdfPage }) {
       {page.showTotals && (
         <>
           <div
-            className="blueprint"
             style={{
               alignSelf: 'flex-end',
               width: 340,
               display: 'flex',
               flexDirection: 'column',
-              border: `1.5px solid ${C.ink}`,
+              border: `1.5px solid ${C.orange200}`,
             }}
           >
-            <Corners />
             <div
               style={{
                 display: 'flex',
@@ -307,7 +302,7 @@ export function PageView({ model, page }: { model: PdfModel; page: PdfPage }) {
                   display: 'flex',
                   justifyContent: 'space-between',
                   padding: '9px 14px',
-                  borderTop: `1px solid ${C.line}`,
+                  borderTop: `1px solid ${C.orange200}`,
                   fontSize: TYPE.totalsRow,
                 }}
               >
@@ -322,8 +317,9 @@ export function PageView({ model, page }: { model: PdfModel; page: PdfPage }) {
                 alignItems: 'baseline',
                 gap: 12,
                 padding: '11px 14px',
-                borderTop: `2px solid ${C.ink}`,
-                background: C.orange100,
+                borderTop: `2px solid ${C.orange600}`,
+                background: C.orange600,
+                color: '#FFFFFF',
               }}
             >
               <span style={{ fontWeight: 700, fontSize: TYPE.totalsRow }}>

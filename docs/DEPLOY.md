@@ -65,8 +65,10 @@ paso 1; si Zero Trust aún no está activado, usa la pestaña **Access** despué
 - **iPhone (Safari):** abrir la URL → Compartir → **Agregar a inicio**.
 - **Android (Chrome):** abrir la URL → menú ⋮ → **Instalar app**.
 
-Después de la primera carga funciona sin internet (incluido crear el PDF). Las actualizaciones se
-instalan solas en segundo plano y se ven al volver a abrir la app.
+Después de la primera carga funciona sin internet (incluido crear el PDF). Cuando publicas una
+versión nueva, la app la descarga en segundo plano y muestra **"Hay una versión nueva de la app"**
+con el botón **Actualizar** (guarda el borrador y recarga). La app revisa si hay versión nueva cada
+vez que vuelve a primer plano.
 
 ## 4. Probar localmente como en Cloudflare
 

@@ -31,8 +31,3 @@ export function formatCents(cents: number): string {
 export function formatQty(hundredths: number): string {
   return qtyFormat.format(hundredths / 100);
 }
-
-/** Plain decimal for editable inputs: 300000 → "3000.00". */
-export function centsToInput(cents: number): string {
-  return (cents / 100).toFixed(2);
-}

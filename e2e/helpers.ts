@@ -1,4 +1,7 @@
 import { execFileSync } from 'node:child_process';
+import { copyFileSync, mkdtempSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { expect, type Page, type TestInfo } from '@playwright/test';
 
 export const isMobile = (info: TestInfo) => info.project.name === 'mobile-375';
@@ -30,28 +33,28 @@ export function watchConsole(page: Page): string[] {
 /** Inputs of item `n` (1-based), on the mobile cards or the desktop table. */
 export function item(page: Page, n: number, mobile: boolean) {
   if (mobile) {
-    const card = page.getByRole('listitem', { name: `Partida ${String(n)}` });
+    const card = page.getByRole('listitem', { name: `Trabajo ${String(n)}` });
     return {
       description: card.getByLabel('Descripción'),
       unit: card.getByRole('combobox'),
       otherUnit: card.getByLabel('Escribe la unidad'),
       qty: card.getByLabel('Cantidad'),
-      price: card.getByLabel('Precio $'),
+      price: card.getByLabel(/^Precio por/),
       amount: card.getByLabel('Monto total $'),
     };
   }
   return {
-    description: page.getByLabel(`Descripción partida ${String(n)}`),
-    unit: page.getByLabel(`Unidad partida ${String(n)}`),
-    otherUnit: page.getByLabel(`Unidad escrita partida ${String(n)}`),
-    qty: page.getByLabel(`Cantidad partida ${String(n)}`),
-    price: page.getByLabel(`Precio partida ${String(n)}`),
-    amount: page.getByLabel(`Monto partida ${String(n)}`),
+    description: page.getByLabel(`Descripción trabajo ${String(n)}`),
+    unit: page.getByLabel(`Unidad trabajo ${String(n)}`),
+    otherUnit: page.getByLabel(`Unidad escrita trabajo ${String(n)}`),
+    qty: page.getByLabel(`Cantidad trabajo ${String(n)}`),
+    price: page.getByLabel(`Precio trabajo ${String(n)}`),
+    amount: page.getByLabel(`Monto trabajo ${String(n)}`),
   };
 }
 
 export async function addItem(page: Page) {
-  await page.getByRole('button', { name: /agregar (primera )?partida/i }).click();
+  await page.getByRole('button', { name: /agregar (primer )?trabajo/i }).click();
 }
 
 export async function fillSample(page: Page, mobile: boolean) {
@@ -79,7 +82,10 @@ export async function fillSample(page: Page, mobile: boolean) {
 
 /** Text of a downloaded PDF, via poppler (whitespace removed: labels are letter-spaced). */
 export function pdfText(file: string): string {
-  return execFileSync('pdftotext', [file, '-'], { encoding: 'utf8' }).replace(/\s+/g, '');
+  // Poppler on Windows can't open paths with non-ASCII characters (test titles contain "→").
+  const plain = join(mkdtempSync(join(tmpdir(), 'pdf-')), 'doc.pdf');
+  copyFileSync(file, plain);
+  return execFileSync('pdftotext', [plain, '-'], { encoding: 'utf8' }).replace(/\s+/g, '');
 }
 
 export async function expectNoErrors(errors: string[]) {

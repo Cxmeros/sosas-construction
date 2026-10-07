@@ -17,8 +17,12 @@ export const COLORS = {
   oak500: '#D9A866',
   gold500: '#C9962E',
   orange100: '#FCEBDF',
+  /** PDF table grid and box outlines (light orange, as in Danilo's original estimate). */
+  orange200: '#F2C4A2',
   orange400: '#EE7A30',
   orange500: '#E06A1F',
+  /** PDF section bars: the brightest orange that keeps white text at AA (4.56:1). */
+  orange600: '#C2551A',
   orange700: '#B5470F',
   orange800: '#8F3709',
   paper: '#F6F1EA',
@@ -31,6 +35,4 @@ export const COLORS = {
   error: '#B3261E',
   errorBg: '#FBE9E7',
   success: '#2F6B3A',
-  /** Registration "+" marks: ink at 55 % over white. */
-  corner: '#847F7D',
 } as const;

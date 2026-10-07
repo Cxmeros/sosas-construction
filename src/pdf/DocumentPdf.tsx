@@ -10,7 +10,7 @@ import {
 } from '@react-pdf/renderer';
 import { COLORS as C, COMPANY } from '../config/company';
 import { formatCents } from '../domain/money';
-import { COLS, PAGE, TYPE, paginate, type PdfPage } from './layout';
+import { BAR, BOX, CELL, COLS, PAGE, TYPE, paginate, type PdfPage } from './layout';
 import type { PdfModel, PdfRow } from './model';
 
 type Style = Styles[string];
@@ -50,17 +50,29 @@ const s = StyleSheet.create({
     gap: pt(PAGE.gap),
   },
   cond: { fontFamily: 'Barlow Condensed', fontWeight: 700 },
-  sectionLabel: {
+  bar: {
     fontFamily: 'Barlow Condensed',
     fontWeight: 700,
     fontSize: pt(TYPE.label),
     letterSpacing: pt(TYPE.label) * 0.1,
-    color: C.orange700,
+    color: '#FFFFFF',
+    backgroundColor: C.orange600,
+    paddingVertical: pt(BAR.padY),
+    paddingHorizontal: pt(BAR.padX),
   },
-  rule: { borderBottomWidth: 1 * 0.75, borderBottomColor: C.line, paddingBottom: pt(4) },
+  box: {
+    backgroundColor: C.orange100,
+    paddingVertical: pt(BOX.padY),
+    paddingHorizontal: pt(BOX.padX),
+    gap: pt(BOX.gap),
+  },
   row: { flexDirection: 'row' },
-  cell: { paddingVertical: pt(7), paddingHorizontal: pt(6) },
-  descCell: { flexGrow: 1, flexBasis: 0, paddingVertical: pt(7), paddingRight: pt(8) },
+  descCell: {
+    flexGrow: 1,
+    flexBasis: 0,
+    paddingVertical: pt(CELL.padY),
+    paddingHorizontal: pt(CELL.padX),
+  },
   footer: {
     position: 'absolute',
     left: pt(PAGE.padX),
@@ -76,51 +88,20 @@ const s = StyleSheet.create({
   },
 });
 
-const col = (width: number, align: 'left' | 'right', last = false): Style => ({
+/** Fixed-width column with a light grid line on its left. */
+const col = (width: number, align: 'left' | 'right'): Style => ({
   width: pt(width),
-  paddingVertical: pt(7),
-  paddingLeft: pt(6),
-  paddingRight: last ? 0 : pt(6),
+  paddingVertical: pt(CELL.padY),
+  paddingHorizontal: pt(CELL.padX),
+  borderLeftWidth: pt(1),
+  borderLeftColor: C.orange200,
   textAlign: align,
 });
-
-/** "+" registration marks outside the corners of a box. */
-function Corners() {
-  const arm = pt(11);
-  const off = -pt(6);
-  const mark = (pos: Style) => (
-    <View style={{ position: 'absolute', width: arm, height: arm, ...pos }}>
-      <View
-        style={{
-          position: 'absolute',
-          left: pt(5),
-          top: 0,
-          width: pt(1),
-          height: arm,
-          backgroundColor: C.corner,
-        }}
-      />
-      <View
-        style={{
-          position: 'absolute',
-          top: pt(5),
-          left: 0,
-          height: pt(1),
-          width: arm,
-          backgroundColor: C.corner,
-        }}
-      />
-    </View>
-  );
-  return (
-    <>
-      {mark({ top: off, left: off })}
-      {mark({ top: off, right: off })}
-      {mark({ bottom: off, left: off })}
-      {mark({ bottom: off, right: off })}
-    </>
-  );
-}
+const tableSides: Style = {
+  borderLeftWidth: pt(1),
+  borderRightWidth: pt(1),
+  borderColor: C.orange200,
+};
 
 function FullHeader({ model, logoSrc }: { model: PdfModel; logoSrc: string }) {
   const meta: [string, string][] = [
@@ -165,7 +146,7 @@ function FullHeader({ model, logoSrc }: { model: PdfModel; logoSrc: string }) {
             {
               fontSize: pt(TYPE.title),
               lineHeight: 0.95,
-              color: C.orange700,
+              color: C.orange600,
               letterSpacing: pt(TYPE.title) * 0.02,
             },
           ]}
@@ -217,7 +198,7 @@ function CompactHeader({ model, logoSrc }: { model: PdfModel; logoSrc: string })
             {
               fontSize: pt(TYPE.compactTitle),
               lineHeight: 1,
-              color: C.orange700,
+              color: C.orange600,
               letterSpacing: pt(TYPE.compactTitle) * 0.02,
             },
           ]}
@@ -234,7 +215,10 @@ function CompactHeader({ model, logoSrc }: { model: PdfModel; logoSrc: string })
 
 function Row({ row }: { row: PdfRow }) {
   return (
-    <View style={[s.row, { borderBottomWidth: pt(1), borderBottomColor: C.lineSoft }]} wrap={false}>
+    <View
+      style={[s.row, tableSides, { borderBottomWidth: pt(1), borderBottomColor: C.orange200 }]}
+      wrap={false}
+    >
       <View style={s.descCell}>
         <Text style={{ fontWeight: 500 }}>{row.description}</Text>
         {row.note ? (
@@ -244,16 +228,18 @@ function Row({ row }: { row: PdfRow }) {
       <Text style={col(COLS.qty, 'right')}>{row.qty}</Text>
       <Text style={col(COLS.unit, 'left')}>{row.unit}</Text>
       <Text style={col(COLS.unitPrice, 'right')}>{row.unitPrice}</Text>
-      <Text style={[col(COLS.amount, 'right', true), { fontWeight: 600 }]}>{row.amount}</Text>
+      <Text style={[col(COLS.amount, 'right'), { fontWeight: 600 }]}>{row.amount}</Text>
     </View>
   );
 }
 
 function Section({ label, text, style }: { label: string; text: string; style: Style }) {
   return (
-    <View style={{ gap: pt(6) }} wrap={false}>
-      <Text style={[s.sectionLabel, s.rule]}>{label}</Text>
-      <Text style={style}>{text}</Text>
+    <View wrap={false}>
+      <Text style={s.bar}>{label}</Text>
+      <View style={s.box}>
+        <Text style={style}>{text}</Text>
+      </View>
     </View>
   );
 }
@@ -272,23 +258,15 @@ function PdfPageView({
       {page.fullHeader ? (
         <>
           <FullHeader model={model} logoSrc={logoSrc} />
-          <View
-            style={{
-              position: 'relative',
-              borderWidth: pt(1.5),
-              borderColor: C.ink,
-              paddingVertical: pt(12),
-              paddingHorizontal: pt(14),
-              gap: pt(6),
-            }}
-          >
-            <Corners />
-            <Text style={s.sectionLabel}>CUSTOMER INFORMATION</Text>
-            <Text style={{ fontSize: pt(TYPE.customerName), fontWeight: 700 }}>
-              {model.customer.name}
-            </Text>
-            {model.customer.address ? <Text>{model.customer.address}</Text> : null}
-            {model.customer.contact ? <Text>{model.customer.contact}</Text> : null}
+          <View wrap={false}>
+            <Text style={s.bar}>CUSTOMER INFORMATION</Text>
+            <View style={s.box}>
+              <Text style={{ fontSize: pt(TYPE.customerName), fontWeight: 700 }}>
+                {model.customer.name}
+              </Text>
+              {model.customer.address ? <Text>{model.customer.address}</Text> : null}
+              {model.customer.contact ? <Text>{model.customer.contact}</Text> : null}
+            </View>
           </View>
           {model.jobDescription ? (
             <Section
@@ -304,15 +282,16 @@ function PdfPageView({
 
       {page.showTable ? (
         <View>
-          <Text style={[s.sectionLabel, { paddingBottom: pt(6) }]}>SERVICES AND MATERIALS</Text>
+          <Text style={[s.bar, { marginBottom: pt(6) }]}>SERVICES AND MATERIALS</Text>
           <View
             style={[
               s.row,
+              tableSides,
               {
-                borderTopWidth: pt(2),
-                borderTopColor: C.ink,
+                borderTopWidth: pt(1),
                 borderBottomWidth: pt(1),
-                borderBottomColor: C.ink,
+                backgroundColor: C.orange100,
+                color: C.orange800,
                 fontWeight: 700,
                 fontSize: pt(TYPE.tableHead),
                 letterSpacing: pt(TYPE.tableHead) * 0.08,
@@ -323,7 +302,7 @@ function PdfPageView({
             <Text style={col(COLS.qty, 'right')}>QTY</Text>
             <Text style={col(COLS.unit, 'left')}>UNIT</Text>
             <Text style={col(COLS.unitPrice, 'right')}>UNIT PRICE</Text>
-            <Text style={col(COLS.amount, 'right', true)}>AMOUNT</Text>
+            <Text style={col(COLS.amount, 'right')}>AMOUNT</Text>
           </View>
           {page.rows.map((row) => (
             <Row key={row.key} row={row} />
@@ -360,11 +339,10 @@ function PdfPageView({
               alignSelf: 'flex-end',
               width: pt(340),
               borderWidth: pt(1.5),
-              borderColor: C.ink,
+              borderColor: C.orange200,
             }}
             wrap={false}
           >
-            <Corners />
             <View
               style={{
                 flexDirection: 'row',
@@ -386,7 +364,7 @@ function PdfPageView({
                   paddingVertical: pt(9),
                   paddingHorizontal: pt(14),
                   borderTopWidth: pt(1),
-                  borderTopColor: C.line,
+                  borderTopColor: C.orange200,
                   fontSize: pt(TYPE.totalsRow),
                 }}
               >
@@ -402,8 +380,9 @@ function PdfPageView({
                 paddingVertical: pt(11),
                 paddingHorizontal: pt(14),
                 borderTopWidth: pt(2),
-                borderTopColor: C.ink,
-                backgroundColor: C.orange100,
+                borderTopColor: C.orange600,
+                backgroundColor: C.orange600,
+                color: '#FFFFFF',
               }}
             >
               <Text style={{ fontWeight: 700, fontSize: pt(TYPE.totalsRow), paddingBottom: pt(2) }}>
