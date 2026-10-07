@@ -10,8 +10,20 @@ import {
 } from '@react-pdf/renderer';
 import { COLORS as C, COMPANY } from '../config/company';
 import { formatCents } from '../domain/money';
-import { BAR, BOX, CELL, COLS, PAGE, TYPE, paginate, type PdfPage } from './layout';
-import type { PdfModel, PdfRow } from './model';
+import {
+  BAR,
+  BOX,
+  CELL,
+  COLS,
+  COLUMNS,
+  PAGE,
+  TABLE_GAP,
+  TYPE,
+  paginate,
+  type PdfPage,
+  type PdfSegment,
+} from './layout';
+import type { PdfModel, PdfOption, PdfRow } from './model';
 
 type Style = Styles[string];
 
@@ -244,6 +256,188 @@ function Section({ label, text, style }: { label: string; text: string; style: S
   );
 }
 
+function TableHead() {
+  return (
+    <View
+      style={[
+        s.row,
+        tableSides,
+        {
+          borderTopWidth: pt(1),
+          borderBottomWidth: pt(1),
+          backgroundColor: C.orange100,
+          color: C.orange800,
+          fontWeight: 700,
+          fontSize: pt(TYPE.tableHead),
+          letterSpacing: pt(TYPE.tableHead) * 0.08,
+        },
+      ]}
+    >
+      <Text style={s.descCell}>DESCRIPTION</Text>
+      <Text style={col(COLS.qty, 'right')}>QTY</Text>
+      <Text style={col(COLS.unit, 'left')}>UNIT</Text>
+      <Text style={col(COLS.unitPrice, 'right')}>UNIT PRICE</Text>
+      <Text style={col(COLS.amount, 'right')}>AMOUNT</Text>
+    </View>
+  );
+}
+
+function Totals({ option, full = false }: { option: PdfOption; full?: boolean }) {
+  return (
+    <View
+      style={{
+        position: 'relative',
+        alignSelf: full ? 'stretch' : 'flex-end',
+        ...(full ? {} : { width: pt(340) }),
+        borderWidth: pt(1.5),
+        borderColor: C.orange200,
+      }}
+      wrap={false}
+    >
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          paddingVertical: pt(9),
+          paddingHorizontal: pt(14),
+          fontSize: pt(TYPE.totalsTotal),
+          fontWeight: 700,
+        }}
+      >
+        <Text>{option.shortLabel ? `${option.shortLabel} total` : 'Total'}</Text>
+        <Text>{option.total}</Text>
+      </View>
+      {option.deposit ? (
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            paddingVertical: pt(9),
+            paddingHorizontal: pt(14),
+            borderTopWidth: pt(1),
+            borderTopColor: C.orange200,
+            fontSize: pt(TYPE.totalsRow),
+          }}
+        >
+          <Text>{option.deposit.label}</Text>
+          <Text style={{ fontWeight: 600 }}>{option.deposit.value}</Text>
+        </View>
+      ) : null}
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'flex-end',
+          paddingVertical: pt(11),
+          paddingHorizontal: pt(14),
+          borderTopWidth: pt(2),
+          borderTopColor: C.orange600,
+          backgroundColor: C.orange600,
+          color: '#FFFFFF',
+        }}
+      >
+        <Text style={{ fontWeight: 700, fontSize: pt(TYPE.totalsRow), paddingBottom: pt(2) }}>
+          {option.balanceLabel}
+        </Text>
+        <Text style={[s.cond, { fontSize: pt(TYPE.balance), lineHeight: 1 }]}>
+          {option.balance}
+        </Text>
+      </View>
+    </View>
+  );
+}
+
+/** Two-option layout: one option as a card, like a side-by-side comparison. */
+function OptionCard({ option }: { option: PdfOption }) {
+  const amountCol: Style = { ...col(COLUMNS.amount, 'right') };
+  return (
+    <View style={{ flexGrow: 1, flexBasis: 0 }}>
+      <Text style={s.bar}>{option.shortLabel.toUpperCase()}</Text>
+      {option.title || option.description ? (
+        <View style={s.box}>
+          {option.title ? (
+            <Text style={{ fontSize: pt(TYPE.customerName), fontWeight: 700 }}>{option.title}</Text>
+          ) : null}
+          {option.description ? <Text>{option.description}</Text> : null}
+        </View>
+      ) : null}
+      <View style={{ marginTop: pt(TABLE_GAP) }}>
+        <View
+          style={[
+            s.row,
+            tableSides,
+            {
+              borderTopWidth: pt(1),
+              borderBottomWidth: pt(1),
+              backgroundColor: C.orange100,
+              color: C.orange800,
+              fontWeight: 700,
+              fontSize: pt(TYPE.tableHead),
+              letterSpacing: pt(TYPE.tableHead) * 0.08,
+            },
+          ]}
+        >
+          <Text style={s.descCell}>DESCRIPTION</Text>
+          <Text style={amountCol}>AMOUNT</Text>
+        </View>
+        {option.rows.map((row) => (
+          <View
+            key={row.key}
+            style={[
+              s.row,
+              tableSides,
+              { borderBottomWidth: pt(1), borderBottomColor: C.orange200 },
+            ]}
+            wrap={false}
+          >
+            <View style={s.descCell}>
+              <Text style={{ fontWeight: 500 }}>{row.description}</Text>
+              {row.note ? (
+                <Text style={{ fontSize: pt(TYPE.note), color: C.inkMuted }}>{row.note}</Text>
+              ) : null}
+              {row.detail ? (
+                <Text style={{ fontSize: pt(TYPE.note), color: C.inkMuted }}>{row.detail}</Text>
+              ) : null}
+            </View>
+            <Text style={[amountCol, { fontWeight: 600 }]}>{row.amount}</Text>
+          </View>
+        ))}
+      </View>
+      {/* Pushes both cards' totals to the same line. */}
+      <View style={{ flexGrow: 1, minHeight: pt(PAGE.gap) }} />
+      <Totals option={option} full />
+    </View>
+  );
+}
+
+/** One option's part of a page: its bar (and description), table rows, and/or totals. */
+function OptionSegment({ option, segment }: { option: PdfOption; segment: PdfSegment }) {
+  const continued = segment.header === 'continued';
+  return (
+    <>
+      <View>
+        <Text style={s.bar}>
+          {continued ? `${option.shortLabel || option.label} (continued)` : option.label}
+        </Text>
+        {!continued && option.description ? (
+          <View style={s.box}>
+            <Text>{option.description}</Text>
+          </View>
+        ) : null}
+        {segment.showTable ? (
+          <View style={{ marginTop: pt(TABLE_GAP) }}>
+            <TableHead />
+            {segment.rows.map((row) => (
+              <Row key={row.key} row={row} />
+            ))}
+          </View>
+        ) : null}
+      </View>
+      {segment.showTotals ? <Totals option={option} /> : null}
+    </>
+  );
+}
+
 function PdfPageView({
   model,
   page,
@@ -280,127 +474,59 @@ function PdfPageView({
         <CompactHeader model={model} logoSrc={logoSrc} />
       )}
 
-      {page.showTable ? (
-        <View>
-          <Text style={[s.bar, { marginBottom: pt(6) }]}>SERVICES AND MATERIALS</Text>
-          <View
-            style={[
-              s.row,
-              tableSides,
-              {
-                borderTopWidth: pt(1),
-                borderBottomWidth: pt(1),
-                backgroundColor: C.orange100,
-                color: C.orange800,
-                fontWeight: 700,
-                fontSize: pt(TYPE.tableHead),
-                letterSpacing: pt(TYPE.tableHead) * 0.08,
-              },
-            ]}
-          >
-            <Text style={s.descCell}>DESCRIPTION</Text>
-            <Text style={col(COLS.qty, 'right')}>QTY</Text>
-            <Text style={col(COLS.unit, 'left')}>UNIT</Text>
-            <Text style={col(COLS.unitPrice, 'right')}>UNIT PRICE</Text>
-            <Text style={col(COLS.amount, 'right')}>AMOUNT</Text>
-          </View>
-          {page.rows.map((row) => (
-            <Row key={row.key} row={row} />
+      {page.columns ? (
+        <View style={{ flexDirection: 'row', gap: pt(COLUMNS.gap), alignItems: 'stretch' }}>
+          {model.options.map((option) => (
+            <OptionCard key={option.key} option={option} />
           ))}
-          {page.continued ? (
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                paddingTop: pt(8),
-                fontSize: pt(TYPE.note),
-                color: C.inkMuted,
-              }}
-            >
-              <Text>
+        </View>
+      ) : null}
+      {page.segments.map((segment) => {
+        if (page.columns) return null;
+        const option = model.options[segment.option];
+        if (!option) return null;
+        return (
+          <OptionSegment
+            key={`${option.key}-${segment.header}`}
+            option={option}
+            segment={segment}
+          />
+        );
+      })}
+
+      {page.continued ? (
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            fontSize: pt(TYPE.note),
+            color: C.inkMuted,
+          }}
+        >
+          <Text>
+            {page.continued.subtotalCents !== null ? (
+              <>
                 Subtotal this page:{' '}
                 <Text style={{ color: C.ink, fontWeight: 700 }}>
                   {formatCents(page.continued.subtotalCents)}
                 </Text>
-              </Text>
-              <Text style={{ color: C.ink, fontWeight: 700 }}>
-                Continued on page {page.continued.nextPage} ›
-              </Text>
-            </View>
-          ) : null}
+              </>
+            ) : (
+              ''
+            )}
+          </Text>
+          <Text style={{ color: C.ink, fontWeight: 700 }}>
+            Continued on page {page.continued.nextPage} ›
+          </Text>
         </View>
       ) : null}
 
-      {page.showTotals ? (
-        <>
-          <View
-            style={{
-              position: 'relative',
-              alignSelf: 'flex-end',
-              width: pt(340),
-              borderWidth: pt(1.5),
-              borderColor: C.orange200,
-            }}
-            wrap={false}
-          >
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                paddingVertical: pt(9),
-                paddingHorizontal: pt(14),
-                fontSize: pt(TYPE.totalsTotal),
-                fontWeight: 700,
-              }}
-            >
-              <Text>Total</Text>
-              <Text>{model.total}</Text>
-            </View>
-            {model.deposit ? (
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  paddingVertical: pt(9),
-                  paddingHorizontal: pt(14),
-                  borderTopWidth: pt(1),
-                  borderTopColor: C.orange200,
-                  fontSize: pt(TYPE.totalsRow),
-                }}
-              >
-                <Text>{model.deposit.label}</Text>
-                <Text style={{ fontWeight: 600 }}>{model.deposit.value}</Text>
-              </View>
-            ) : null}
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                alignItems: 'flex-end',
-                paddingVertical: pt(11),
-                paddingHorizontal: pt(14),
-                borderTopWidth: pt(2),
-                borderTopColor: C.orange600,
-                backgroundColor: C.orange600,
-                color: '#FFFFFF',
-              }}
-            >
-              <Text style={{ fontWeight: 700, fontSize: pt(TYPE.totalsRow), paddingBottom: pt(2) }}>
-                {model.balanceLabel}
-              </Text>
-              <Text style={[s.cond, { fontSize: pt(TYPE.balance), lineHeight: 1 }]}>
-                {model.balance}
-              </Text>
-            </View>
-          </View>
-          {model.terms ? (
-            <Section
-              label="TERMS AND CONDITIONS"
-              text={model.terms}
-              style={{ fontSize: pt(TYPE.terms), color: C.walnut700 }}
-            />
-          ) : null}
-        </>
+      {page.showTerms ? (
+        <Section
+          label="TERMS AND CONDITIONS"
+          text={model.terms}
+          style={{ fontSize: pt(TYPE.terms), color: C.walnut700 }}
+        />
       ) : null}
 
       <View style={s.footer} fixed>

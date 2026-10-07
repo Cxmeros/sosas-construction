@@ -14,6 +14,26 @@ export interface PdfRow {
   unitPrice: string;
   amount: string;
   amountCents: number;
+  /** "1,625 sq ft × $7.50" (empty for lump sum): the detail line in the two-column layout. */
+  detail: string;
+}
+
+export interface PdfOption {
+  key: string;
+  /** Bar text: "OPTION 1 · INSTALL NEW FLOORING" with several options; the title or
+   *  "SERVICES AND MATERIALS" with one. */
+  label: string;
+  /** Short form for continued pages and the totals box ("Option 1"), or '' with one option. */
+  shortLabel: string;
+  /** As typed; shown under the bar in the two-column layout. */
+  title: string;
+  description: string;
+  rows: PdfRow[];
+  total: string;
+  totalCents: number;
+  deposit: { label: string; value: string } | null;
+  balanceLabel: string;
+  balance: string;
 }
 
 export interface PdfModel {
@@ -23,11 +43,9 @@ export interface PdfModel {
   estimateRef: string;
   customer: { name: string; address: string; contact: string };
   jobDescription: string;
-  rows: PdfRow[];
-  total: string;
-  deposit: { label: string; value: string } | null;
-  balanceLabel: string;
-  balance: string;
+  /** True when the estimate offers 2+ options to choose from. */
+  multi: boolean;
+  options: PdfOption[];
   terms: string;
   footer: { left: string; center: string };
   fileName: string;
@@ -45,11 +63,8 @@ export function splitDescription(description: string): { description: string; no
   };
 }
 
-export function buildPdfModel(doc: DocumentData): PdfModel {
-  const invoice = doc.type === 'invoice';
-  const totals = computeTotals(doc.items, doc.deposit);
-
-  const rows = doc.items.map((item): PdfRow => {
+function buildRows(items: DocumentData['options'][number]['items']): PdfRow[] {
+  return items.map((item): PdfRow => {
     const lump = item.unit === 'lump sum';
     const cents = lineAmountCents(item);
     return {
@@ -60,18 +75,46 @@ export function buildPdfModel(doc: DocumentData): PdfModel {
       unitPrice: lump ? '—' : formatCents(item.unitPriceCents),
       amount: formatCents(cents),
       amountCents: cents,
+      detail: lump
+        ? ''
+        : `${formatQty(item.qtyHundredths)} ${item.unit === 'other' ? item.otherUnit || 'other' : item.unit} × ${formatCents(item.unitPriceCents)}`,
     };
   });
+}
 
-  let deposit: PdfModel['deposit'] = null;
-  if (doc.deposit.mode !== 'none') {
-    const pct =
-      doc.deposit.mode === 'percent' ? ` (${formatQty(doc.deposit.percentHundredths)}%)` : '';
-    deposit = {
-      label: (invoice ? 'Deposit received' : 'Deposit required') + pct,
-      value: (invoice && totals.depositCents > 0 ? '−' : '') + formatCents(totals.depositCents),
+export function buildPdfModel(doc: DocumentData): PdfModel {
+  const invoice = doc.type === 'invoice';
+  const multi = doc.options.length > 1;
+
+  const options = doc.options.map((option, i): PdfOption => {
+    const totals = computeTotals(option.items, doc.deposit);
+    let deposit: PdfOption['deposit'] = null;
+    if (doc.deposit.mode !== 'none') {
+      const pct =
+        doc.deposit.mode === 'percent' ? ` (${formatQty(doc.deposit.percentHundredths)}%)` : '';
+      deposit = {
+        label: (invoice ? 'Deposit received' : 'Deposit required') + pct,
+        value: (invoice && totals.depositCents > 0 ? '−' : '') + formatCents(totals.depositCents),
+      };
+    }
+    const title = option.title.toUpperCase();
+    const shortLabel = multi ? `Option ${String(i + 1)}` : '';
+    return {
+      key: option.id,
+      label: multi
+        ? `OPTION ${String(i + 1)}${title ? ` · ${title}` : ''}`
+        : title || 'SERVICES AND MATERIALS',
+      shortLabel,
+      title: option.title,
+      description: option.description,
+      rows: buildRows(option.items),
+      total: formatCents(totals.totalCents),
+      totalCents: totals.totalCents,
+      deposit,
+      balanceLabel: invoice ? 'Balance due' : 'Balance due upon completion',
+      balance: formatCents(totals.balanceCents),
     };
-  }
+  });
 
   return {
     title: invoice ? 'INVOICE' : 'WORK ESTIMATE',
@@ -84,11 +127,8 @@ export function buildPdfModel(doc: DocumentData): PdfModel {
       contact: [doc.customer.phone, doc.customer.email].filter(Boolean).join(' · '),
     },
     jobDescription: doc.jobDescription,
-    rows,
-    total: formatCents(totals.totalCents),
-    deposit,
-    balanceLabel: invoice ? 'Balance due' : 'Balance due upon completion',
-    balance: formatCents(totals.balanceCents),
+    multi,
+    options,
     terms: doc.terms,
     footer: { left: `${COMPANY.name} · ${COMPANY.tagline}`, center: doc.number },
     fileName: documentFileName(doc.type, doc.number, doc.customer.name),

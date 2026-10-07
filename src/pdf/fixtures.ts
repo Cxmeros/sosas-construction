@@ -40,11 +40,18 @@ export const SAMPLE_ESTIMATE: DocumentData = {
   },
   jobDescription:
     'Demolition of existing flooring area, removal of existing carpet, installation of new hardwood floors and refinishing.',
-  items: [
-    sqft('Remove carpet and hardwood floor', 1625, 85),
-    sqft('Install and refinish', 1625, 750),
-    sqft('Refinish scraper hardwood floors', 447, 400),
-    lump('Refinish steps and handrails — 15 steps, 10 sticks', 300000),
+  options: [
+    {
+      id: 'o1',
+      title: '',
+      description: '',
+      items: [
+        sqft('Remove carpet and hardwood floor', 1625, 85),
+        sqft('Install and refinish', 1625, 750),
+        sqft('Refinish scraper hardwood floors', 447, 400),
+        lump('Refinish steps and handrails — 15 steps, 10 sticks', 300000),
+      ],
+    },
   ],
   deposit: { mode: 'percent', percentHundredths: 3000 },
   terms: DEFAULT_TERMS.estimate,
@@ -64,24 +71,62 @@ export const LONG_ESTIMATE: DocumentData = {
   number: 'EST-20261005-02',
   jobDescription:
     'Whole-house flooring: demolition of existing flooring, subfloor repair, installation of new hardwood floors on first floor and closets, staircase refinishing, trim and final finish.',
-  items: [
-    lump('Floor protection and dust containment', 45000),
-    sqft('Remove carpet and hardwood floor', 1625, 85),
-    sqft('Subfloor repair and leveling', 220, 325),
-    sqft('Moisture barrier underlayment', 1625, 45),
-    sqft('Install and refinish', 1625, 750),
-    sqft('Refinish scraper hardwood floors', 447, 400),
-    sqft('Stain application — Provincial, 1 coat', 2072, 75),
-    lump('Refinish steps and handrails — 15 steps, 10 sticks', 300000),
-    sqft('Stair nosing replacement', 15, 2800, 'each'),
-    sqft('Quarter round install', 380, 225, 'linear ft'),
-    sqft('Baseboard removal and reinstall', 380, 150, 'linear ft'),
-    sqft('Transition strips', 6, 4500, 'each'),
-    sqft('Floor register cutouts', 9, 1800, 'each'),
-    sqft('Furniture moving', 6, 6500, 'hours'),
-    sqft('Closet floor install', 64, 750),
-    sqft('Water-based polyurethane topcoat — 3 coats', 2072, 120),
-    lump('Debris haul-away and dumpster', 65000),
-    lump('Final cleaning', 20000),
+  options: [
+    {
+      id: 'o1',
+      title: '',
+      description: '',
+      items: [
+        lump('Floor protection and dust containment', 45000),
+        sqft('Remove carpet and hardwood floor', 1625, 85),
+        sqft('Subfloor repair and leveling', 220, 325),
+        sqft('Moisture barrier underlayment', 1625, 45),
+        sqft('Install and refinish', 1625, 750),
+        sqft('Refinish scraper hardwood floors', 447, 400),
+        sqft('Stain application — Provincial, 1 coat', 2072, 75),
+        lump('Refinish steps and handrails — 15 steps, 10 sticks', 300000),
+        sqft('Stair nosing replacement', 15, 2800, 'each'),
+        sqft('Quarter round install', 380, 225, 'linear ft'),
+        sqft('Baseboard removal and reinstall', 380, 150, 'linear ft'),
+        sqft('Transition strips', 6, 4500, 'each'),
+        sqft('Floor register cutouts', 9, 1800, 'each'),
+        sqft('Furniture moving', 6, 6500, 'hours'),
+        sqft('Closet floor install', 64, 750),
+        sqft('Water-based polyurethane topcoat — 3 coats', 2072, 120),
+        lump('Debris haul-away and dumpster', 65000),
+        lump('Final cleaning', 20000),
+      ],
+    },
+  ],
+};
+
+/** Two options, modeled on the estimate a customer showed Danilo (totals $4,200 and $5,465). */
+export const OPTIONS_ESTIMATE: DocumentData = {
+  ...SAMPLE_ESTIMATE,
+  number: 'EST-20261006-01',
+  jobDescription: 'Hardwood floors, steps, risers and hallway.',
+  deposit: { mode: 'percent', percentHundredths: 3000 },
+  options: [
+    {
+      id: 'opt-refinish',
+      title: 'Refinish existing hardwood floors',
+      description:
+        'Sand and refinish the existing hardwood floors, steps, risers and hallway: natural color stain and a high-quality polyurethane finish.',
+      items: [
+        lump('Refinish steps, risers and hallway', 188000),
+        lump('Refinish existing hardwood floors — sand, natural color and polyurethane', 232000),
+      ],
+    },
+    {
+      id: 'opt-new',
+      title: 'Install new hardwood flooring',
+      description:
+        'Remove the existing flooring, install new hardwood flooring and new trim. Steps, risers and hallway sanded and refinished.',
+      items: [
+        lump('Refinish steps, risers and hallway', 188000),
+        lump('Remove old flooring and install new hardwood flooring', 333500),
+        lump('Remove old trim and install new trim', 25000),
+      ],
+    },
   ],
 };

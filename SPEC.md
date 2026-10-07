@@ -46,6 +46,16 @@ Quiere llenar campos y obtener un PDF listo para mandar al cliente.
    cliente y partidas (cambia número, tipo, fecha y términos).
 10. **Borrador automático** del documento en curso (sobrevive a cerrar la app);
     "Nuevo documento" lo limpia previa confirmación.
+11. **Opciones en el estimate** (pedido del cliente, oct 2026): de 1 a 3 opciones, cada una con
+    nombre (requerido si hay 2 o más), descripción opcional, sus propias partidas (1–30) y su total.
+    - El anticipo elegido se aplica al total de cada opción (monto fijo: no puede superar la opción
+      más barata).
+    - PDF: con 2 opciones que caben en la primera página, van lado a lado (Description | Amount, con
+      "qty unit × price" en gris); si no caben o son 3, una debajo de otra con su tabla completa.
+      Cada opción lleva su caja de totales.
+    - "Convertir en Invoice" (o cambiar el tipo) pregunta qué opción aceptó el cliente; el invoice
+      lleva solo esa. Un invoice nunca tiene más de una opción.
+    - Sin fotos por ahora.
 
 ### Fase 2 (no construir aún)
 - Catálogo de servicios frecuentes con precio por defecto (ej. "Install and refinish — $7.50/sq ft").

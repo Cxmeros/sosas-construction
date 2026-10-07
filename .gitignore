@@ -11,3 +11,4 @@ test-results
 .claude/
 .impeccable/
 graphify-out/
+.wrangler

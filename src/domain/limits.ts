@@ -9,7 +9,11 @@ export const LIMITS = {
   otherUnit: 15,
   terms: 1000,
   number: 30,
+  optionTitle: 80,
+  optionDescription: 600,
+  maxOptions: 3,
   minItems: 1,
+  /** Per option. */
   maxItems: 30,
   maxQtyHundredths: 1_000_000 * 100,
   maxUnitPriceCents: 100_000 * 100,
