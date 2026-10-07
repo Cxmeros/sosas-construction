@@ -11,16 +11,16 @@ repositorio y el dominio deben quedar **a nombre de Danilo** (o con acceso de ad
    **Import a repository** → elige la cuenta de GitHub y el repo `sosas-construction`.
 2. Configura:
 
-   | Campo                     | Valor                                                              |
-   | ------------------------- | ------------------------------------------------------------------ |
-   | **Project name**          | `sosas-construction` (debe ser igual a `name` en `wrangler.jsonc`) |
-   | **Build command**         | `pnpm build`                                                       |
-   | **Deploy command**        | `npx wrangler deploy`                                              |
-   | **Preview command**       | el que propone Cloudflare                                          |
-   | **Enable Preview builds** | activado (cada rama tiene su URL de prueba)                        |
-   | **Advanced → Path**       | `/`                                                                |
-   | **API token**             | dejar que lo cree automáticamente                                  |
-   | **Variables**             | ninguna                                                            |
+   | Campo                     | Valor                                                                      |
+   | ------------------------- | -------------------------------------------------------------------------- |
+   | **Project name**          | `sosas-construction` (debe ser igual a `name` en `wrangler.jsonc`)         |
+   | **Build command**         | `pnpm build`                                                               |
+   | **Deploy command**        | `npx wrangler deploy`                                                      |
+   | **Preview command**       | `npx wrangler preview` (necesita el bloque `previews` de `wrangler.jsonc`) |
+   | **Enable Preview builds** | activado (cada rama tiene su URL de prueba)                                |
+   | **Advanced → Path**       | `/`                                                                        |
+   | **API token**             | dejar que lo cree automáticamente                                          |
+   | **Variables**             | ninguna                                                                    |
 
    La versión de Node sale de `.node-version` (22) y la de pnpm de `packageManager` en
    `package.json`.
