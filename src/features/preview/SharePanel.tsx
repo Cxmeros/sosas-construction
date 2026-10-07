@@ -1,5 +1,5 @@
 import { formatCents } from '../../domain/money';
-import { computeTotals } from '../../domain/calc';
+import { optionTotals } from '../../domain/calc';
 import { downloadBlob, mailtoUrl, whatsappUrl } from '../../lib/share';
 import { Dialog } from '../../ui/Dialog';
 import { DownloadIcon } from '../../ui/Icons';
@@ -14,8 +14,12 @@ export function SharePanel({ file, onClose }: { file: PdfFile | null; onClose: (
   const doc = file?.doc;
   const name = doc?.customer.name ?? '';
   const kind = doc?.type === 'invoice' ? 'invoice' : 'work estimate';
-  const total = doc ? formatCents(computeTotals(doc.items, doc.deposit).balanceCents) : '';
-  const greeting = `Hello ${name}, here is your ${kind} ${doc?.number ?? ''} from ${COMPANY.name}. Balance: ${total}. The PDF is attached.`;
+  const totals = doc ? optionTotals(doc) : [];
+  const amounts =
+    totals.length > 1
+      ? `${String(totals.length)} options: ${totals.map((t, k) => `Option ${String(k + 1)} ${formatCents(t.totalCents)}`).join(', ')}.`
+      : `Balance: ${formatCents(totals[0]?.balanceCents ?? 0)}.`;
+  const greeting = `Hello ${name}, here is your ${kind} ${doc?.number ?? ''} from ${COMPANY.name}. ${amounts} The PDF is attached.`;
   const wa = doc ? whatsappUrl(doc.customer.phone, greeting) : null;
   const mail = doc
     ? mailtoUrl(

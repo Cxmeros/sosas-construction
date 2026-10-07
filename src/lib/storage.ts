@@ -17,7 +17,18 @@ const KEYS = {
   prefs: 'sosa.prefs.v1',
 } as const;
 
-const draftSchema = z.object({ savedAt: z.number().int().nonnegative(), values: formValuesSchema });
+/** Drafts saved before estimates had options kept a flat `items` list: wrap it as one option. */
+function migrateDraftValues(values: unknown): unknown {
+  if (!values || typeof values !== 'object' || 'options' in values || !('items' in values))
+    return values;
+  const { items, ...rest } = values;
+  return { ...rest, options: [{ id: 'option-1', title: '', description: '', items }] };
+}
+
+const draftSchema = z.object({
+  savedAt: z.number().int().nonnegative(),
+  values: z.preprocess(migrateDraftValues, formValuesSchema),
+});
 export type Draft = z.infer<typeof draftSchema>;
 
 /** Only the current day is kept: `{ "EST-20261005": 2, "INV-20261005": 1 }`. */
