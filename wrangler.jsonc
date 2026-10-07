@@ -12,5 +12,8 @@
     "html_handling": "none",
   },
   "workers_dev": true,
+  // Required by `npx wrangler preview`, the command Workers Builds runs for each branch / PR.
+  // Empty: assets and compatibility settings at the top level apply to previews too.
+  "previews": {},
   "observability": { "enabled": false },
 }
