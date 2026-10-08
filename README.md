@@ -54,6 +54,19 @@ Si el Chromium instalado no coincide con la versión de Playwright, usa
   scripts inline) y el manifiesto se pide con credenciales para funcionar detrás de Cloudflare
   Access. Íconos en `public/`, generados a partir del emblema del logo sobre blanco.
 
+## Cambiar el logo
+
+El logo actual es provisional. Cuando llegue el oficial:
+
+1. Expórtalo en **PNG** (o JPG) de alta resolución, al menos 1000 px de ancho, fondo blanco o
+   transparente. SVG no sirve: la librería del PDF no lo dibuja.
+2. Reemplaza `src/assets/logo-placeholder.png` con el nuevo archivo (mismo nombre).
+3. En `src/config/logo.ts`, pon su tamaño en píxeles (`width`, `height`). La app, la vista previa
+   y el PDF toman la proporción de ahí; `pnpm test` avisa si no coincide con el archivo.
+4. Regenera los íconos de `public/` (favicon 48, apple-touch 180, 192, 512 y maskable 512 con
+   margen del 20 %) a partir del emblema sobre blanco, con los mismos nombres.
+5. Revisa el encabezado del PDF (página 1 y la compacta de las siguientes) en 375 y 1280 px.
+
 ## Despliegue
 
 Cloudflare Workers (archivos estáticos, configuración en `wrangler.jsonc`) detrás de Cloudflare

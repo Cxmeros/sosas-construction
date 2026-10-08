@@ -9,6 +9,7 @@ import {
   type Styles,
 } from '@react-pdf/renderer';
 import { COLORS as C, COMPANY, OWNERS_LINE } from '../config/company';
+import { logoWidth } from '../config/logo';
 import { formatCents } from '../domain/money';
 import {
   BAR,
@@ -134,7 +135,7 @@ function FullHeader({ model, logoSrc }: { model: PdfModel; logoSrc: string }) {
       }}
     >
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: pt(14) }}>
-        <Image src={logoSrc} style={{ height: pt(92), width: pt((92 * 525) / 245) }} />
+        <Image src={logoSrc} style={{ height: pt(92), width: pt(logoWidth(92)) }} />
         <View
           style={{
             borderLeftWidth: pt(1),
@@ -203,7 +204,7 @@ function CompactHeader({ model, logoSrc }: { model: PdfModel; logoSrc: string })
         borderBottomColor: C.brand500,
       }}
     >
-      <Image src={logoSrc} style={{ height: pt(48), width: pt((48 * 525) / 245) }} />
+      <Image src={logoSrc} style={{ height: pt(48), width: pt(logoWidth(48)) }} />
       <View style={{ alignItems: 'flex-end', gap: pt(2) }}>
         <Text
           style={[

@@ -1,7 +1,7 @@
 import type { CSSProperties, ReactNode } from 'react';
 import { COLORS as C, COMPANY, OWNERS_LINE } from '../config/company';
+import { LOGO, logoWidth } from '../config/logo';
 import { formatCents } from '../domain/money';
-import logoUrl from '../assets/logo-placeholder.png';
 import { BAR, BOX, CELL, COLS, COLUMNS, PAGE, STEP_NUMBER_WIDTH, TABLE_GAP, TYPE } from './layout';
 import type { PdfPage, PdfSegment } from './layout';
 import type { PdfModel, PdfOption, PdfRow } from './model';
@@ -62,7 +62,11 @@ function FullHeader({ model }: { model: PdfModel }) {
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-        <img src={logoUrl} alt={COMPANY.name} style={{ height: 92, display: 'block' }} />
+        <img
+          src={LOGO.src}
+          alt={COMPANY.name}
+          style={{ height: 92, width: logoWidth(92), display: 'block' }}
+        />
         <div
           style={{
             borderLeft: `1px solid ${C.lineSoft}`,
@@ -132,7 +136,11 @@ function CompactHeader({ model }: { model: PdfModel }) {
         borderBottom: `3px solid ${C.brand500}`,
       }}
     >
-      <img src={logoUrl} alt={COMPANY.name} style={{ height: 48, display: 'block' }} />
+      <img
+        src={LOGO.src}
+        alt={COMPANY.name}
+        style={{ height: 48, width: logoWidth(48), display: 'block' }}
+      />
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 2 }}>
         <span
           style={{
