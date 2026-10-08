@@ -268,3 +268,30 @@ test('touch targets are at least 48 px', async ({ page }, info) => {
   );
   expect(small).toEqual([]);
 });
+
+test('the date picked in the form is the one in the downloaded PDF (date and number)', async ({
+  page,
+}, info) => {
+  const mobile = isMobile(info);
+  await fillSample(page, mobile);
+  await page.getByLabel('Fecha').fill('2026-11-20');
+  // The automatic number follows the date…
+  await expect(page.getByLabel('Número')).toHaveValue('EST-20261120-01');
+  if (mobile) await page.getByRole('button', { name: 'Ver PDF' }).click();
+  const download = page.waitForEvent('download');
+  await page.getByRole('button', { name: mobile ? 'Descargar' : 'Descargar PDF' }).click();
+  const file = await download;
+  expect(file.suggestedFilename()).toBe('Estimate_EST-20261120-01_Margaret-Kelly.pdf');
+  const path = info.outputPath('dated.pdf');
+  await file.saveAs(path);
+  const text = pdfText(path);
+  expect(text).toContain('11-20-2026');
+  expect(text).toContain('EST-20261120-01');
+  expect(text).not.toContain(`EST-${today()}`);
+
+  // …but a number Danilo typed himself is never changed.
+  if (mobile) await page.getByRole('button', { name: 'Editar' }).click();
+  await page.getByLabel('Número').fill('A-1043');
+  await page.getByLabel('Fecha').fill('2026-12-01');
+  await expect(page.getByLabel('Número')).toHaveValue('A-1043');
+});

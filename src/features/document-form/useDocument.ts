@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { computeTotals } from '../../domain/calc';
 import { emptyForm, documentSchema, toLenientDocument, type FormValues } from '../../domain/form';
-import { counterKey, formatDocNumber, toIsoDate } from '../../domain/numbering';
+import { counterKey, formatDocNumber, numberForDate, toIsoDate } from '../../domain/numbering';
 import { DEFAULT_TERMS } from '../../domain/terms';
 import type { DocType, DocumentData } from '../../domain/types';
 import {
@@ -110,6 +110,22 @@ export function useDocument() {
       sub.unsubscribe();
     };
   }, [watch, getValues]);
+
+  // The automatic number carries a date (EST-YYYYMMDD-NN): keep it on the date Danilo picks, so the
+  // PDF never shows one date in the number and another in DATE. A number he typed is left alone.
+  useEffect(() => {
+    const sub = watch((values, { name }) => {
+      if (name !== 'date' || !values.type || !values.number || !values.date) return;
+      if (values.number !== numbers.current[values.type]) return;
+      const moved = numberForDate(values.number, values.date);
+      if (!moved || moved === values.number) return;
+      numbers.current[values.type] = moved;
+      setValue('number', moved, { shouldDirty: true });
+    });
+    return () => {
+      sub.unsubscribe();
+    };
+  }, [watch, setValue]);
 
   const persist = useCallback((values: FormValues) => {
     const now = Date.now();
