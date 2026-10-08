@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { UseFormReturn } from 'react-hook-form';
-import { parseSteps, type FormValues } from '../../domain/form';
+import { stepsIssue, type FormValues } from '../../domain/form';
 import { LIMITS } from '../../domain/limits';
 import type { DocumentData } from '../../domain/types';
 import { savePrefs } from '../../lib/storage';
@@ -10,14 +10,17 @@ type Form = UseFormReturn<FormValues, unknown, DocumentData>;
 
 /** Estimate-only work-process steps (SPEC §3.7b), one per line, with a saveable default. */
 export function StepsEditor({ form, desktop }: { form: Form; desktop: boolean }) {
-  const { register, formState, getValues } = form;
+  const { register, formState, getValues, setError, clearErrors } = form;
   const error = errorAt(formState.errors, 'steps');
   const [saved, setSaved] = useState(false);
 
   const saveDefault = () => {
     const raw = getValues('steps');
-    const steps = parseSteps(raw);
-    if (steps.length > LIMITS.maxSteps || steps.some((s) => s.length > LIMITS.stepLength)) return;
+    const issue = stepsIssue(raw);
+    if (issue) {
+      setError('steps', { message: issue }, { shouldFocus: true });
+      return;
+    }
     savePrefs({ defaultSteps: raw.trim() });
     setSaved(true);
   };
@@ -45,6 +48,7 @@ export function StepsEditor({ form, desktop }: { form: Form; desktop: boolean })
           {...register('steps', {
             onChange: () => {
               setSaved(false);
+              if (!formState.isSubmitted) clearErrors('steps');
             },
           })}
         />

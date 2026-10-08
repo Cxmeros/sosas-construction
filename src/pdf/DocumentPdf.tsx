@@ -23,6 +23,7 @@ import {
   TYPE,
   WOOD_STRIP_HEIGHT,
   paginate,
+  segmentTables,
   type PdfPage,
   type PdfSegment,
 } from './layout';
@@ -430,8 +431,7 @@ function OptionSegment({
   simple: boolean;
 }) {
   const continued = segment.header === 'continued';
-  const items = segment.rows.filter((r) => r.kind === 'item');
-  const extras = segment.rows.filter((r) => r.kind === 'extra');
+  const { items, extras, showItemsHead } = segmentTables(segment);
   return (
     <>
       <View>
@@ -445,7 +445,7 @@ function OptionSegment({
         ) : null}
         {segment.showTable ? (
           <View style={{ marginTop: pt(TABLE_GAP) }}>
-            {items.length > 0 || extras.length === 0 ? <TableHead simple={simple} /> : null}
+            {showItemsHead ? <TableHead simple={simple} /> : null}
             {items.map((row) => (
               <Row key={row.key} row={row} simple={simple} />
             ))}

@@ -112,6 +112,25 @@ export function parseSteps(raw: string): string[] {
     .filter(Boolean);
 }
 
+/** Why these steps can't be saved or printed, or null when they are fine. */
+export function stepsIssue(raw: string): string | null {
+  const steps = parseSteps(raw);
+  if (steps.length > LIMITS.maxSteps)
+    return `Máximo ${String(LIMITS.maxSteps)} pasos (uno por renglón).`;
+  if (steps.some((step) => step.length > LIMITS.stepLength))
+    return `Cada paso puede tener hasta ${String(LIMITS.stepLength)} letras.`;
+  return null;
+}
+
+/** Problem with a required money amount (`example` shows the format), or null. */
+function moneyIssue(raw: string, example: string): string | null {
+  if (!raw.trim()) return 'Falta el monto.';
+  const cents = parseMoneyToCents(raw);
+  if (cents === null) return `Usa solo números, ej. ${example}`;
+  if (cents > LIMITS.maxTotalCents) return 'Máximo $10,000,000.';
+  return null;
+}
+
 export function emptyForm(
   type: DocType,
   number: string,
@@ -250,21 +269,16 @@ export function validateForm(values: FormValues): Issue[] {
   );
 
   if (values.type === 'estimate') {
-    const steps = parseSteps(values.steps);
-    if (steps.length > LIMITS.maxSteps)
-      add(['steps'], `Máximo ${String(LIMITS.maxSteps)} pasos (uno por renglón).`);
-    else if (steps.some((step) => step.length > LIMITS.stepLength))
-      add(['steps'], `Cada paso puede tener hasta ${String(LIMITS.stepLength)} letras.`);
+    const issue = stepsIssue(values.steps);
+    if (issue) add(['steps'], issue);
   }
 
   if (values.type === 'invoice') {
     values.extras.forEach((extra, i) => {
       const at = (field: string) => ['extras', i, field];
-      const cents = parseMoneyToCents(extra.amount);
       if (!extra.description.trim()) add(at('description'), 'Escribe qué es el cargo.');
-      if (!extra.amount.trim()) add(at('amount'), 'Falta el monto.');
-      else if (cents === null) add(at('amount'), 'Usa solo números, ej. 50.00');
-      else if (cents > LIMITS.maxTotalCents) add(at('amount'), 'Máximo $10,000,000.');
+      const issue = moneyIssue(extra.amount, '50.00');
+      if (issue) add(at('amount'), issue);
     });
   }
 
@@ -281,10 +295,8 @@ export function validateForm(values: FormValues): Issue[] {
         add(at('otherUnit'), 'Escribe la unidad.');
 
       if (item.unit === 'lump sum') {
-        const cents = parseMoneyToCents(item.lumpSum);
-        if (!item.lumpSum.trim()) add(at('lumpSum'), 'Falta el monto.');
-        else if (cents === null) add(at('lumpSum'), 'Usa solo números, ej. 3000.00');
-        else if (cents > LIMITS.maxTotalCents) add(at('lumpSum'), 'Máximo $10,000,000.');
+        const issue = moneyIssue(item.lumpSum, '3000.00');
+        if (issue) add(at('lumpSum'), issue);
         return;
       }
 

@@ -80,7 +80,7 @@ export function customerHeight(model: PdfModel): number {
 }
 
 /** Invoice table: Description | Amount. */
-export const SIMPLE_DESC_COL_WIDTH = PAGE.contentWidth - COLS.amount;
+const SIMPLE_DESC_COL_WIDTH = PAGE.contentWidth - COLS.amount;
 
 export function rowHeight(row: PdfRow, simple = false): number {
   // Table side borders (2) and the description cell's own padding.
@@ -115,7 +115,7 @@ function stepsHeight(model: PdfModel): number {
     (sum, step) => sum + Math.max(1, countLines(step, width, TYPE.body)),
     0,
   );
-  return BAR_HEIGHT + 2 * BOX.padY + lines * lh(TYPE.body) + (model.steps.length - 1) * BOX.gap;
+  return sectionHeight(lines, TYPE.body) + (model.steps.length - 1) * BOX.gap;
 }
 
 function termsHeight(model: PdfModel): number {
@@ -161,6 +161,14 @@ export interface PdfSegment {
   showTable: boolean;
   rows: PdfRow[];
   showTotals: boolean;
+}
+
+/** A segment's rows as printed: the items table, then the "ADDITIONAL CHARGES" table. */
+export function segmentTables(segment: PdfSegment) {
+  const items = segment.rows.filter((r) => r.kind === 'item');
+  const extras = segment.rows.filter((r) => r.kind === 'extra');
+  // A continued page holding only extras skips the items head.
+  return { items, extras, showItemsHead: items.length > 0 || extras.length === 0 };
 }
 
 export interface PdfPage {
@@ -245,17 +253,16 @@ export function paginate(model: PdfModel): PdfPage[] {
       if (!fits(start) && (page.segments.length > 0 || page.fullHeader)) breakPage();
       let current = open(i, 'full', true);
 
-      /** The "ADDITIONAL CHARGES" head row, printed before the first extra on each page. */
-      const extraHead = (segment: PdfSegment, row: PdfRow) =>
-        row.kind === 'extra' && !segment.rows.some((r) => r.kind === 'extra') ? TABLE_HEAD : 0;
-
       for (const row of option.rows) {
+        // The "ADDITIONAL CHARGES" head row comes before the first extra on each page.
+        const firstExtra = () =>
+          row.kind === 'extra' && !current.rows.some((r) => r.kind === 'extra');
         const h = rowHeight(row, model.simpleTable);
-        if (current.rows.length > 0 && !fits(h + extraHead(current, row))) {
+        if (current.rows.length > 0 && !fits(h + (firstExtra() ? TABLE_HEAD : 0))) {
           breakPage();
           current = open(i, 'continued', true);
         }
-        y += h + extraHead(current, row);
+        y += h + (firstExtra() ? TABLE_HEAD : 0);
         current.rows.push(row);
       }
 

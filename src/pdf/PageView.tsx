@@ -1,5 +1,5 @@
 import type { CSSProperties, ReactNode } from 'react';
-import { COLORS as C, COMPANY, FEATURES, OWNERS_LINE } from '../config/company';
+import { COLORS as C, COMPANY, OWNERS_LINE } from '../config/company';
 import { LOGO, logoWidth, WOOD_STRIP } from '../config/logo';
 import { formatCents } from '../domain/money';
 import {
@@ -13,6 +13,7 @@ import {
   TABLE_GAP,
   TYPE,
   WOOD_STRIP_HEIGHT,
+  segmentTables,
 } from './layout';
 import type { PdfPage, PdfSegment } from './layout';
 import type { PdfModel, PdfOption, PdfRow } from './model';
@@ -375,8 +376,7 @@ function OptionSegment({
   simple: boolean;
 }) {
   const continued = segment.header === 'continued';
-  const items = segment.rows.filter((r) => r.kind === 'item');
-  const extras = segment.rows.filter((r) => r.kind === 'extra');
+  const { items, extras, showItemsHead } = segmentTables(segment);
   return (
     <>
       <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -390,7 +390,7 @@ function OptionSegment({
         )}
         {segment.showTable && (
           <div style={{ display: 'flex', flexDirection: 'column', marginTop: TABLE_GAP }}>
-            {(items.length > 0 || extras.length === 0) && <TableHead simple={simple} />}
+            {showItemsHead && <TableHead simple={simple} />}
             {items.map((row) => (
               <Row key={row.key} row={row} simple={simple} />
             ))}
@@ -427,7 +427,7 @@ export function PageView({ model, page }: { model: PdfModel; page: PdfPage }) {
         textAlign: 'left',
       }}
     >
-      {FEATURES.woodHeader && (
+      {WOOD_STRIP && (
         <img
           src={WOOD_STRIP}
           alt=""

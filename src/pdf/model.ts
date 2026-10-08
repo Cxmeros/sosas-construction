@@ -105,7 +105,6 @@ export function buildPdfModel(doc: DocumentData): PdfModel {
     detail: '',
     kind: 'extra',
   }));
-  const last = doc.options.length - 1;
 
   const options = doc.options.map((option, i): PdfOption => {
     const totals = computeTotals(option.items, doc.deposit, doc.extras);
@@ -129,7 +128,7 @@ export function buildPdfModel(doc: DocumentData): PdfModel {
       title: option.title,
       description: option.description,
       // Extras exist only on invoices (one option): they follow its items.
-      rows: i === last ? [...buildRows(option.items), ...extraRows] : buildRows(option.items),
+      rows: [...buildRows(option.items), ...extraRows],
       total: formatCents(totals.totalCents),
       totalCents: totals.totalCents,
       deposit,

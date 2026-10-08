@@ -1,5 +1,6 @@
 import logoUrl from '../assets/logo-placeholder.png';
 import woodUrl from '../assets/wood-strip.jpg';
+import { FEATURES } from './company';
 
 /**
  * The company logo, used by the app header and both PDF renderers. To replace it, follow
@@ -11,5 +12,5 @@ export const LOGO = { src: logoUrl, width: 525, height: 245 } as const;
 /** Width that keeps the logo's proportions at `height`. */
 export const logoWidth = (height: number) => (height * LOGO.width) / LOGO.height;
 
-/** Wood-grain strip for the top of the PDF pages (`FEATURES.woodHeader`), 1632 × 40 px JPG. */
-export const WOOD_STRIP = woodUrl;
+/** Wood-grain strip for the top of the PDF pages, 1632 × 40 px JPG; undefined while it's off. */
+export const WOOD_STRIP = FEATURES.woodHeader ? woodUrl : undefined;
