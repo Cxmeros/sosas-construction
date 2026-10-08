@@ -7,6 +7,7 @@ import { AlertIcon } from '../../ui/Icons';
 import type { DocumentState } from './useDocument';
 import { DepositSection } from './DepositSection';
 import { errorAt, Field, invalidProps, Section, SectionTitle, Segmented } from './fields';
+import { ExtrasEditor } from './ExtrasEditor';
 import { OptionsEditor } from './OptionsEditor';
 
 const DOC_OPTIONS: readonly { value: DocType; label: string }[] = [
@@ -197,6 +198,7 @@ export function DocumentForm({
           {jobDescription}
         </label>
         <OptionsEditor form={form} desktop invoice={values.type === 'invoice'} totals={totals} />
+        {values.type === 'invoice' && <ExtrasEditor form={form} desktop />}
         <div className="grid grid-cols-2 gap-6">
           <DepositSection form={form} doc={doc} totals={totals} desktop hintCents={depositHint} />
           <label className="label gap-3">
@@ -254,6 +256,7 @@ export function DocumentForm({
         invoice={values.type === 'invoice'}
         totals={totals}
       />
+      {values.type === 'invoice' && <ExtrasEditor form={form} desktop={false} />}
       <DepositSection
         form={form}
         doc={doc}

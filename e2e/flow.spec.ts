@@ -295,3 +295,53 @@ test('the date picked in the form is the one in the downloaded PDF (date and num
   await page.getByLabel('Fecha').fill('2026-12-01');
   await expect(page.getByLabel('Número')).toHaveValue('A-1043');
 });
+
+test('invoice: extra charges are added to the total and printed', async ({ page }, info) => {
+  const mobile = isMobile(info);
+  await fillSample(page, mobile);
+  // Estimates have no extra charges.
+  await expect(page.getByRole('button', { name: 'Agregar cargo extra' })).toHaveCount(0);
+
+  // On the phone, "Convertir en Invoice" is on the preview screen; it returns to the form to ask
+  // about the deposit received.
+  if (mobile) await page.getByRole('button', { name: 'Ver PDF' }).click();
+  await page.getByRole('button', { name: 'Convertir en Invoice' }).click();
+  await page.getByText('Sin anticipo', { exact: true }).click();
+  await page.getByRole('button', { name: 'Agregar cargo extra' }).click();
+  const extra = page.getByRole('listitem', { name: 'Cargo extra 1' });
+  await expect(extra.getByLabel('Descripción')).toBeFocused();
+  await extra.getByLabel('Descripción').fill('Debris disposal');
+  await extra.getByLabel('Monto $').fill('50');
+
+  if (mobile) {
+    await expect(page.getByText('$18,406.75').first()).toBeVisible();
+    await page.getByRole('button', { name: 'Ver PDF' }).click();
+  }
+  const preview = page.getByLabel('Vista previa del PDF');
+  await expect(preview.getByText('ADDITIONAL CHARGES')).toBeVisible();
+  await expect(preview.getByText('Debris disposal')).toBeVisible();
+  await expect(preview.getByText('$18,406.75').first()).toBeVisible();
+
+  const download = page.waitForEvent('download');
+  await page.getByRole('button', { name: mobile ? 'Descargar' : 'Descargar PDF' }).click();
+  const path = info.outputPath('invoice-extras.pdf');
+  await (await download).saveAs(path);
+  const text = pdfText(path);
+  for (const s of ['ADDITIONALCHARGES', 'Debrisdisposal$50.00', '$18,406.75'])
+    expect(text).toContain(s);
+});
+
+test('invoice: an extra charge needs a description and an amount', async ({ page }, info) => {
+  const mobile = isMobile(info);
+  await fillSample(page, mobile);
+  if (mobile) await page.getByRole('button', { name: 'Ver PDF' }).click();
+  await page.getByRole('button', { name: 'Convertir en Invoice' }).click();
+  await page.getByText('Sin anticipo', { exact: true }).click();
+  await page.getByRole('button', { name: 'Agregar cargo extra' }).click();
+  await page.getByRole('button', { name: mobile ? 'Ver PDF' : 'Descargar PDF' }).click();
+  const extra = page.getByRole('listitem', { name: 'Cargo extra 1' });
+  await expect(extra.getByText('Escribe qué es el cargo.')).toBeVisible();
+  await expect(extra.getByText('Falta el monto.')).toBeVisible();
+  await page.getByRole('button', { name: 'Quitar cargo extra 1' }).click();
+  await expect(page.getByRole('listitem', { name: 'Cargo extra 1' })).toHaveCount(0);
+});
