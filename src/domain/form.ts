@@ -98,7 +98,8 @@ export function emptyOption(items: FormItem[] = []): FormOption {
 
 /**
  * Steps typed one per line → clean list. Blank lines are dropped and numbering Danilo typed
- * ("1.", "2)", "Step 3:") is removed, since the PDF numbers them itself.
+ * ("1. ", "2) ", "Step 3:") is removed, since the PDF numbers them itself. A step that starts
+ * with a number ("3-coat finish", "8:00 AM arrival", "2 days drying") is kept as is.
  */
 export function parseSteps(raw: string): string[] {
   return raw
@@ -106,7 +107,7 @@ export function parseSteps(raw: string): string[] {
     .map((line) =>
       line
         .trim()
-        .replace(/^(?:step\s*)?\d+\s*[.):-]\s*/i, '')
+        .replace(/^(?:step\s*\d+\s*[.):-]?|\d+[.)])\s+/i, '')
         .trim(),
     )
     .filter(Boolean);

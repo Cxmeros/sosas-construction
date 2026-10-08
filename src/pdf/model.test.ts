@@ -142,12 +142,12 @@ describe('invoice extra charges', () => {
 describe('work-process steps', () => {
   it('print before the terms only when there are steps', () => {
     const pages = paginate(buildPdfModel(ESTIMATE_WITH_STEPS));
-    const stepsPage = pages.findIndex((p) => p.showSteps);
-    expect(pages.filter((p) => p.showSteps)).toHaveLength(1);
+    const stepsPage = pages.findIndex((p) => p.steps !== null);
+    expect(pages.filter((p) => p.steps !== null)).toHaveLength(1);
     expect(stepsPage).toBeGreaterThanOrEqual(0);
     expect(stepsPage).toBeLessThanOrEqual(pages.findIndex((p) => p.showTerms));
     expect(pages.at(-1)?.showTerms).toBe(true);
-    expect(paginate(buildPdfModel(SAMPLE_ESTIMATE)).some((p) => p.showSteps)).toBe(false);
+    expect(paginate(buildPdfModel(SAMPLE_ESTIMATE)).some((p) => p.steps !== null)).toBe(false);
   });
 
   it('move whole to the next page when they do not fit', () => {
@@ -156,7 +156,22 @@ describe('work-process steps', () => {
       (_, i) => `Step ${String(i + 1)} ${'word '.repeat(30)}`,
     );
     const pages = paginate(buildPdfModel({ ...LONG_ESTIMATE, steps }));
-    expect(pages.filter((p) => p.showSteps)).toHaveLength(1);
+    expect(pages.filter((p) => p.steps !== null)).toHaveLength(1);
+    expect(pages.at(-1)?.showTerms).toBe(true);
+  });
+
+  it('continue on the next page when the list is longer than a page', () => {
+    // 15 steps of 200 wide characters: several lines each, more than one page.
+    const steps = Array.from({ length: 15 }, (_, i) => `${String(i + 1)} ${'WWWW '.repeat(39)}`);
+    const pages = paginate(buildPdfModel({ ...LONG_ESTIMATE, steps }));
+    const ranges = pages.flatMap((p) => (p.steps ? [p.steps] : []));
+    expect(ranges.length).toBeGreaterThan(1);
+    // Every step once, in order.
+    expect(ranges[0]?.from).toBe(0);
+    ranges.slice(1).forEach((r, i) => {
+      expect(r.from).toBe(ranges[i]?.to);
+    });
+    expect(ranges.at(-1)?.to).toBe(15);
     expect(pages.at(-1)?.showTerms).toBe(true);
   });
 });

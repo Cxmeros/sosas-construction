@@ -282,6 +282,9 @@ describe('work-process steps (SPEC §3.7b)', () => {
       parseSteps('1. Move furniture\n\n  2) Sand the floor  \nStep 3: Finish\nInspect'),
     ).toEqual(['Move furniture', 'Sand the floor', 'Finish', 'Inspect']);
     expect(parseSteps('   \n')).toEqual([]);
+    expect(
+      parseSteps('3-coat polyurethane finish\n8:00 AM crew arrival\n2-3 days drying\n2 coats'),
+    ).toEqual(['3-coat polyurethane finish', '8:00 AM crew arrival', '2-3 days drying', '2 coats']);
   });
 
   it('go on estimates only', () => {

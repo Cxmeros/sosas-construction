@@ -13,6 +13,7 @@ import {
   SAMPLE_ESTIMATE,
   SAMPLE_INVOICE,
 } from './fixtures';
+import { paginate } from './layout';
 import { buildPdfModel } from './model';
 import type { DocumentData } from '../domain/types';
 
@@ -131,6 +132,15 @@ describe('DocumentPdf', () => {
     }
     const plain = await renderText(SAMPLE_ESTIMATE, 'no-steps');
     expect(plain.text).not.toContain('WORKPROCESS');
+  });
+
+  it('continues a work-process list longer than a page, with the pages the layout planned', async () => {
+    const steps = Array.from({ length: 15 }, (_, i) => `${String(i + 1)} ${'WWWW '.repeat(39)}`);
+    const doc = { ...LONG_ESTIMATE, steps };
+    const { text, pages } = await renderText(doc, 'long-steps');
+    expect(pages).toBe(paginate(buildPdfModel(doc)).length);
+    expect(text).toContain('WORKPROCESS(continued)');
+    expect(text).toContain('15.15WWWW');
   });
 
   it('paginates the long estimate with the table header repeated', async () => {

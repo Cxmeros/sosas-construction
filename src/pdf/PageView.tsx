@@ -506,16 +506,19 @@ export function PageView({ model, page }: { model: PdfModel; page: PdfPage }) {
         </div>
       )}
 
-      {page.showSteps && (
-        <Section label="WORK PROCESS">
-          {model.steps.map((step, i) => (
-            <div key={i} style={{ display: 'flex' }}>
-              <span style={{ width: STEP_NUMBER_WIDTH, flex: 'none', fontWeight: 700 }}>
-                {i + 1}.
-              </span>
-              <span style={{ flex: 1, minWidth: 0 }}>{step}</span>
-            </div>
-          ))}
+      {page.steps && (
+        <Section label={page.steps.from > 0 ? 'WORK PROCESS (continued)' : 'WORK PROCESS'}>
+          {model.steps.slice(page.steps.from, page.steps.to).map((step, k) => {
+            const n = (page.steps?.from ?? 0) + k + 1;
+            return (
+              <div key={n} style={{ display: 'flex' }}>
+                <span style={{ width: STEP_NUMBER_WIDTH, flex: 'none', fontWeight: 700 }}>
+                  {n}.
+                </span>
+                <span style={{ flex: 1, minWidth: 0 }}>{step}</span>
+              </div>
+            );
+          })}
         </Section>
       )}
 

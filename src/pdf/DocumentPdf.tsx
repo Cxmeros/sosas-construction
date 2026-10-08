@@ -561,16 +561,21 @@ function PdfPageView({
         </View>
       ) : null}
 
-      {page.showSteps ? (
+      {page.steps ? (
         <View wrap={false}>
-          <Text style={s.bar}>WORK PROCESS</Text>
+          <Text style={s.bar}>
+            {page.steps.from > 0 ? 'WORK PROCESS (continued)' : 'WORK PROCESS'}
+          </Text>
           <View style={s.box}>
-            {model.steps.map((step, i) => (
-              <View key={i} style={{ flexDirection: 'row' }}>
-                <Text style={{ width: pt(STEP_NUMBER_WIDTH), fontWeight: 700 }}>{i + 1}.</Text>
-                <Text style={{ flex: 1 }}>{step}</Text>
-              </View>
-            ))}
+            {model.steps.slice(page.steps.from, page.steps.to).map((step, k) => {
+              const n = (page.steps?.from ?? 0) + k + 1;
+              return (
+                <View key={n} style={{ flexDirection: 'row' }}>
+                  <Text style={{ width: pt(STEP_NUMBER_WIDTH), fontWeight: 700 }}>{n}.</Text>
+                  <Text style={{ flex: 1 }}>{step}</Text>
+                </View>
+              );
+            })}
           </View>
         </View>
       ) : null}

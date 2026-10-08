@@ -51,6 +51,9 @@ function hasContent(values: FormValues): boolean {
   return (
     values.customer.name.trim() !== '' ||
     values.jobDescription.trim() !== '' ||
+    values.extras.length > 0 ||
+    // Steps count only when they differ from the saved default every estimate starts with.
+    values.steps.trim() !== (loadPrefs().defaultSteps ?? '').trim() ||
     values.options.some(
       (o) =>
         o.title.trim() !== '' ||
@@ -77,7 +80,11 @@ function initialState(): Initial {
 }
 
 const AUTOSAVE_MS = 600;
-const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
+/**
+ * A finished date. While the year is being typed the date input reports 0002-, 0020-, 0202-…:
+ * those must not take numbers.
+ */
+const SETTLED_DATE = /^20\d{2}-\d{2}-\d{2}$/;
 
 export function useDocument() {
   const [initial] = useState(initialState);
@@ -128,7 +135,7 @@ export function useDocument() {
   useEffect(() => {
     const sub = watch((values, { name }) => {
       const { type, number, date } = values;
-      if (name !== 'date' || !type || !number || !date || !ISO_DATE.test(date)) return;
+      if (name !== 'date' || !type || !number || !date || !SETTLED_DATE.test(date)) return;
       if (!Object.values(numbers.current).includes(number)) return;
       const next = autoNumber(type, date);
       if (next !== number) setValue('number', next, { shouldDirty: true });
