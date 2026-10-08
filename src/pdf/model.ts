@@ -16,6 +16,8 @@ export interface PdfRow {
   amountCents: number;
   /** "1,625 sq ft × $7.50" (empty for lump sum): the detail line in the two-column layout. */
   detail: string;
+  /** An invoice extra charge (SPEC §3.7c), printed under "ADDITIONAL CHARGES". */
+  kind: 'item' | 'extra';
 }
 
 export interface PdfOption {
@@ -80,6 +82,7 @@ function buildRows(items: DocumentData['options'][number]['items']): PdfRow[] {
       detail: lump
         ? ''
         : `${formatQty(item.qtyHundredths)} ${item.unit === 'other' ? item.otherUnit || 'other' : item.unit} × ${formatCents(item.unitPriceCents)}`,
+      kind: 'item',
     };
   });
 }
@@ -87,6 +90,19 @@ function buildRows(items: DocumentData['options'][number]['items']): PdfRow[] {
 export function buildPdfModel(doc: DocumentData): PdfModel {
   const invoice = doc.type === 'invoice';
   const multi = doc.options.length > 1;
+
+  const extraRows = doc.extras.map((extra): PdfRow => ({
+    key: extra.id,
+    ...splitDescription(extra.description),
+    qty: '',
+    unit: '',
+    unitPrice: '',
+    amount: formatCents(extra.amountCents),
+    amountCents: extra.amountCents,
+    detail: '',
+    kind: 'extra',
+  }));
+  const last = doc.options.length - 1;
 
   const options = doc.options.map((option, i): PdfOption => {
     const totals = computeTotals(option.items, doc.deposit, doc.extras);
@@ -109,7 +125,8 @@ export function buildPdfModel(doc: DocumentData): PdfModel {
       shortLabel,
       title: option.title,
       description: option.description,
-      rows: buildRows(option.items),
+      // Extras exist only on invoices (one option): they follow its items.
+      rows: i === last ? [...buildRows(option.items), ...extraRows] : buildRows(option.items),
       total: formatCents(totals.totalCents),
       totalCents: totals.totalCents,
       deposit,

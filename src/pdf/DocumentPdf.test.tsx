@@ -5,7 +5,13 @@ import { join, resolve } from 'node:path';
 import { renderToBuffer } from '@react-pdf/renderer';
 import { describe, expect, it } from 'vitest';
 import { DocumentPdf, registerFonts } from './DocumentPdf';
-import { LONG_ESTIMATE, OPTIONS_ESTIMATE, SAMPLE_ESTIMATE, SAMPLE_INVOICE } from './fixtures';
+import {
+  INVOICE_WITH_EXTRAS,
+  LONG_ESTIMATE,
+  OPTIONS_ESTIMATE,
+  SAMPLE_ESTIMATE,
+  SAMPLE_INVOICE,
+} from './fixtures';
 import { buildPdfModel } from './model';
 import type { DocumentData } from '../domain/types';
 
@@ -87,6 +93,21 @@ describe('DocumentPdf', () => {
     expect(text).not.toContain('1,625');
     expect(text).not.toContain('$0.85');
     expect(text).toContain('Installandrefinish$12,187.50');
+  });
+
+  it('prints invoice extra charges and adds them to the total', async () => {
+    const { text } = await renderText(INVOICE_WITH_EXTRAS, 'invoice-extras');
+    for (const s of [
+      'ADDITIONAL CHARGES',
+      'Debris disposal',
+      '$50.00',
+      'Extra trip for materials',
+      '$125.00',
+      '$18,531.75',
+      '$12,972.22',
+    ]) {
+      expect(text).toContain(s.replace(/\s+/g, ''));
+    }
   });
 
   it('paginates the long estimate with the table header repeated', async () => {

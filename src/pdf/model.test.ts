@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { LONG_ESTIMATE, OPTIONS_ESTIMATE, SAMPLE_ESTIMATE, SAMPLE_INVOICE } from './fixtures';
+import {
+  INVOICE_WITH_EXTRAS,
+  LONG_ESTIMATE,
+  OPTIONS_ESTIMATE,
+  SAMPLE_ESTIMATE,
+  SAMPLE_INVOICE,
+} from './fixtures';
 import { buildPdfModel, splitDescription } from './model';
 import { paginate, type PdfPage } from './layout';
 import { countLines } from './measure';
@@ -95,6 +101,32 @@ describe('buildPdfModel', () => {
       ['$1,260.00', '$2,940.00'],
       ['$1,639.50', '$3,825.50'],
     ]);
+  });
+});
+
+describe('invoice extra charges', () => {
+  it('follow the items and count in the total, deposit and balance', () => {
+    const m = buildPdfModel(INVOICE_WITH_EXTRAS);
+    const rows = m.options[0]!.rows;
+    expect(rows.map((r) => r.kind)).toEqual(['item', 'item', 'item', 'item', 'extra', 'extra']);
+    expect(rows.slice(4).map((r) => [r.description, r.amount])).toEqual([
+      ['Debris disposal', '$50.00'],
+      ['Extra trip for materials', '$125.00'],
+    ]);
+    // $18,356.75 + $175 = $18,531.75; 30 % deposit received = $5,559.53.
+    expect(m.options[0]).toMatchObject({ total: '$18,531.75', balance: '$12,972.22' });
+  });
+
+  it('get their head row again when they continue on another page', () => {
+    const extras = Array.from({ length: 10 }, (_, i) => ({
+      id: `x${String(i)}`,
+      description: `Extra charge number ${String(i + 1)}`,
+      amountCents: 1000,
+    }));
+    const doc = { ...LONG_ESTIMATE, type: 'invoice' as const, extras, estimateRef: '' };
+    const pages = paginate(buildPdfModel(doc));
+    expect(rowsOf(pages).filter((r) => r.kind === 'extra')).toHaveLength(10);
+    expect(pages.at(-1)?.segments.at(-1)?.showTotals).toBe(true);
   });
 });
 

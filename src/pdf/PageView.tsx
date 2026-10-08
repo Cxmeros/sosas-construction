@@ -195,7 +195,8 @@ function Row({ row, simple }: { row: PdfRow; simple: boolean }) {
   );
 }
 
-function TableHead({ simple }: { simple: boolean }) {
+/** `label`: "DESCRIPTION", or "ADDITIONAL CHARGES" above an invoice's extra charges. */
+function TableHead({ simple, label = 'DESCRIPTION' }: { simple: boolean; label?: string }) {
   return (
     <div
       style={{
@@ -208,7 +209,7 @@ function TableHead({ simple }: { simple: boolean }) {
         letterSpacing: '0.08em',
       }}
     >
-      <span style={cell('left', true)}>DESCRIPTION</span>
+      <span style={cell('left', true)}>{label}</span>
       {!simple && (
         <>
           <span style={cell('right')}>QTY</span>
@@ -355,6 +356,8 @@ function OptionSegment({
   simple: boolean;
 }) {
   const continued = segment.header === 'continued';
+  const items = segment.rows.filter((r) => r.kind === 'item');
+  const extras = segment.rows.filter((r) => r.kind === 'extra');
   return (
     <>
       <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -368,9 +371,13 @@ function OptionSegment({
         )}
         {segment.showTable && (
           <div style={{ display: 'flex', flexDirection: 'column', marginTop: TABLE_GAP }}>
-            <TableHead simple={simple} />
-            {segment.rows.map((row) => (
+            {(items.length > 0 || extras.length === 0) && <TableHead simple={simple} />}
+            {items.map((row) => (
               <Row key={row.key} row={row} simple={simple} />
+            ))}
+            {extras.length > 0 && <TableHead simple label="ADDITIONAL CHARGES" />}
+            {extras.map((row) => (
+              <Row key={row.key} row={row} simple />
             ))}
           </div>
         )}

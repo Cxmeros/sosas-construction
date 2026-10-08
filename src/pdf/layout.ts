@@ -221,14 +221,18 @@ export function paginate(model: PdfModel): PdfPage[] {
       if (!fits(start) && (page.segments.length > 0 || page.fullHeader)) breakPage();
       let current = open(i, 'full', true);
 
+      /** The "ADDITIONAL CHARGES" head row, printed before the first extra on each page. */
+      const extraHead = (segment: PdfSegment, row: PdfRow) =>
+        row.kind === 'extra' && !segment.rows.some((r) => r.kind === 'extra') ? TABLE_HEAD : 0;
+
       for (const row of option.rows) {
         const h = rowHeight(row, model.simpleTable);
-        if (current.rows.length > 0 && !fits(h)) {
+        if (current.rows.length > 0 && !fits(h + extraHead(current, row))) {
           breakPage();
           current = open(i, 'continued', true);
         }
+        y += h + extraHead(current, row);
         current.rows.push(row);
-        y += h;
       }
 
       const t = PAGE.gap + totalsHeight(option);
