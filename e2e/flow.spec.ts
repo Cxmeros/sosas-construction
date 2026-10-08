@@ -345,3 +345,36 @@ test('invoice: an extra charge needs a description and an amount', async ({ page
   await page.getByRole('button', { name: 'Quitar cargo extra 1' }).click();
   await expect(page.getByRole('listitem', { name: 'Cargo extra 1' })).toHaveCount(0);
 });
+
+test('estimate: work-process steps print numbered and can be the default', async ({
+  page,
+}, info) => {
+  const mobile = isMobile(info);
+  await fillSample(page, mobile);
+  const steps = page.getByLabel('Pasos del proceso');
+  await steps.fill('Move furniture\nSand floors\n\nApply finish');
+  await page.getByRole('button', { name: 'Guardar como predeterminado' }).click();
+  await expect(page.getByRole('status').filter({ hasText: 'próximos estimates' })).toBeVisible();
+
+  if (mobile) await page.getByRole('button', { name: 'Ver PDF' }).click();
+  const preview = page.getByLabel('Vista previa del PDF');
+  await expect(preview.getByText('WORK PROCESS')).toBeVisible();
+  await expect(preview.getByText('Apply finish')).toBeVisible();
+
+  const download = page.waitForEvent('download');
+  await page.getByRole('button', { name: mobile ? 'Descargar' : 'Descargar PDF' }).click();
+  const path = info.outputPath('estimate-steps.pdf');
+  await (await download).saveAs(path);
+  const text = pdfText(path);
+  for (const s of ['WORKPROCESS', '1.Movefurniture', '2.Sandfloors', '3.Applyfinish'])
+    expect(text).toContain(s);
+
+  // The saved steps fill the next estimate; an invoice has no steps.
+  await page.getByRole('button', { name: 'Nuevo documento' }).click();
+  await page.getByRole('button', { name: 'Sí, empezar nuevo' }).click();
+  await expect(page.getByLabel('Pasos del proceso')).toHaveValue(
+    'Move furniture\nSand floors\n\nApply finish',
+  );
+  await page.getByText('Invoice', { exact: true }).first().click();
+  await expect(page.getByLabel('Pasos del proceso')).toHaveCount(0);
+});
