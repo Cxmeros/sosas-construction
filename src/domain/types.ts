@@ -38,6 +38,13 @@ export interface EstimateOption {
   items: LineItem[];
 }
 
+/** Invoice-only extra line: description + amount, no quantity or unit (e.g. "Debris disposal"). */
+export interface ExtraCharge {
+  id: string;
+  description: string;
+  amountCents: number;
+}
+
 export interface DocumentData {
   type: DocType;
   number: string;
@@ -49,6 +56,8 @@ export interface DocumentData {
   jobDescription: string;
   /** Always at least one; an invoice has exactly one (the option the customer accepted). */
   options: EstimateOption[];
+  /** Invoice only (always empty on an estimate); added to the total. */
+  extras: ExtraCharge[];
   deposit: Deposit;
   terms: string;
 }

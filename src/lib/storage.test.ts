@@ -89,6 +89,7 @@ describe('draft migration', () => {
       ...emptyForm('estimate', 'EST-20261005-01', '2026-10-05', '30'),
     };
     delete rest.options;
+    delete rest.extras;
     const item = {
       id: 'a',
       description: 'Install and refinish',
@@ -105,5 +106,7 @@ describe('draft migration', () => {
     expect(loadDraft()?.values.options).toEqual([
       { id: 'option-1', title: '', description: '', items: [item] },
     ]);
+    // …and drafts from before invoice extra charges get an empty list.
+    expect(loadDraft()?.values.extras).toEqual([]);
   });
 });

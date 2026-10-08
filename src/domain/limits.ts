@@ -12,6 +12,8 @@ export const LIMITS = {
   optionTitle: 80,
   optionDescription: 600,
   maxOptions: 3,
+  extraDescription: 100,
+  maxExtras: 10,
   minItems: 1,
   /** Per option. */
   maxItems: 30,

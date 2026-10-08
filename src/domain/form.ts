@@ -58,6 +58,10 @@ export const formValuesSchema = z.object({
     )
     .min(1)
     .max(LIMITS.maxOptions),
+  /** Invoice extra charges (SPEC §3.7c); kept but ignored while the document is an estimate. */
+  extras: z
+    .array(z.object({ id: text(40), description: text(LIMITS.extraDescription), amount: numeric }))
+    .max(LIMITS.maxExtras),
   depositMode: z.enum(DEPOSIT_MODES),
   depositPercent: numeric,
   depositFixed: numeric,
@@ -67,6 +71,11 @@ export const formValuesSchema = z.object({
 export type FormValues = z.infer<typeof formValuesSchema>;
 export type FormOption = FormValues['options'][number];
 export type FormItem = FormOption['items'][number];
+export type FormExtra = FormValues['extras'][number];
+
+export function emptyExtra(): FormExtra {
+  return { id: crypto.randomUUID(), description: '', amount: '' };
+}
 
 export function emptyItem(): FormItem {
   return {
@@ -98,6 +107,7 @@ export function emptyForm(
     customer: { name: '', address: '', phone: '', email: '' },
     jobDescription: '',
     options: [emptyOption()],
+    extras: [],
     depositMode: depositPercent === '20' || depositPercent === '30' ? depositPercent : 'percent',
     depositPercent,
     depositFixed: '',
@@ -160,6 +170,14 @@ export function toLenientDocument(values: FormValues): DocumentData {
       description: option.description.trim(),
       items: option.items.map(toLenientItem),
     })),
+    extras:
+      values.type === 'invoice'
+        ? values.extras.map((extra) => ({
+            id: extra.id,
+            description: extra.description.trim(),
+            amountCents: parseMoneyToCents(extra.amount) ?? 0,
+          }))
+        : [],
     deposit: depositOf(values),
     terms: values.terms.trim(),
   };
@@ -207,7 +225,20 @@ export function validateForm(values: FormValues): Issue[] {
     add(['options'], 'Un invoice lleva una sola opción: la que aceptó el cliente.');
 
   const doc = toLenientDocument(values);
-  const totals = doc.options.map((o) => computeTotals(o.items, { mode: 'none' }).totalCents);
+  const totals = doc.options.map(
+    (o) => computeTotals(o.items, { mode: 'none' }, doc.extras).totalCents,
+  );
+
+  if (values.type === 'invoice') {
+    values.extras.forEach((extra, i) => {
+      const at = (field: string) => ['extras', i, field];
+      const cents = parseMoneyToCents(extra.amount);
+      if (!extra.description.trim()) add(at('description'), 'Escribe qué es el cargo.');
+      if (!extra.amount.trim()) add(at('amount'), 'Falta el monto.');
+      else if (cents === null) add(at('amount'), 'Usa solo números, ej. 50.00');
+      else if (cents > LIMITS.maxTotalCents) add(at('amount'), 'Máximo $10,000,000.');
+    });
+  }
 
   values.options.forEach((option, k) => {
     const base = ['options', k];

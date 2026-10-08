@@ -53,6 +53,7 @@ export const SAMPLE_ESTIMATE: DocumentData = {
       ],
     },
   ],
+  extras: [],
   deposit: { mode: 'percent', percentHundredths: 3000 },
   terms: DEFAULT_TERMS.estimate,
 };
@@ -63,6 +64,15 @@ export const SAMPLE_INVOICE: DocumentData = {
   number: 'INV-20261005-01',
   estimateRef: 'EST-20261005-01',
   terms: DEFAULT_TERMS.invoice,
+};
+
+/** The sample invoice with two extra charges (SPEC §3.7c): total $18,356.75 + $50 + $125. */
+export const INVOICE_WITH_EXTRAS: DocumentData = {
+  ...SAMPLE_INVOICE,
+  extras: [
+    { id: 'x1', description: 'Debris disposal', amountCents: 5000 },
+    { id: 'x2', description: 'Extra trip for materials', amountCents: 12500 },
+  ],
 };
 
 /** The long estimate from the design's two-page example (18 rows). */

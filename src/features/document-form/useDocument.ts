@@ -34,7 +34,7 @@ function requestedDeposit(values: FormValues, optionIndex: number): number | nul
   const doc = toLenientDocument(values);
   const option = doc.options[optionIndex];
   if (!option) return null;
-  const { depositCents } = computeTotals(option.items, doc.deposit);
+  const { depositCents } = computeTotals(option.items, doc.deposit, doc.extras);
   return depositCents > 0 ? depositCents : null;
 }
 

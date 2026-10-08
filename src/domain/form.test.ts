@@ -227,6 +227,54 @@ describe('options', () => {
   });
 });
 
+describe('invoice extra charges', () => {
+  const invoice = (): FormValues => ({
+    ...valid(),
+    type: 'invoice',
+    depositMode: 'none',
+    extras: [
+      { id: 'x1', description: 'Debris disposal', amount: '50' },
+      { id: 'x2', description: 'Extra trip', amount: '125.00' },
+    ],
+  });
+
+  it('adds them to the invoice total', () => {
+    const doc = documentSchema.parse(invoice());
+    expect(doc.extras.map((e) => e.amountCents)).toEqual([5000, 12500]);
+    expect(optionTotals(doc)[0]?.totalCents).toBe(1835675 + 17500);
+  });
+
+  it('validates description and amount in Spanish', () => {
+    const values = invoice();
+    values.extras = [
+      { id: 'x1', description: ' ', amount: '' },
+      { id: 'x2', description: 'Trip', amount: 'abc' },
+    ];
+    expect(messages(values)).toEqual({
+      'extras.0.description': 'Escribe qué es el cargo.',
+      'extras.0.amount': 'Falta el monto.',
+      'extras.1.amount': 'Usa solo números, ej. 50.00',
+    });
+  });
+
+  it('are ignored on an estimate (kept, not printed or counted)', () => {
+    const values = { ...invoice(), type: 'estimate' as const };
+    values.extras = [{ id: 'x1', description: '', amount: 'abc' }];
+    const doc = documentSchema.parse(values);
+    expect(doc.extras).toEqual([]);
+  });
+
+  it('allow at most 10 lines', () => {
+    const values = invoice();
+    values.extras = Array.from({ length: 11 }, (_, i) => ({
+      id: String(i),
+      description: 'x',
+      amount: '1',
+    }));
+    expect(documentSchema.safeParse(values).success).toBe(false);
+  });
+});
+
 describe('toLenientDocument', () => {
   it('counts unparseable numbers as zero', () => {
     const values = valid();

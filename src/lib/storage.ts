@@ -17,12 +17,19 @@ const KEYS = {
   prefs: 'sosa.prefs.v1',
 } as const;
 
-/** Drafts saved before estimates had options kept a flat `items` list: wrap it as one option. */
+/**
+ * Older drafts: before options they kept a flat `items` list (wrapped as one option); before
+ * invoice extra charges they had no `extras` (an empty list).
+ */
 function migrateDraftValues(values: unknown): unknown {
-  if (!values || typeof values !== 'object' || 'options' in values || !('items' in values))
-    return values;
-  const { items, ...rest } = values;
-  return { ...rest, options: [{ id: 'option-1', title: '', description: '', items }] };
+  if (!values || typeof values !== 'object') return values;
+  let migrated: Record<string, unknown> = { ...values };
+  if (!('options' in migrated) && 'items' in migrated) {
+    const { items, ...rest } = migrated;
+    migrated = { ...rest, options: [{ id: 'option-1', title: '', description: '', items }] };
+  }
+  if (!('extras' in migrated)) migrated.extras = [];
+  return migrated;
 }
 
 const draftSchema = z.object({

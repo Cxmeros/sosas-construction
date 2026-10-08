@@ -89,7 +89,7 @@ export function buildPdfModel(doc: DocumentData): PdfModel {
   const multi = doc.options.length > 1;
 
   const options = doc.options.map((option, i): PdfOption => {
-    const totals = computeTotals(option.items, doc.deposit);
+    const totals = computeTotals(option.items, doc.deposit, doc.extras);
     let deposit: PdfOption['deposit'] = null;
     if (doc.deposit.mode !== 'none') {
       const pct =

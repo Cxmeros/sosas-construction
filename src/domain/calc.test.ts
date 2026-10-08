@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { computeTotals, depositCents, lineAmountCents } from './calc';
+import { computeTotals, depositCents, lineAmountCents, optionTotals } from './calc';
 import type { LineItem } from './types';
 
 const item = (patch: Partial<LineItem>): LineItem => ({
@@ -87,5 +87,28 @@ describe('depositCents', () => {
   it('supports fractional percentages', () => {
     // 12.5% of $100.00
     expect(depositCents(10000, { mode: 'percent', percentHundredths: 1250 })).toBe(1250);
+  });
+});
+
+describe('invoice extra charges (SPEC §3.7c)', () => {
+  const extras = [
+    { id: 'a', description: 'Debris disposal', amountCents: 5000 },
+    { id: 'b', description: 'Extra trip', amountCents: 12500 },
+  ];
+  it('adds extras to the total, then applies deposit and balance', () => {
+    expect(computeTotals(SAMPLE, { mode: 'fixed', cents: 550703 }, extras)).toEqual({
+      totalCents: 1853175,
+      depositCents: 550703,
+      balanceCents: 1302472,
+    });
+  });
+  it('totals each option with the extras', () => {
+    expect(
+      optionTotals({
+        options: [{ id: 'o', title: '', description: '', items: SAMPLE }],
+        deposit: { mode: 'none' },
+        extras,
+      }),
+    ).toEqual([{ totalCents: 1853175, depositCents: 0, balanceCents: 1853175 }]);
   });
 });
