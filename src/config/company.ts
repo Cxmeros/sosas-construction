@@ -8,6 +8,14 @@ export const COMPANY = {
   tagline: 'Hardwood floors · Lansdowne, PA',
 } as const;
 
+/**
+ * Feature switches. `estimateOptions` (1–3 options per estimate, SPEC §3.11) is built and tested
+ * but turned off: after the October meeting the client chose the simple version.
+ */
+export const FEATURES: { readonly estimateOptions: boolean } = {
+  estimateOptions: false,
+};
+
 /** Brand colors shared by the app and the PDF (tokens from the Claude Design handoff). */
 export const COLORS = {
   walnut900: '#2A1A10',

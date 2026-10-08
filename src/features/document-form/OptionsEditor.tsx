@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useFieldArray, type UseFormReturn } from 'react-hook-form';
 import { emptyItem, emptyOption, type FormValues } from '../../domain/form';
+import { FEATURES } from '../../config/company';
 import { LIMITS } from '../../domain/limits';
 import { formatCents } from '../../domain/money';
 import type { DocumentData, Totals } from '../../domain/types';
@@ -72,7 +73,8 @@ export function OptionsEditor({
     </>
   );
 
-  const addButton = !invoice && fields.length < LIMITS.maxOptions && (
+  // Turned off: a draft that already has several options still shows (and can remove) them.
+  const addButton = FEATURES.estimateOptions && !invoice && fields.length < LIMITS.maxOptions && (
     <div className="flex flex-col gap-1.5">
       <button
         type="button"
