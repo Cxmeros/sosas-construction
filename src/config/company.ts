@@ -17,10 +17,12 @@ export const OWNERS_LINE = COMPANY.owners.join(' & ');
 
 /**
  * Feature switches. `estimateOptions` (1–3 options per estimate, SPEC §3.11) is built and tested
- * but turned off: after the October meeting the client chose the simple version.
+ * but turned off: after the October meeting the client chose the simple version. `woodHeader` is
+ * a thin wood-grain strip across the top of each PDF page, off until the client sees it.
  */
-export const FEATURES: { readonly estimateOptions: boolean } = {
+export const FEATURES: { readonly estimateOptions: boolean; readonly woodHeader: boolean } = {
   estimateOptions: false,
+  woodHeader: false,
 };
 
 /** Brand colors shared by the app and the PDF (tokens from the Claude Design handoff). */

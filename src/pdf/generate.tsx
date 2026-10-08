@@ -1,4 +1,5 @@
-import { LOGO } from '../config/logo';
+import { FEATURES } from '../config/company';
+import { LOGO, WOOD_STRIP } from '../config/logo';
 import type { DocumentData } from '../domain/types';
 import { buildPdfModel } from './model';
 
@@ -11,6 +12,12 @@ export async function renderPdf(doc: DocumentData): Promise<{ blob: Blob; fileNa
   ]);
   registerFonts(FONT_FILES);
   const model = buildPdfModel(doc);
-  const blob = await pdf(<DocumentPdf model={model} logoSrc={LOGO.src} />).toBlob();
+  const blob = await pdf(
+    <DocumentPdf
+      model={model}
+      logoSrc={LOGO.src}
+      woodSrc={FEATURES.woodHeader ? WOOD_STRIP : undefined}
+    />,
+  ).toBlob();
   return { blob, fileName: model.fileName };
 }

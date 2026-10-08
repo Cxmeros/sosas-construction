@@ -21,6 +21,7 @@ import {
   STEP_NUMBER_WIDTH,
   TABLE_GAP,
   TYPE,
+  WOOD_STRIP_HEIGHT,
   paginate,
   type PdfPage,
   type PdfSegment,
@@ -464,13 +465,29 @@ function PdfPageView({
   model,
   page,
   logoSrc,
+  woodSrc,
 }: {
   model: PdfModel;
   page: PdfPage;
   logoSrc: string;
+  woodSrc: string | undefined;
 }) {
   return (
     <Page size="LETTER" style={s.page}>
+      {woodSrc ? (
+        <Image
+          src={woodSrc}
+          fixed
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: pt(PAGE.width),
+            height: pt(WOOD_STRIP_HEIGHT),
+            objectFit: 'cover',
+          }}
+        />
+      ) : null}
       {page.fullHeader ? (
         <>
           <FullHeader model={model} logoSrc={logoSrc} />
@@ -577,7 +594,16 @@ function PdfPageView({
   );
 }
 
-export function DocumentPdf({ model, logoSrc }: { model: PdfModel; logoSrc: string }) {
+export function DocumentPdf({
+  model,
+  logoSrc,
+  woodSrc,
+}: {
+  model: PdfModel;
+  logoSrc: string;
+  /** Wood strip image (`FEATURES.woodHeader`); none when undefined. */
+  woodSrc?: string;
+}) {
   const pages = paginate(model);
   return (
     <Document
@@ -588,7 +614,13 @@ export function DocumentPdf({ model, logoSrc }: { model: PdfModel; logoSrc: stri
       language="en-US"
     >
       {pages.map((page) => (
-        <PdfPageView key={page.pageNo} model={model} page={page} logoSrc={logoSrc} />
+        <PdfPageView
+          key={page.pageNo}
+          model={model}
+          page={page}
+          logoSrc={logoSrc}
+          woodSrc={woodSrc}
+        />
       ))}
     </Document>
   );

@@ -1,8 +1,19 @@
 import type { CSSProperties, ReactNode } from 'react';
-import { COLORS as C, COMPANY, OWNERS_LINE } from '../config/company';
-import { LOGO, logoWidth } from '../config/logo';
+import { COLORS as C, COMPANY, FEATURES, OWNERS_LINE } from '../config/company';
+import { LOGO, logoWidth, WOOD_STRIP } from '../config/logo';
 import { formatCents } from '../domain/money';
-import { BAR, BOX, CELL, COLS, COLUMNS, PAGE, STEP_NUMBER_WIDTH, TABLE_GAP, TYPE } from './layout';
+import {
+  BAR,
+  BOX,
+  CELL,
+  COLS,
+  COLUMNS,
+  PAGE,
+  STEP_NUMBER_WIDTH,
+  TABLE_GAP,
+  TYPE,
+  WOOD_STRIP_HEIGHT,
+} from './layout';
 import type { PdfPage, PdfSegment } from './layout';
 import type { PdfModel, PdfOption, PdfRow } from './model';
 
@@ -416,6 +427,21 @@ export function PageView({ model, page }: { model: PdfModel; page: PdfPage }) {
         textAlign: 'left',
       }}
     >
+      {FEATURES.woodHeader && (
+        <img
+          src={WOOD_STRIP}
+          alt=""
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: PAGE.width,
+            height: WOOD_STRIP_HEIGHT,
+            objectFit: 'cover',
+            display: 'block',
+          }}
+        />
+      )}
       {page.fullHeader ? (
         <>
           <FullHeader model={model} />

@@ -122,8 +122,9 @@ Carta (8.5×11 in), márgenes 0.75 in, texto real y seleccionable, fuentes embeb
 Basado en el formato actual de Danilo, con correcciones:
 1. Encabezado: logo a la izquierda (PNG de fondo blanco: no ponerlo sobre fondos de color); título "WORK ESTIMATE" o "INVOICE" a la derecha;
    debajo, número y fecha (MM/DD/YYYY).
-   - Opcional: fondo con textura de madera en el encabezado, con un flag en `config/company.ts`
-     **apagado por defecto**. El logo sigue sobre su recuadro blanco (regla de arriba).
+   - Opcional: franja delgada con textura de madera en el borde superior de cada página
+     (`FEATURES.woodHeader` en `config/company.ts`, **apagado por defecto**). Va dentro del margen
+     superior, sin texto encima, así el logo sigue sobre blanco y el contraste no cambia (+7 KB).
 2. Bloque empresa: **Danilo Sosa & Carlos Sosa** · 29 E Providence Rd · Lansdowne, PA 19050 ·
    435-512-4801 · 208-600-7776 (desde `config/company.ts`).
 3. **CUSTOMER INFORMATION** (el original dice "COSTUMER": corregir).

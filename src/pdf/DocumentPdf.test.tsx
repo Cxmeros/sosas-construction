@@ -47,6 +47,15 @@ async function renderText(
   return { text: text.replace(/\s+/g, ''), pages };
 }
 
+it('embeds the optional wood strip once, adding only a few KB', async () => {
+  const model = buildPdfModel(LONG_ESTIMATE);
+  const plain = await renderToBuffer(<DocumentPdf model={model} logoSrc={logo} />);
+  const wood = await renderToBuffer(
+    <DocumentPdf model={model} logoSrc={logo} woodSrc={join(assets, 'wood-strip.jpg')} />,
+  );
+  expect(wood.length - plain.length).toBeLessThan(15_000);
+});
+
 describe('DocumentPdf', () => {
   it('renders the SPEC §6 estimate with total, deposit and balance', async () => {
     const { text, pages } = await renderText(SAMPLE_ESTIMATE, 'estimate');

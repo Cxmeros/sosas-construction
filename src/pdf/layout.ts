@@ -54,6 +54,9 @@ export const BOX = { padY: 10, padX: 12, gap: 4 } as const;
 /** Light grid around the items table; cell padding inside each column. */
 export const CELL = { padY: 7, padX: 8 } as const;
 
+/** Wood strip (`FEATURES.woodHeader`): drawn inside the top padding, so it moves nothing. */
+export const WOOD_STRIP_HEIGHT = 20;
+
 const FULL_HEADER = 92 + 14 + 3;
 const COMPACT_HEADER = 48 + 10 + 3;
 const BAR_HEIGHT = lh(TYPE.label) + 2 * BAR.padY;
