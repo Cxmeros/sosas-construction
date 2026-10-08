@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { computeTotals } from '../../domain/calc';
 import { emptyForm, documentSchema, toLenientDocument, type FormValues } from '../../domain/form';
-import { counterKey, formatDocNumber, numberForDate, toIsoDate } from '../../domain/numbering';
+import { counterKey, formatDocNumber, toIsoDate } from '../../domain/numbering';
 import { DEFAULT_TERMS } from '../../domain/terms';
 import type { DocType, DocumentData } from '../../domain/types';
 import {
@@ -77,6 +77,7 @@ function initialState(): Initial {
 }
 
 const AUTOSAVE_MS = 600;
+const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 
 export function useDocument() {
   const [initial] = useState(initialState);
@@ -91,10 +92,18 @@ export function useDocument() {
   });
   const { getValues, setValue, reset, watch } = form;
 
-  /** Numbers already handed out for this document, so toggling the type doesn't burn numbers. */
-  const numbers = useRef<Partial<Record<DocType, string>>>({
-    [initial.values.type]: initial.values.number,
+  /**
+   * Automatic numbers handed out for this document, by counter (type + day), so toggling the type
+   * or the date back doesn't burn numbers. A number not in here is one Danilo typed.
+   */
+  const numbers = useRef<Record<string, string>>({
+    [counterKey(initial.values.type, initial.values.date)]: initial.values.number,
   });
+  const autoNumber = useCallback((type: DocType, isoDate: string) => {
+    const key = counterKey(type, isoDate);
+    numbers.current[key] ??= allocateNumber(type, isoDate);
+    return numbers.current[key];
+  }, []);
 
   // Autosave the draft (the document in progress — not a history, SPEC §4).
   useEffect(() => {
@@ -113,21 +122,21 @@ export function useDocument() {
     };
   }, [watch, getValues]);
 
-  // The automatic number carries a date (EST-YYYYMMDD-NN): keep it on the date Danilo picks, so the
-  // PDF never shows one date in the number and another in DATE. A number he typed is left alone.
+  // The automatic number carries a date (EST-YYYYMMDD-NN): take it from the counter of the date
+  // Danilo picks, so the PDF never shows one date in the number and another in DATE. A number he
+  // typed is left alone.
   useEffect(() => {
     const sub = watch((values, { name }) => {
-      if (name !== 'date' || !values.type || !values.number || !values.date) return;
-      if (values.number !== numbers.current[values.type]) return;
-      const moved = numberForDate(values.number, values.date);
-      if (!moved || moved === values.number) return;
-      numbers.current[values.type] = moved;
-      setValue('number', moved, { shouldDirty: true });
+      const { type, number, date } = values;
+      if (name !== 'date' || !type || !number || !date || !ISO_DATE.test(date)) return;
+      if (!Object.values(numbers.current).includes(number)) return;
+      const next = autoNumber(type, date);
+      if (next !== number) setValue('number', next, { shouldDirty: true });
     });
     return () => {
       sub.unsubscribe();
     };
-  }, [watch, setValue]);
+  }, [watch, setValue, autoNumber]);
 
   const persist = useCallback((values: FormValues) => {
     const now = Date.now();
@@ -148,11 +157,8 @@ export function useDocument() {
       if (current.type === type) return;
       const opts = { shouldDirty: true, shouldValidate: form.formState.isSubmitted };
       // Swap the number only while it is still the auto-generated one.
-      if (current.number === numbers.current[current.type]) {
-        const number = numbers.current[type] ?? allocateNumber(type, toIsoDate(new Date()));
-        numbers.current[type] = number;
-        setValue('number', number, opts);
-      }
+      if (Object.values(numbers.current).includes(current.number))
+        setValue('number', autoNumber(type, current.date || toIsoDate(new Date())), opts);
       if (current.terms.trim() === DEFAULT_TERMS[current.type])
         setValue('terms', DEFAULT_TERMS[type], opts);
       if (type === 'estimate') {
@@ -168,7 +174,7 @@ export function useDocument() {
       }
       setValue('type', type, opts);
     },
-    [getValues, setValue, form.formState.isSubmitted],
+    [getValues, setValue, form.formState.isSubmitted, autoNumber],
   );
 
   /** The estimate as it was before the last conversion, so "Deshacer" can bring it back. */
@@ -186,7 +192,7 @@ export function useDocument() {
       beforeConvert.current = { values: current, numbers: { ...numbers.current } };
       const today = toIsoDate(new Date());
       const number = allocateNumber('invoice', today);
-      numbers.current = { invoice: number };
+      numbers.current = { [counterKey('invoice', today)]: number };
       const asked = current.depositMode !== 'none';
       setDepositHint(asked ? requestedDeposit(current, optionIndex) : null);
       const values: FormValues = {
@@ -221,7 +227,7 @@ export function useDocument() {
     clearDraft();
     const values = freshForm();
     saveDraft(values);
-    numbers.current = { [values.type]: values.number };
+    numbers.current = { [counterKey(values.type, values.date)]: values.number };
     beforeConvert.current = null;
     setDepositHint(null);
     reset(values);

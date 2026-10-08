@@ -11,19 +11,6 @@ export function counterKey(type: DocType, isoDate: string): string {
   return `${PREFIX[type]}-${isoDate.replace(/-/g, '')}`;
 }
 
-const AUTO_NUMBER = /^(EST|INV)-\d{8}-(\d+)$/;
-
-/**
- * The same number with its date part set to `isoDate` (EST-20261008-01 → EST-20261020-01), so the
- * number never contradicts the date printed on the PDF. Null when `number` is not in the
- * automatic format (Danilo typed his own).
- */
-export function numberForDate(number: string, isoDate: string): string | null {
-  const match = AUTO_NUMBER.exec(number);
-  if (!match || !/^\d{4}-\d{2}-\d{2}$/.test(isoDate)) return null;
-  return `${match[1] ?? ''}-${isoDate.replace(/-/g, '')}-${match[2] ?? ''}`;
-}
-
 /** Local calendar date as yyyy-mm-dd (not UTC: a late-evening estimate keeps today's date). */
 export function toIsoDate(date: Date): string {
   const y = String(date.getFullYear());

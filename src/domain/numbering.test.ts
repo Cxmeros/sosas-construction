@@ -1,11 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  documentFileName,
-  formatDateUS,
-  formatDocNumber,
-  numberForDate,
-  toIsoDate,
-} from './numbering';
+import { documentFileName, formatDateUS, formatDocNumber, toIsoDate } from './numbering';
 
 describe('formatDocNumber', () => {
   it('formats estimates and invoices', () => {
@@ -39,19 +33,5 @@ describe('documentFileName', () => {
   });
   it('omits an empty customer', () => {
     expect(documentFileName('estimate', 'EST-1', '  ')).toBe('Estimate_EST-1.pdf');
-  });
-});
-
-describe('numberForDate', () => {
-  it('moves an automatic number to the chosen date, keeping its sequence', () => {
-    expect(numberForDate('EST-20261008-01', '2026-10-20')).toBe('EST-20261020-01');
-    expect(numberForDate('INV-20261008-12', '2025-01-02')).toBe('INV-20250102-12');
-  });
-  it('leaves numbers Danilo typed himself alone', () => {
-    expect(numberForDate('A-1043', '2026-10-20')).toBeNull();
-    expect(numberForDate('EST-2026108-01', '2026-10-20')).toBeNull();
-  });
-  it('ignores an incomplete date', () => {
-    expect(numberForDate('EST-20261008-01', '')).toBeNull();
   });
 });

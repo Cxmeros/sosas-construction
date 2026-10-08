@@ -40,7 +40,7 @@ const draftSchema = z.object({
 });
 export type Draft = z.infer<typeof draftSchema>;
 
-/** Only the current day is kept: `{ "EST-20261005": 2, "INV-20261005": 1 }`. */
+/** `{ "EST-20261005": 2, "INV-20261005": 1 }`, the most recently used last. */
 const countersSchema = z.record(z.string().max(20), z.number().int().nonnegative().max(9999));
 
 const prefsSchema = z.object({
@@ -101,13 +101,17 @@ export function clearDraft(): void {
 }
 
 /** Returns the next sequence for `key` (e.g. "EST-20261005") and records it. */
+const MAX_COUNTERS = 100;
+
 export function nextSequence(key: string): number {
   const counters = read(KEYS.counters, countersSchema) ?? {};
   const next = (counters[key] ?? 0) + 1;
-  const day = key.slice(-8);
-  // Drop other days so the record stays tiny.
-  const kept = Object.fromEntries(Object.entries(counters).filter(([k]) => k.endsWith(day)));
-  write(KEYS.counters, { ...kept, [key]: next });
+  // Documents can be dated on other days, so several days are kept: the most recently used
+  // counters, last at the end, so the record stays small.
+  const kept = Object.entries(counters)
+    .filter(([k]) => k !== key)
+    .slice(-(MAX_COUNTERS - 1));
+  write(KEYS.counters, Object.fromEntries([...kept, [key, next]]));
   return next;
 }
 

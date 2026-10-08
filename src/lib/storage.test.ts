@@ -58,15 +58,20 @@ describe('draft', () => {
 });
 
 describe('counters', () => {
-  it('counts per prefix and day, dropping old days', () => {
+  it('counts per prefix and day, keeping other days', () => {
     expect(nextSequence('EST-20261004')).toBe(1);
     expect(nextSequence('EST-20261005')).toBe(1);
     expect(nextSequence('EST-20261005')).toBe(2);
     expect(nextSequence('INV-20261005')).toBe(1);
-    expect(JSON.parse(memory.getItem('sosa.counters.v1') ?? '')).toEqual({
-      'EST-20261005': 2,
-      'INV-20261005': 1,
-    });
+    // A document dated back to the 4th continues that day's count.
+    expect(nextSequence('EST-20261004')).toBe(2);
+  });
+
+  it('keeps only the 100 most recently used counters', () => {
+    for (let d = 1; d <= 101; d += 1) nextSequence(`EST-2026${String(1000 + d)}`);
+    const saved = JSON.parse(memory.getItem('sosa.counters.v1') ?? '') as Record<string, number>;
+    expect(Object.keys(saved)).toHaveLength(100);
+    expect(saved).not.toHaveProperty('EST-20261001');
   });
 
   it('restarts from corrupt data', () => {
