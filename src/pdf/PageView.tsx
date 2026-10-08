@@ -1,5 +1,5 @@
 import type { CSSProperties, ReactNode } from 'react';
-import { COLORS as C, COMPANY } from '../config/company';
+import { COLORS as C, COMPANY, OWNERS_LINE } from '../config/company';
 import { formatCents } from '../domain/money';
 import logoUrl from '../assets/logo-placeholder.png';
 import { BAR, BOX, CELL, COLS, COLUMNS, PAGE, TABLE_GAP, TYPE } from './layout';
@@ -74,7 +74,7 @@ function FullHeader({ model }: { model: PdfModel }) {
             flexDirection: 'column',
           }}
         >
-          <strong style={{ color: C.ink, fontSize: 13 }}>{COMPANY.owner}</strong>
+          <strong style={{ color: C.ink, fontSize: 13 }}>{OWNERS_LINE}</strong>
           <span>{COMPANY.addressLine1}</span>
           <span>{COMPANY.addressLine2}</span>
           {COMPANY.phones.map((p) => (

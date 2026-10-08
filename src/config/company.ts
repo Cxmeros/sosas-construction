@@ -1,12 +1,19 @@
 /** Fixed company data printed on every PDF. Editing it from the app is Phase 2 (SPEC §3). */
 export const COMPANY = {
   name: "Sosa's Constructions",
-  owner: 'Danilo Sosa',
+  /** Printed together in the PDF header: "Danilo Sosa & Carlos Sosa". */
+  owners: ['Danilo Sosa', 'Carlos Sosa'],
   addressLine1: '29 E Providence Rd',
   addressLine2: 'Lansdowne, PA 19050',
+  /**
+   * Both numbers from Danilo's original estimate (design/project/uploads/ESTIMADO SOSAS.docx.pdf),
+   * which lists them together without saying whose each one is.
+   */
   phones: ['435-512-4801', '208-600-7776'],
   tagline: 'Hardwood floors · Lansdowne, PA',
 } as const;
+
+export const OWNERS_LINE = COMPANY.owners.join(' & ');
 
 /**
  * Feature switches. `estimateOptions` (1–3 options per estimate, SPEC §3.11) is built and tested

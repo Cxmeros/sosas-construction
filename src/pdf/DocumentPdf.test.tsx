@@ -51,7 +51,7 @@ describe('DocumentPdf', () => {
       'CUSTOMER INFORMATION',
       'Margaret Kelly',
       'JOB DESCRIPTION',
-      'Danilo Sosa',
+      'Danilo Sosa & Carlos Sosa',
       '29 E Providence Rd',
       'Lansdowne, PA 19050',
       '435-512-4801',

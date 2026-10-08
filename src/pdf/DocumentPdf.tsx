@@ -8,7 +8,7 @@ import {
   View,
   type Styles,
 } from '@react-pdf/renderer';
-import { COLORS as C, COMPANY } from '../config/company';
+import { COLORS as C, COMPANY, OWNERS_LINE } from '../config/company';
 import { formatCents } from '../domain/money';
 import {
   BAR,
@@ -143,7 +143,7 @@ function FullHeader({ model, logoSrc }: { model: PdfModel; logoSrc: string }) {
             color: C.inkMuted,
           }}
         >
-          <Text style={{ color: C.ink, fontSize: pt(13), fontWeight: 700 }}>{COMPANY.owner}</Text>
+          <Text style={{ color: C.ink, fontSize: pt(13), fontWeight: 700 }}>{OWNERS_LINE}</Text>
           <Text>{COMPANY.addressLine1}</Text>
           <Text>{COMPANY.addressLine2}</Text>
           {COMPANY.phones.map((p) => (
