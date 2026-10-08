@@ -1,5 +1,11 @@
 import type { DocType } from './types';
 
+/**
+ * Default work-process steps (SPEC §3.7b), one per line, until Danilo saves his own on the device.
+ * Empty until the client sends the steps they use: the section only prints when it has steps.
+ */
+export const DEFAULT_STEPS = '';
+
 /** Default terms printed on the PDF (English), editable per document (SPEC §7). */
 export const DEFAULT_TERMS: Record<DocType, string> = {
   estimate:

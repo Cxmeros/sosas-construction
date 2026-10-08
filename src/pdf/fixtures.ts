@@ -54,6 +54,7 @@ export const SAMPLE_ESTIMATE: DocumentData = {
     },
   ],
   extras: [],
+  steps: [],
   deposit: { mode: 'percent', percentHundredths: 3000 },
   terms: DEFAULT_TERMS.estimate,
 };
@@ -72,6 +73,17 @@ export const INVOICE_WITH_EXTRAS: DocumentData = {
   extras: [
     { id: 'x1', description: 'Debris disposal', amountCents: 5000 },
     { id: 'x2', description: 'Extra trip for materials', amountCents: 12500 },
+  ],
+};
+
+/** The sample estimate with work-process steps (SPEC §3.7b). */
+export const ESTIMATE_WITH_STEPS: DocumentData = {
+  ...SAMPLE_ESTIMATE,
+  steps: [
+    'Move furniture and protect walls, doors and vents',
+    'Remove carpet and the damaged hardwood',
+    'Install the new hardwood floor',
+    'Sand, stain and apply three coats of polyurethane',
   ],
 };
 

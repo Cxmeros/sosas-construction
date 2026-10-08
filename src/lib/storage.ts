@@ -10,6 +10,7 @@
  */
 import { z } from 'zod';
 import { formValuesSchema, type FormValues } from '../domain/form';
+import { LIMITS } from '../domain/limits';
 
 const KEYS = {
   draft: 'sosa.draft.v1',
@@ -29,6 +30,7 @@ function migrateDraftValues(values: unknown): unknown {
     migrated = { ...rest, options: [{ id: 'option-1', title: '', description: '', items }] };
   }
   if (!('extras' in migrated)) migrated.extras = [];
+  if (!('steps' in migrated)) migrated.steps = '';
   return migrated;
 }
 
@@ -41,7 +43,11 @@ export type Draft = z.infer<typeof draftSchema>;
 /** Only the current day is kept: `{ "EST-20261005": 2, "INV-20261005": 1 }`. */
 const countersSchema = z.record(z.string().max(20), z.number().int().nonnegative().max(9999));
 
-const prefsSchema = z.object({ depositPercent: z.string().max(10) });
+const prefsSchema = z.object({
+  depositPercent: z.string().max(10),
+  /** Work-process steps new documents start with (SPEC §3.7b); absent until Danilo saves some. */
+  defaultSteps: z.string().max(LIMITS.stepsText).optional(),
+});
 export type Prefs = z.infer<typeof prefsSchema>;
 const DEFAULT_PREFS: Prefs = { depositPercent: '30' };
 
@@ -109,6 +115,7 @@ export function loadPrefs(): Prefs {
   return read(KEYS.prefs, prefsSchema) ?? DEFAULT_PREFS;
 }
 
-export function savePrefs(prefs: Prefs): void {
-  write(KEYS.prefs, prefs);
+/** Updates only the given preferences, keeping the rest. */
+export function savePrefs(prefs: Partial<Prefs>): void {
+  write(KEYS.prefs, { ...loadPrefs(), ...prefs });
 }

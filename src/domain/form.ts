@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { computeTotals } from './calc';
 import { LIMITS } from './limits';
 import { parseMoneyToCents, parseQtyToHundredths } from './money';
-import { DEFAULT_TERMS } from './terms';
+import { DEFAULT_STEPS, DEFAULT_TERMS } from './terms';
 import {
   DOC_TYPES,
   UNITS,
@@ -62,6 +62,8 @@ export const formValuesSchema = z.object({
   extras: z
     .array(z.object({ id: text(40), description: text(LIMITS.extraDescription), amount: numeric }))
     .max(LIMITS.maxExtras),
+  /** Work-process steps as typed, one per line (estimate only). */
+  steps: text(LIMITS.stepsText),
   depositMode: z.enum(DEPOSIT_MODES),
   depositPercent: numeric,
   depositFixed: numeric,
@@ -93,11 +95,28 @@ export function emptyOption(items: FormItem[] = []): FormOption {
   return { id: crypto.randomUUID(), title: '', description: '', items };
 }
 
+/**
+ * Steps typed one per line → clean list. Blank lines are dropped and numbering Danilo typed
+ * ("1.", "2)", "Step 3:") is removed, since the PDF numbers them itself.
+ */
+export function parseSteps(raw: string): string[] {
+  return raw
+    .split('\n')
+    .map((line) =>
+      line
+        .trim()
+        .replace(/^(?:step\s*)?\d+\s*[.):-]\s*/i, '')
+        .trim(),
+    )
+    .filter(Boolean);
+}
+
 export function emptyForm(
   type: DocType,
   number: string,
   date: string,
   depositPercent: string,
+  steps: string = DEFAULT_STEPS,
 ): FormValues {
   return {
     type,
@@ -108,6 +127,7 @@ export function emptyForm(
     jobDescription: '',
     options: [emptyOption()],
     extras: [],
+    steps,
     depositMode: depositPercent === '20' || depositPercent === '30' ? depositPercent : 'percent',
     depositPercent,
     depositFixed: '',
@@ -178,6 +198,7 @@ export function toLenientDocument(values: FormValues): DocumentData {
             amountCents: parseMoneyToCents(extra.amount) ?? 0,
           }))
         : [],
+    steps: values.type === 'estimate' ? parseSteps(values.steps) : [],
     deposit: depositOf(values),
     terms: values.terms.trim(),
   };
@@ -228,6 +249,14 @@ export function validateForm(values: FormValues): Issue[] {
   const totals = doc.options.map(
     (o) => computeTotals(o.items, { mode: 'none' }, doc.extras).totalCents,
   );
+
+  if (values.type === 'estimate') {
+    const steps = parseSteps(values.steps);
+    if (steps.length > LIMITS.maxSteps)
+      add(['steps'], `Máximo ${String(LIMITS.maxSteps)} pasos (uno por renglón).`);
+    else if (steps.some((step) => step.length > LIMITS.stepLength))
+      add(['steps'], `Cada paso puede tener hasta ${String(LIMITS.stepLength)} letras.`);
+  }
 
   if (values.type === 'invoice') {
     values.extras.forEach((extra, i) => {

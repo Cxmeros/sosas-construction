@@ -4,6 +4,7 @@ import {
   documentSchema,
   emptyForm,
   emptyOption,
+  parseSteps,
   toLenientDocument,
   type FormItem,
   type FormValues,
@@ -272,6 +273,43 @@ describe('invoice extra charges', () => {
       amount: '1',
     }));
     expect(documentSchema.safeParse(values).success).toBe(false);
+  });
+});
+
+describe('work-process steps (SPEC §3.7b)', () => {
+  it('splits one step per line, dropping blanks and typed numbering', () => {
+    expect(
+      parseSteps('1. Move furniture\n\n  2) Sand the floor  \nStep 3: Finish\nInspect'),
+    ).toEqual(['Move furniture', 'Sand the floor', 'Finish', 'Inspect']);
+    expect(parseSteps('   \n')).toEqual([]);
+  });
+
+  it('go on estimates only', () => {
+    const steps = 'Move furniture\nSand the floor';
+    expect(documentSchema.parse({ ...valid(), steps }).steps).toEqual([
+      'Move furniture',
+      'Sand the floor',
+    ]);
+    expect(
+      documentSchema.parse({ ...valid(), type: 'invoice', depositMode: 'none', steps }).steps,
+    ).toEqual([]);
+  });
+
+  it('allow at most 15 steps of 200 characters', () => {
+    const many = Array.from({ length: 16 }, (_, i) => `Step ${String(i)} text`).join('\n');
+    expect(messages({ ...valid(), steps: many })).toEqual({
+      steps: 'Máximo 15 pasos (uno por renglón).',
+    });
+    expect(messages({ ...valid(), steps: 'x'.repeat(201) })).toEqual({
+      steps: 'Cada paso puede tener hasta 200 letras.',
+    });
+  });
+
+  it('start from the given default', () => {
+    expect(emptyForm('estimate', 'E', '2026-10-05', '30', 'Sand\nFinish').steps).toBe(
+      'Sand\nFinish',
+    );
+    expect(emptyForm('estimate', 'E', '2026-10-05', '30').steps).toBe('');
   });
 });
 

@@ -76,6 +76,12 @@ describe('counters', () => {
 });
 
 describe('prefs', () => {
+  it('keeps saved default steps when another preference changes', () => {
+    savePrefs({ defaultSteps: 'Sand\nFinish' });
+    savePrefs({ depositPercent: '20' });
+    expect(loadPrefs()).toEqual({ depositPercent: '20', defaultSteps: 'Sand\nFinish' });
+  });
+
   it('defaults to 30 % and remembers the last deposit', () => {
     expect(loadPrefs()).toEqual({ depositPercent: '30' });
     savePrefs({ depositPercent: '20' });
@@ -90,6 +96,7 @@ describe('draft migration', () => {
     };
     delete rest.options;
     delete rest.extras;
+    delete rest.steps;
     const item = {
       id: 'a',
       description: 'Install and refinish',
@@ -108,5 +115,6 @@ describe('draft migration', () => {
     ]);
     // …and drafts from before invoice extra charges get an empty list.
     expect(loadDraft()?.values.extras).toEqual([]);
+    expect(loadDraft()?.values.steps).toBe('');
   });
 });

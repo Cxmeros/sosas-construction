@@ -58,6 +58,8 @@ export interface DocumentData {
   options: EstimateOption[];
   /** Invoice only (always empty on an estimate); added to the total. */
   extras: ExtraCharge[];
+  /** Estimate only (always empty on an invoice): work-process steps, printed numbered. */
+  steps: string[];
   deposit: Deposit;
   terms: string;
 }

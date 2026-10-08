@@ -14,6 +14,10 @@ export const LIMITS = {
   maxOptions: 3,
   extraDescription: 100,
   maxExtras: 10,
+  /** Work-process steps (SPEC §3.7b): one per line. */
+  maxSteps: 15,
+  stepLength: 200,
+  stepsText: 3200,
   minItems: 1,
   /** Per option. */
   maxItems: 30,

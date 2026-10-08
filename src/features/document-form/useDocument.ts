@@ -21,11 +21,13 @@ function allocateNumber(type: DocType, isoDate: string): string {
 
 function freshForm(): FormValues {
   const today = toIsoDate(new Date());
+  const prefs = loadPrefs();
   return emptyForm(
     'estimate',
     allocateNumber('estimate', today),
     today,
-    loadPrefs().depositPercent,
+    prefs.depositPercent,
+    prefs.defaultSteps,
   );
 }
 
