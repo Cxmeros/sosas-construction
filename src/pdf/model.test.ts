@@ -77,6 +77,14 @@ describe('buildPdfModel', () => {
     ).toEqual({ label: 'Deposit required', value: '$1,000.00' });
   });
 
+  it('prints the customer phone as (XXX) XXX-XXXX', () => {
+    const doc = {
+      ...SAMPLE_ESTIMATE,
+      customer: { ...SAMPLE_ESTIMATE.customer, phone: '+1 610.555.0142' },
+    };
+    expect(buildPdfModel(doc).customer.contact).toMatch(/^\(610\) 555-0142/);
+  });
+
   it('prints the free-text unit for "other"', () => {
     const doc = withItems([{ ...sampleItems[0]!, unit: 'other', otherUnit: 'rooms' }]);
     expect(buildPdfModel(doc).options[0]?.rows[0]?.unit).toBe('rooms');

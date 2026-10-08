@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { computeTotals } from './calc';
 import { LIMITS } from './limits';
 import { parseMoneyToCents, parseQtyToHundredths } from './money';
+import { usPhoneDigits } from './phone';
 import { DEFAULT_STEPS, DEFAULT_TERMS } from './terms';
 import {
   DOC_TYPES,
@@ -230,12 +231,10 @@ export function validateForm(values: FormValues): Issue[] {
 
   if (!values.customer.name.trim()) add(['customer', 'name'], 'Escribe el nombre del cliente.');
 
-  const phoneDigits = values.customer.phone.replace(/\D/g, '');
-  if (values.customer.phone.trim()) {
-    const national = phoneDigits.length === 11 && phoneDigits.startsWith('1');
-    if (phoneDigits.length < 10) add(['customer', 'phone'], 'Faltan dígitos: usa 10 números.');
-    else if (phoneDigits.length > 10 && !national)
-      add(['customer', 'phone'], 'Sobran dígitos: usa 10 números.');
+  const phone = values.customer.phone;
+  if (phone.trim() && !usPhoneDigits(phone)) {
+    const short = phone.replace(/\D/g, '').length < 10;
+    add(['customer', 'phone'], `${short ? 'Faltan' : 'Sobran'} dígitos: usa 10 números.`);
   }
 
   if (values.customer.email.trim() && !EMAIL.test(values.customer.email.trim()))

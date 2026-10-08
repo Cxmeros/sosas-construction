@@ -1,4 +1,5 @@
 import { EMAIL } from '../domain/form';
+import { usPhoneDigits } from '../domain/phone';
 
 /** Web Share API with a file (WhatsApp, Messages, Mail…), when the device supports it. */
 export function canShareFile(file: File): boolean {
@@ -38,15 +39,9 @@ export function downloadBlob(blob: Blob, fileName: string): void {
 
 /** wa.me link for a US number (10 digits, or 11 starting with 1). */
 export function whatsappUrl(phone: string, text: string): string | null {
-  const digits = phone.replace(/\D/g, '');
-  const intl =
-    digits.length === 10
-      ? `1${digits}`
-      : digits.length === 11 && digits.startsWith('1')
-        ? digits
-        : null;
-  if (!intl) return null;
-  return `https://wa.me/${intl}?text=${encodeURIComponent(text)}`;
+  const digits = usPhoneDigits(phone);
+  if (!digits) return null;
+  return `https://wa.me/1${digits}?text=${encodeURIComponent(text)}`;
 }
 
 export function mailtoUrl(email: string, subject: string, body: string): string | null {

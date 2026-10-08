@@ -2,6 +2,7 @@ import { COMPANY } from '../config/company';
 import { computeTotals, lineAmountCents } from '../domain/calc';
 import { formatCents, formatQty } from '../domain/money';
 import { documentFileName, formatDateUS } from '../domain/numbering';
+import { formatPhoneUS } from '../domain/phone';
 import type { DocumentData } from '../domain/types';
 
 export interface PdfRow {
@@ -145,7 +146,7 @@ export function buildPdfModel(doc: DocumentData): PdfModel {
     customer: {
       name: doc.customer.name,
       address: doc.customer.address,
-      contact: [doc.customer.phone, doc.customer.email].filter(Boolean).join(' · '),
+      contact: [formatPhoneUS(doc.customer.phone), doc.customer.email].filter(Boolean).join(' · '),
     },
     jobDescription: doc.jobDescription,
     multi,
