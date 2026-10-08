@@ -50,6 +50,8 @@ export interface PdfModel {
   /** Invoice: items show only Description | Amount (no qty, unit or unit price). */
   simpleTable: boolean;
   options: PdfOption[];
+  /** Estimate work-process steps, printed as a numbered list (empty: no section). */
+  steps: string[];
   terms: string;
   footer: { left: string; center: string };
   fileName: string;
@@ -149,6 +151,7 @@ export function buildPdfModel(doc: DocumentData): PdfModel {
     multi,
     simpleTable: invoice,
     options,
+    steps: doc.steps,
     terms: doc.terms,
     footer: { left: `${COMPANY.name} · ${COMPANY.tagline}`, center: doc.number },
     fileName: documentFileName(doc.type, doc.number, doc.customer.name),

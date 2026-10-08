@@ -102,6 +102,19 @@ function totalsHeight(option: PdfOption): number {
   );
 }
 
+/** Width of the number column in the work-process list ("12."). */
+export const STEP_NUMBER_WIDTH = 22;
+
+function stepsHeight(model: PdfModel): number {
+  if (model.steps.length === 0) return 0;
+  const width = BOX_TEXT_WIDTH - STEP_NUMBER_WIDTH;
+  const lines = model.steps.reduce(
+    (sum, step) => sum + Math.max(1, countLines(step, width, TYPE.body)),
+    0,
+  );
+  return BAR_HEIGHT + 2 * BOX.padY + lines * lh(TYPE.body) + (model.steps.length - 1) * BOX.gap;
+}
+
 function termsHeight(model: PdfModel): number {
   const lines = countLines(model.terms, BOX_TEXT_WIDTH, TYPE.terms);
   return lines ? sectionHeight(lines, TYPE.terms) : 0;
@@ -155,6 +168,8 @@ export interface PdfPage {
   /** Two options side by side as cards (segments[0] and segments[1], complete). */
   columns: boolean;
   segments: PdfSegment[];
+  /** Estimate work-process steps (SPEC §3.7b), before the terms. */
+  showSteps: boolean;
   showTerms: boolean;
   /**
    * Set on every page but the last: "Continued on page N", with the subtotal of the page's rows
@@ -175,13 +190,19 @@ export function paginate(model: PdfModel): PdfPage[] {
   let y = PAGE.padTop + FULL_HEADER + PAGE.gap + customerHeight(model);
   const descLines = countLines(model.jobDescription, BOX_TEXT_WIDTH, TYPE.jobDescription);
   if (descLines) y += PAGE.gap + sectionHeight(descLines, TYPE.jobDescription);
-  let page: Draft = { fullHeader: true, columns: false, segments: [], showTerms: false };
+  let page: Draft = {
+    fullHeader: true,
+    columns: false,
+    segments: [],
+    showSteps: false,
+    showTerms: false,
+  };
 
   /** Room left, always keeping space for the "Continued on page N" line. */
   const fits = (h: number) => y + h + CONTINUED <= CONTENT_BOTTOM;
   const breakPage = () => {
     drafts.push(page);
-    page = { fullHeader: false, columns: false, segments: [], showTerms: false };
+    page = { fullHeader: false, columns: false, segments: [], showSteps: false, showTerms: false };
     y = PAGE.padTop + COMPACT_HEADER;
   };
   const open = (option: number, header: PdfSegment['header'], showTable: boolean) => {
@@ -243,6 +264,13 @@ export function paginate(model: PdfModel): PdfPage[] {
       current.showTotals = true;
       y += t;
     });
+
+  const steps = stepsHeight(model);
+  if (steps) {
+    if (!fits(PAGE.gap + steps)) breakPage();
+    page.showSteps = true;
+    y += PAGE.gap + steps;
+  }
 
   const terms = termsHeight(model);
   if (terms) {

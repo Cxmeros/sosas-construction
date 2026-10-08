@@ -17,6 +17,7 @@ import {
   COLS,
   COLUMNS,
   PAGE,
+  STEP_NUMBER_WIDTH,
   TABLE_GAP,
   TYPE,
   paginate,
@@ -543,6 +544,20 @@ function PdfPageView({
           <Text style={{ color: C.ink, fontWeight: 700 }}>
             Continued on page {page.continued.nextPage} ›
           </Text>
+        </View>
+      ) : null}
+
+      {page.showSteps ? (
+        <View wrap={false}>
+          <Text style={s.bar}>WORK PROCESS</Text>
+          <View style={s.box}>
+            {model.steps.map((step, i) => (
+              <View key={i} style={{ flexDirection: 'row' }}>
+                <Text style={{ width: pt(STEP_NUMBER_WIDTH), fontWeight: 700 }}>{i + 1}.</Text>
+                <Text style={{ flex: 1 }}>{step}</Text>
+              </View>
+            ))}
+          </View>
         </View>
       ) : null}
 

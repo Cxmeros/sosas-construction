@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  ESTIMATE_WITH_STEPS,
   INVOICE_WITH_EXTRAS,
   LONG_ESTIMATE,
   OPTIONS_ESTIMATE,
@@ -127,6 +128,28 @@ describe('invoice extra charges', () => {
     const pages = paginate(buildPdfModel(doc));
     expect(rowsOf(pages).filter((r) => r.kind === 'extra')).toHaveLength(10);
     expect(pages.at(-1)?.segments.at(-1)?.showTotals).toBe(true);
+  });
+});
+
+describe('work-process steps', () => {
+  it('print before the terms only when there are steps', () => {
+    const pages = paginate(buildPdfModel(ESTIMATE_WITH_STEPS));
+    const stepsPage = pages.findIndex((p) => p.showSteps);
+    expect(pages.filter((p) => p.showSteps)).toHaveLength(1);
+    expect(stepsPage).toBeGreaterThanOrEqual(0);
+    expect(stepsPage).toBeLessThanOrEqual(pages.findIndex((p) => p.showTerms));
+    expect(pages.at(-1)?.showTerms).toBe(true);
+    expect(paginate(buildPdfModel(SAMPLE_ESTIMATE)).some((p) => p.showSteps)).toBe(false);
+  });
+
+  it('move whole to the next page when they do not fit', () => {
+    const steps = Array.from(
+      { length: 15 },
+      (_, i) => `Step ${String(i + 1)} ${'word '.repeat(30)}`,
+    );
+    const pages = paginate(buildPdfModel({ ...LONG_ESTIMATE, steps }));
+    expect(pages.filter((p) => p.showSteps)).toHaveLength(1);
+    expect(pages.at(-1)?.showTerms).toBe(true);
   });
 });
 

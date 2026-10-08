@@ -6,6 +6,7 @@ import { renderToBuffer } from '@react-pdf/renderer';
 import { describe, expect, it } from 'vitest';
 import { DocumentPdf, registerFonts } from './DocumentPdf';
 import {
+  ESTIMATE_WITH_STEPS,
   INVOICE_WITH_EXTRAS,
   LONG_ESTIMATE,
   OPTIONS_ESTIMATE,
@@ -108,6 +109,19 @@ describe('DocumentPdf', () => {
     ]) {
       expect(text).toContain(s.replace(/\s+/g, ''));
     }
+  });
+
+  it('prints the work-process steps numbered, only when there are steps', async () => {
+    const { text } = await renderText(ESTIMATE_WITH_STEPS, 'steps');
+    for (const s of [
+      'WORK PROCESS',
+      '1.Movefurniture',
+      '4.Sand,stainandapplythreecoatsofpolyurethane',
+    ]) {
+      expect(text).toContain(s.replace(/\s+/g, ''));
+    }
+    const plain = await renderText(SAMPLE_ESTIMATE, 'no-steps');
+    expect(plain.text).not.toContain('WORKPROCESS');
   });
 
   it('paginates the long estimate with the table header repeated', async () => {

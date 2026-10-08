@@ -2,7 +2,7 @@ import type { CSSProperties, ReactNode } from 'react';
 import { COLORS as C, COMPANY, OWNERS_LINE } from '../config/company';
 import { formatCents } from '../domain/money';
 import logoUrl from '../assets/logo-placeholder.png';
-import { BAR, BOX, CELL, COLS, COLUMNS, PAGE, TABLE_GAP, TYPE } from './layout';
+import { BAR, BOX, CELL, COLS, COLUMNS, PAGE, STEP_NUMBER_WIDTH, TABLE_GAP, TYPE } from './layout';
 import type { PdfPage, PdfSegment } from './layout';
 import type { PdfModel, PdfOption, PdfRow } from './model';
 
@@ -470,6 +470,19 @@ export function PageView({ model, page }: { model: PdfModel; page: PdfPage }) {
           </span>
           <strong style={{ color: C.ink }}>Continued on page {page.continued.nextPage} ›</strong>
         </div>
+      )}
+
+      {page.showSteps && (
+        <Section label="WORK PROCESS">
+          {model.steps.map((step, i) => (
+            <div key={i} style={{ display: 'flex' }}>
+              <span style={{ width: STEP_NUMBER_WIDTH, flex: 'none', fontWeight: 700 }}>
+                {i + 1}.
+              </span>
+              <span style={{ flex: 1, minWidth: 0 }}>{step}</span>
+            </div>
+          ))}
+        </Section>
       )}
 
       {page.showTerms && (
