@@ -12,8 +12,8 @@ describe('formatDocNumber', () => {
 });
 
 describe('dates', () => {
-  it('formats MM-DD-YYYY', () => {
-    expect(formatDateUS('2026-10-05')).toBe('10-05-2026');
+  it('formats MM/DD/YYYY', () => {
+    expect(formatDateUS('2026-10-05')).toBe('10/05/2026');
   });
   it('builds a local ISO date', () => {
     expect(toIsoDate(new Date(2026, 0, 9))).toBe('2026-01-09');

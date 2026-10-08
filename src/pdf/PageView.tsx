@@ -1,8 +1,20 @@
 import type { CSSProperties, ReactNode } from 'react';
-import { COLORS as C, COMPANY } from '../config/company';
+import { COLORS as C, COMPANY, OWNERS_LINE } from '../config/company';
+import { LOGO, logoWidth, WOOD_STRIP } from '../config/logo';
 import { formatCents } from '../domain/money';
-import logoUrl from '../assets/logo-placeholder.png';
-import { BAR, BOX, CELL, COLS, COLUMNS, PAGE, TABLE_GAP, TYPE } from './layout';
+import {
+  BAR,
+  BOX,
+  CELL,
+  COLS,
+  COLUMNS,
+  PAGE,
+  STEP_NUMBER_WIDTH,
+  TABLE_GAP,
+  TYPE,
+  WOOD_STRIP_HEIGHT,
+  segmentTables,
+} from './layout';
 import type { PdfPage, PdfSegment } from './layout';
 import type { PdfModel, PdfOption, PdfRow } from './model';
 
@@ -15,24 +27,24 @@ const cond: CSSProperties = {
   fontFamily: "'Barlow Condensed', Barlow, sans-serif",
   fontWeight: 700,
 };
-/** Solid orange bar + pale orange box, as in Danilo's original estimate (mirrors DocumentPdf). */
+/** Solid brand bar + pale brand box, as in Danilo's original estimate (mirrors DocumentPdf). */
 const bar: CSSProperties = {
   ...cond,
   fontSize: TYPE.label,
   letterSpacing: '0.1em',
   color: '#FFFFFF',
-  background: C.orange600,
+  background: C.brand600,
   lineHeight: TYPE.lineHeight,
   padding: `${String(BAR.padY)}px ${String(BAR.padX)}px`,
 };
 const box: CSSProperties = {
-  background: C.orange100,
+  background: C.brand100,
   padding: `${String(BOX.padY)}px ${String(BOX.padX)}px`,
   display: 'flex',
   flexDirection: 'column',
   gap: BOX.gap,
 };
-const gridLine = `1px solid ${C.orange200}`;
+const gridLine = `1px solid ${C.brand200}`;
 const grid: CSSProperties = {
   display: 'grid',
   gridTemplateColumns: `minmax(0,1fr) ${String(COLS.qty)}px ${String(COLS.unit)}px ${String(COLS.unitPrice)}px ${String(COLS.amount)}px`,
@@ -58,11 +70,15 @@ function FullHeader({ model }: { model: PdfModel }) {
         alignItems: 'flex-end',
         gap: 24,
         paddingBottom: 14,
-        borderBottom: `3px solid ${C.orange500}`,
+        borderBottom: `3px solid ${C.brand500}`,
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-        <img src={logoUrl} alt={COMPANY.name} style={{ height: 92, display: 'block' }} />
+        <img
+          src={LOGO.src}
+          alt={COMPANY.name}
+          style={{ height: 92, width: logoWidth(92), display: 'block' }}
+        />
         <div
           style={{
             borderLeft: `1px solid ${C.lineSoft}`,
@@ -74,7 +90,7 @@ function FullHeader({ model }: { model: PdfModel }) {
             flexDirection: 'column',
           }}
         >
-          <strong style={{ color: C.ink, fontSize: 13 }}>{COMPANY.owner}</strong>
+          <strong style={{ color: C.ink, fontSize: 13 }}>{OWNERS_LINE}</strong>
           <span>{COMPANY.addressLine1}</span>
           <span>{COMPANY.addressLine2}</span>
           {COMPANY.phones.map((p) => (
@@ -88,7 +104,7 @@ function FullHeader({ model }: { model: PdfModel }) {
             ...cond,
             fontSize: TYPE.title,
             lineHeight: 0.95,
-            color: C.orange600,
+            color: C.brand600,
             letterSpacing: '0.02em',
           }}
         >
@@ -129,17 +145,21 @@ function CompactHeader({ model }: { model: PdfModel }) {
         justifyContent: 'space-between',
         alignItems: 'center',
         paddingBottom: 10,
-        borderBottom: `3px solid ${C.orange500}`,
+        borderBottom: `3px solid ${C.brand500}`,
       }}
     >
-      <img src={logoUrl} alt={COMPANY.name} style={{ height: 48, display: 'block' }} />
+      <img
+        src={LOGO.src}
+        alt={COMPANY.name}
+        style={{ height: 48, width: logoWidth(48), display: 'block' }}
+      />
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 2 }}>
         <span
           style={{
             ...cond,
             fontSize: TYPE.compactTitle,
             lineHeight: 1,
-            color: C.orange600,
+            color: C.brand600,
             letterSpacing: '0.02em',
           }}
         >
@@ -162,11 +182,17 @@ function Section({ label, children }: { label: string; children: ReactNode }) {
   );
 }
 
-function Row({ row }: { row: PdfRow }) {
+const simpleGrid: CSSProperties = {
+  display: 'grid',
+  gridTemplateColumns: `minmax(0,1fr) ${String(COLS.amount)}px`,
+};
+
+/** `simple` (invoice): Description | Amount only. */
+function Row({ row, simple }: { row: PdfRow; simple: boolean }) {
   return (
     <div
       style={{
-        ...grid,
+        ...(simple ? simpleGrid : grid),
         borderLeft: gridLine,
         borderRight: gridLine,
         borderBottom: gridLine,
@@ -177,31 +203,40 @@ function Row({ row }: { row: PdfRow }) {
         <span style={{ fontWeight: 500 }}>{row.description}</span>
         {row.note && <span style={{ fontSize: TYPE.note, color: C.inkMuted }}>{row.note}</span>}
       </span>
-      <span style={cell('right')}>{row.qty}</span>
-      <span style={cell('left')}>{row.unit}</span>
-      <span style={cell('right')}>{row.unitPrice}</span>
+      {!simple && (
+        <>
+          <span style={cell('right')}>{row.qty}</span>
+          <span style={cell('left')}>{row.unit}</span>
+          <span style={cell('right')}>{row.unitPrice}</span>
+        </>
+      )}
       <span style={{ ...cell('right'), fontWeight: 600 }}>{row.amount}</span>
     </div>
   );
 }
 
-function TableHead() {
+/** `label`: "DESCRIPTION", or "ADDITIONAL CHARGES" above an invoice's extra charges. */
+function TableHead({ simple, label = 'DESCRIPTION' }: { simple: boolean; label?: string }) {
   return (
     <div
       style={{
-        ...grid,
+        ...(simple ? simpleGrid : grid),
         border: gridLine,
-        background: C.orange100,
-        color: C.orange800,
+        background: C.brand100,
+        color: C.brand800,
         fontWeight: 700,
         fontSize: TYPE.tableHead,
         letterSpacing: '0.08em',
       }}
     >
-      <span style={cell('left', true)}>DESCRIPTION</span>
-      <span style={cell('right')}>QTY</span>
-      <span style={cell('left')}>UNIT</span>
-      <span style={cell('right')}>UNIT PRICE</span>
+      <span style={cell('left', true)}>{label}</span>
+      {!simple && (
+        <>
+          <span style={cell('right')}>QTY</span>
+          <span style={cell('left')}>UNIT</span>
+          <span style={cell('right')}>UNIT PRICE</span>
+        </>
+      )}
       <span style={cell('right')}>AMOUNT</span>
     </div>
   );
@@ -215,7 +250,7 @@ function Totals({ option, full = false }: { option: PdfOption; full?: boolean })
         width: full ? 'auto' : 340,
         display: 'flex',
         flexDirection: 'column',
-        border: `1.5px solid ${C.orange200}`,
+        border: `1.5px solid ${C.brand200}`,
       }}
     >
       <div
@@ -236,7 +271,7 @@ function Totals({ option, full = false }: { option: PdfOption; full?: boolean })
             display: 'flex',
             justifyContent: 'space-between',
             padding: '9px 14px',
-            borderTop: `1px solid ${C.orange200}`,
+            borderTop: `1px solid ${C.brand200}`,
             fontSize: TYPE.totalsRow,
           }}
         >
@@ -251,8 +286,8 @@ function Totals({ option, full = false }: { option: PdfOption; full?: boolean })
           alignItems: 'baseline',
           gap: 12,
           padding: '11px 14px',
-          borderTop: `2px solid ${C.orange600}`,
-          background: C.orange600,
+          borderTop: `2px solid ${C.brand600}`,
+          background: C.brand600,
           color: '#FFFFFF',
         }}
       >
@@ -290,8 +325,8 @@ function OptionCard({ option }: { option: PdfOption }) {
           style={{
             ...columnGrid,
             border: gridLine,
-            background: C.orange100,
-            color: C.orange800,
+            background: C.brand100,
+            color: C.brand800,
             fontWeight: 700,
             fontSize: TYPE.tableHead,
             letterSpacing: '0.08em',
@@ -331,8 +366,17 @@ function OptionCard({ option }: { option: PdfOption }) {
 }
 
 /** One option's part of a page: its bar (and description), table rows, and/or totals. */
-function OptionSegment({ option, segment }: { option: PdfOption; segment: PdfSegment }) {
+function OptionSegment({
+  option,
+  segment,
+  simple,
+}: {
+  option: PdfOption;
+  segment: PdfSegment;
+  simple: boolean;
+}) {
   const continued = segment.header === 'continued';
+  const { items, extras, showItemsHead } = segmentTables(segment);
   return (
     <>
       <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -346,9 +390,13 @@ function OptionSegment({ option, segment }: { option: PdfOption; segment: PdfSeg
         )}
         {segment.showTable && (
           <div style={{ display: 'flex', flexDirection: 'column', marginTop: TABLE_GAP }}>
-            <TableHead />
-            {segment.rows.map((row) => (
-              <Row key={row.key} row={row} />
+            {showItemsHead && <TableHead simple={simple} />}
+            {items.map((row) => (
+              <Row key={row.key} row={row} simple={simple} />
+            ))}
+            {extras.length > 0 && <TableHead simple label="ADDITIONAL CHARGES" />}
+            {extras.map((row) => (
+              <Row key={row.key} row={row} simple />
             ))}
           </div>
         )}
@@ -379,6 +427,21 @@ export function PageView({ model, page }: { model: PdfModel; page: PdfPage }) {
         textAlign: 'left',
       }}
     >
+      {WOOD_STRIP && (
+        <img
+          src={WOOD_STRIP}
+          alt=""
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: PAGE.width,
+            height: WOOD_STRIP_HEIGHT,
+            objectFit: 'cover',
+            display: 'block',
+          }}
+        />
+      )}
       {page.fullHeader ? (
         <>
           <FullHeader model={model} />
@@ -415,6 +478,7 @@ export function PageView({ model, page }: { model: PdfModel; page: PdfPage }) {
               key={`${option.key}-${segment.header}`}
               option={option}
               segment={segment}
+              simple={model.simpleTable}
             />
           );
         })}
@@ -440,6 +504,22 @@ export function PageView({ model, page }: { model: PdfModel; page: PdfPage }) {
           </span>
           <strong style={{ color: C.ink }}>Continued on page {page.continued.nextPage} ›</strong>
         </div>
+      )}
+
+      {page.steps && (
+        <Section label={page.steps.from > 0 ? 'WORK PROCESS (continued)' : 'WORK PROCESS'}>
+          {model.steps.slice(page.steps.from, page.steps.to).map((step, k) => {
+            const n = (page.steps?.from ?? 0) + k + 1;
+            return (
+              <div key={n} style={{ display: 'flex' }}>
+                <span style={{ width: STEP_NUMBER_WIDTH, flex: 'none', fontWeight: 700 }}>
+                  {n}.
+                </span>
+                <span style={{ flex: 1, minWidth: 0 }}>{step}</span>
+              </div>
+            );
+          })}
+        </Section>
       )}
 
       {page.showTerms && (

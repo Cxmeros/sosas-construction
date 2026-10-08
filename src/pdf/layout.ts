@@ -46,13 +46,16 @@ const lh = (size: number) => size * TYPE.lineHeight;
 const CONTENT_BOTTOM = PAGE.height - PAGE.footerBottom - 26 - 18;
 
 /**
- * Section style from Danilo's original estimate: a solid orange bar with the label, then a pale
- * orange box with the content.
+ * Section style from Danilo's original estimate: a solid brand-color bar with the label, then a pale
+ * tinted box with the content.
  */
 export const BAR = { padY: 4, padX: 10 } as const;
 export const BOX = { padY: 10, padX: 12, gap: 4 } as const;
 /** Light grid around the items table; cell padding inside each column. */
 export const CELL = { padY: 7, padX: 8 } as const;
+
+/** Wood strip (`FEATURES.woodHeader`): drawn inside the top padding, so it moves nothing. */
+export const WOOD_STRIP_HEIGHT = 20;
 
 const FULL_HEADER = 92 + 14 + 3;
 const COMPACT_HEADER = 48 + 10 + 3;
@@ -76,9 +79,12 @@ export function customerHeight(model: PdfModel): number {
   return h;
 }
 
-export function rowHeight(row: PdfRow): number {
+/** Invoice table: Description | Amount. */
+const SIMPLE_DESC_COL_WIDTH = PAGE.contentWidth - COLS.amount;
+
+export function rowHeight(row: PdfRow, simple = false): number {
   // Table side borders (2) and the description cell's own padding.
-  const width = DESC_COL_WIDTH - 2 - 2 * CELL.padX;
+  const width = (simple ? SIMPLE_DESC_COL_WIDTH : DESC_COL_WIDTH) - 2 - 2 * CELL.padX;
   const main = Math.max(1, countLines(row.description, width, TYPE.body, true)) * lh(TYPE.body);
   const note = countLines(row.note, width, TYPE.note) * lh(TYPE.note);
   return 2 * CELL.padY + main + note + 1;
@@ -98,6 +104,12 @@ function totalsHeight(option: PdfOption): number {
     (2 + 22 + 30)
   );
 }
+
+/** Width of the number column in the work-process list ("12."). */
+export const STEP_NUMBER_WIDTH = 22;
+
+const stepHeight = (step: string) =>
+  Math.max(1, countLines(step, BOX_TEXT_WIDTH - STEP_NUMBER_WIDTH, TYPE.body)) * lh(TYPE.body);
 
 function termsHeight(model: PdfModel): number {
   const lines = countLines(model.terms, BOX_TEXT_WIDTH, TYPE.terms);
@@ -144,6 +156,14 @@ export interface PdfSegment {
   showTotals: boolean;
 }
 
+/** A segment's rows as printed: the items table, then the "ADDITIONAL CHARGES" table. */
+export function segmentTables(segment: PdfSegment) {
+  const items = segment.rows.filter((r) => r.kind === 'item');
+  const extras = segment.rows.filter((r) => r.kind === 'extra');
+  // A continued page holding only extras skips the items head.
+  return { items, extras, showItemsHead: items.length > 0 || extras.length === 0 };
+}
+
 export interface PdfPage {
   pageNo: number;
   pageCount: number;
@@ -152,6 +172,11 @@ export interface PdfPage {
   /** Two options side by side as cards (segments[0] and segments[1], complete). */
   columns: boolean;
   segments: PdfSegment[];
+  /**
+   * Estimate work-process steps on this page (SPEC §3.7b), before the terms: `model.steps`
+   * from `from` up to `to` (exclusive). A long list continues on the next page.
+   */
+  steps: { from: number; to: number } | null;
   showTerms: boolean;
   /**
    * Set on every page but the last: "Continued on page N", with the subtotal of the page's rows
@@ -172,13 +197,19 @@ export function paginate(model: PdfModel): PdfPage[] {
   let y = PAGE.padTop + FULL_HEADER + PAGE.gap + customerHeight(model);
   const descLines = countLines(model.jobDescription, BOX_TEXT_WIDTH, TYPE.jobDescription);
   if (descLines) y += PAGE.gap + sectionHeight(descLines, TYPE.jobDescription);
-  let page: Draft = { fullHeader: true, columns: false, segments: [], showTerms: false };
+  let page: Draft = {
+    fullHeader: true,
+    columns: false,
+    segments: [],
+    steps: null,
+    showTerms: false,
+  };
 
   /** Room left, always keeping space for the "Continued on page N" line. */
   const fits = (h: number) => y + h + CONTINUED <= CONTENT_BOTTOM;
   const breakPage = () => {
     drafts.push(page);
-    page = { fullHeader: false, columns: false, segments: [], showTerms: false };
+    page = { fullHeader: false, columns: false, segments: [], steps: null, showTerms: false };
     y = PAGE.padTop + COMPACT_HEADER;
   };
   const open = (option: number, header: PdfSegment['header'], showTable: boolean) => {
@@ -213,19 +244,27 @@ export function paginate(model: PdfModel): PdfPage[] {
         PAGE.gap +
         optionHeaderHeight(option, false) +
         TABLE_HEAD +
-        (first ? rowHeight(first) : PAGE.gap + totalsHeight(option));
+        (first ? rowHeight(first, model.simpleTable) : PAGE.gap + totalsHeight(option));
       // Never leave an option's bar alone at the bottom of a page.
       if (!fits(start) && (page.segments.length > 0 || page.fullHeader)) breakPage();
       let current = open(i, 'full', true);
 
       for (const row of option.rows) {
-        const h = rowHeight(row);
-        if (current.rows.length > 0 && !fits(h)) {
+        // The "ADDITIONAL CHARGES" head row comes before the first extra on each page. On a page
+        // that starts with extras it takes the place of the items head `open` already counted.
+        const extraHead = () =>
+          row.kind === 'extra' &&
+          current.rows.length > 0 &&
+          !current.rows.some((r) => r.kind === 'extra')
+            ? TABLE_HEAD
+            : 0;
+        const h = rowHeight(row, model.simpleTable);
+        if (current.rows.length > 0 && !fits(h + extraHead())) {
           breakPage();
           current = open(i, 'continued', true);
         }
+        y += h + extraHead();
         current.rows.push(row);
-        y += h;
       }
 
       const t = PAGE.gap + totalsHeight(option);
@@ -236,6 +275,38 @@ export function paginate(model: PdfModel): PdfPage[] {
       current.showTotals = true;
       y += t;
     });
+
+  // Steps move whole, but a list too long for the rest of the page continues on the next one.
+  const stepHeights = model.steps.map(stepHeight);
+  let from = 0;
+  while (from < stepHeights.length) {
+    const box = PAGE.gap + BAR_HEIGHT + 2 * BOX.padY;
+    let h = box + (stepHeights[from] ?? 0);
+    let fresh = y === PAGE.padTop + COMPACT_HEADER;
+    if (!fits(h) && !fresh) {
+      breakPage();
+      fresh = true;
+    }
+    let to = from + 1;
+    for (; to < stepHeights.length; to += 1) {
+      const next = BOX.gap + (stepHeights[to] ?? 0);
+      if (!fits(h + next)) break;
+      h += next;
+    }
+    if (from === 0 && to < stepHeights.length && !fresh) {
+      // Don't split a list that would fit whole on the next page.
+      const whole =
+        box + stepHeights.reduce((a, b) => a + b, 0) + (stepHeights.length - 1) * BOX.gap;
+      if (whole <= CONTENT_BOTTOM - CONTINUED - (PAGE.padTop + COMPACT_HEADER)) {
+        breakPage();
+        continue;
+      }
+    }
+    page.steps = { from, to };
+    y += h;
+    from = to;
+    if (from < stepHeights.length) breakPage();
+  }
 
   const terms = termsHeight(model);
   if (terms) {

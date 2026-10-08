@@ -2,7 +2,8 @@ import { z } from 'zod';
 import { computeTotals } from './calc';
 import { LIMITS } from './limits';
 import { parseMoneyToCents, parseQtyToHundredths } from './money';
-import { DEFAULT_TERMS } from './terms';
+import { usPhoneDigits } from './phone';
+import { DEFAULT_STEPS, DEFAULT_TERMS } from './terms';
 import {
   DOC_TYPES,
   UNITS,
@@ -58,6 +59,12 @@ export const formValuesSchema = z.object({
     )
     .min(1)
     .max(LIMITS.maxOptions),
+  /** Invoice extra charges (SPEC §3.7c); kept but ignored while the document is an estimate. */
+  extras: z
+    .array(z.object({ id: text(40), description: text(LIMITS.extraDescription), amount: numeric }))
+    .max(LIMITS.maxExtras),
+  /** Work-process steps as typed, one per line (estimate only). */
+  steps: text(LIMITS.stepsText),
   depositMode: z.enum(DEPOSIT_MODES),
   depositPercent: numeric,
   depositFixed: numeric,
@@ -67,6 +74,11 @@ export const formValuesSchema = z.object({
 export type FormValues = z.infer<typeof formValuesSchema>;
 export type FormOption = FormValues['options'][number];
 export type FormItem = FormOption['items'][number];
+export type FormExtra = FormValues['extras'][number];
+
+export function emptyExtra(): FormExtra {
+  return { id: crypto.randomUUID(), description: '', amount: '' };
+}
 
 export function emptyItem(): FormItem {
   return {
@@ -84,11 +96,48 @@ export function emptyOption(items: FormItem[] = []): FormOption {
   return { id: crypto.randomUUID(), title: '', description: '', items };
 }
 
+/**
+ * Steps typed one per line → clean list. Blank lines are dropped and numbering Danilo typed
+ * ("1. ", "2) ", "Step 3:") is removed, since the PDF numbers them itself. A step that starts
+ * with a number ("3-coat finish", "8:00 AM arrival", "2 days drying") is kept as is.
+ */
+export function parseSteps(raw: string): string[] {
+  return raw
+    .split('\n')
+    .map((line) =>
+      line
+        .trim()
+        .replace(/^(?:step\s*\d+\s*[.):-]?|\d+[.)])\s+/i, '')
+        .trim(),
+    )
+    .filter(Boolean);
+}
+
+/** Why these steps can't be saved or printed, or null when they are fine. */
+export function stepsIssue(raw: string): string | null {
+  const steps = parseSteps(raw);
+  if (steps.length > LIMITS.maxSteps)
+    return `Máximo ${String(LIMITS.maxSteps)} pasos (uno por renglón).`;
+  if (steps.some((step) => step.length > LIMITS.stepLength))
+    return `Cada paso puede tener hasta ${String(LIMITS.stepLength)} letras.`;
+  return null;
+}
+
+/** Problem with a required money amount (`example` shows the format), or null. */
+function moneyIssue(raw: string, example: string): string | null {
+  if (!raw.trim()) return 'Falta el monto.';
+  const cents = parseMoneyToCents(raw);
+  if (cents === null) return `Usa solo números, ej. ${example}`;
+  if (cents > LIMITS.maxTotalCents) return 'Máximo $10,000,000.';
+  return null;
+}
+
 export function emptyForm(
   type: DocType,
   number: string,
   date: string,
   depositPercent: string,
+  steps: string = DEFAULT_STEPS,
 ): FormValues {
   return {
     type,
@@ -98,6 +147,8 @@ export function emptyForm(
     customer: { name: '', address: '', phone: '', email: '' },
     jobDescription: '',
     options: [emptyOption()],
+    extras: [],
+    steps,
     depositMode: depositPercent === '20' || depositPercent === '30' ? depositPercent : 'percent',
     depositPercent,
     depositFixed: '',
@@ -160,6 +211,15 @@ export function toLenientDocument(values: FormValues): DocumentData {
       description: option.description.trim(),
       items: option.items.map(toLenientItem),
     })),
+    extras:
+      values.type === 'invoice'
+        ? values.extras.map((extra) => ({
+            id: extra.id,
+            description: extra.description.trim(),
+            amountCents: parseMoneyToCents(extra.amount) ?? 0,
+          }))
+        : [],
+    steps: values.type === 'estimate' ? parseSteps(values.steps) : [],
     deposit: depositOf(values),
     terms: values.terms.trim(),
   };
@@ -191,12 +251,10 @@ export function validateForm(values: FormValues): Issue[] {
 
   if (!values.customer.name.trim()) add(['customer', 'name'], 'Escribe el nombre del cliente.');
 
-  const phoneDigits = values.customer.phone.replace(/\D/g, '');
-  if (values.customer.phone.trim()) {
-    const national = phoneDigits.length === 11 && phoneDigits.startsWith('1');
-    if (phoneDigits.length < 10) add(['customer', 'phone'], 'Faltan dígitos: usa 10 números.');
-    else if (phoneDigits.length > 10 && !national)
-      add(['customer', 'phone'], 'Sobran dígitos: usa 10 números.');
+  const phone = values.customer.phone;
+  if (phone.trim() && !usPhoneDigits(phone)) {
+    const short = phone.replace(/\D/g, '').length < 10;
+    add(['customer', 'phone'], `${short ? 'Faltan' : 'Sobran'} dígitos: usa 10 números.`);
   }
 
   if (values.customer.email.trim() && !EMAIL.test(values.customer.email.trim()))
@@ -207,7 +265,23 @@ export function validateForm(values: FormValues): Issue[] {
     add(['options'], 'Un invoice lleva una sola opción: la que aceptó el cliente.');
 
   const doc = toLenientDocument(values);
-  const totals = doc.options.map((o) => computeTotals(o.items, { mode: 'none' }).totalCents);
+  const totals = doc.options.map(
+    (o) => computeTotals(o.items, { mode: 'none' }, doc.extras).totalCents,
+  );
+
+  if (values.type === 'estimate') {
+    const issue = stepsIssue(values.steps);
+    if (issue) add(['steps'], issue);
+  }
+
+  if (values.type === 'invoice') {
+    values.extras.forEach((extra, i) => {
+      const at = (field: string) => ['extras', i, field];
+      if (!extra.description.trim()) add(at('description'), 'Escribe qué es el cargo.');
+      const issue = moneyIssue(extra.amount, '50.00');
+      if (issue) add(at('amount'), issue);
+    });
+  }
 
   values.options.forEach((option, k) => {
     const base = ['options', k];
@@ -222,10 +296,8 @@ export function validateForm(values: FormValues): Issue[] {
         add(at('otherUnit'), 'Escribe la unidad.');
 
       if (item.unit === 'lump sum') {
-        const cents = parseMoneyToCents(item.lumpSum);
-        if (!item.lumpSum.trim()) add(at('lumpSum'), 'Falta el monto.');
-        else if (cents === null) add(at('lumpSum'), 'Usa solo números, ej. 3000.00');
-        else if (cents > LIMITS.maxTotalCents) add(at('lumpSum'), 'Máximo $10,000,000.');
+        const issue = moneyIssue(item.lumpSum, '3000.00');
+        if (issue) add(at('lumpSum'), issue);
         return;
       }
 

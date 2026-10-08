@@ -19,10 +19,10 @@ export function toIsoDate(date: Date): string {
   return `${y}-${m}-${d}`;
 }
 
-/** yyyy-mm-dd → MM-DD-YYYY. */
+/** yyyy-mm-dd → MM/DD/YYYY, the date format printed on the PDF. */
 export function formatDateUS(isoDate: string): string {
   const [y = '', m = '', d = ''] = isoDate.split('-');
-  return `${m}-${d}-${y}`;
+  return `${m}/${d}/${y}`;
 }
 
 function slug(value: string): string {

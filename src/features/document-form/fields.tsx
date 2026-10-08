@@ -121,7 +121,7 @@ export function Segmented<T extends string>({
             className="peer sr-only"
           />
           <span
-            className={`flex w-full items-center justify-center bg-surface text-walnut-700 select-none peer-checked:bg-walnut-700 peer-checked:text-white peer-focus-visible:outline-[3px] peer-focus-visible:outline-offset-2 peer-focus-visible:outline-orange-700 ${itemClassName}`}
+            className={`flex w-full items-center justify-center bg-surface text-walnut-700 select-none peer-checked:bg-walnut-700 peer-checked:text-white peer-focus-visible:outline-[3px] peer-focus-visible:outline-offset-2 peer-focus-visible:outline-brand-700 ${itemClassName}`}
           >
             {o.label}
           </span>

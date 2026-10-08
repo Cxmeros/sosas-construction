@@ -4,6 +4,7 @@ import {
   documentSchema,
   emptyForm,
   emptyOption,
+  parseSteps,
   toLenientDocument,
   type FormItem,
   type FormValues,
@@ -224,6 +225,94 @@ describe('options', () => {
     expect(documentSchema.safeParse(values).success).toBe(false);
     values.options[0] = { ...values.options[0]!, title: 'ok', description: 'x'.repeat(601) };
     expect(documentSchema.safeParse(values).success).toBe(false);
+  });
+});
+
+describe('invoice extra charges', () => {
+  const invoice = (): FormValues => ({
+    ...valid(),
+    type: 'invoice',
+    depositMode: 'none',
+    extras: [
+      { id: 'x1', description: 'Debris disposal', amount: '50' },
+      { id: 'x2', description: 'Extra trip', amount: '125.00' },
+    ],
+  });
+
+  it('adds them to the invoice total', () => {
+    const doc = documentSchema.parse(invoice());
+    expect(doc.extras.map((e) => e.amountCents)).toEqual([5000, 12500]);
+    expect(optionTotals(doc)[0]?.totalCents).toBe(1835675 + 17500);
+  });
+
+  it('validates description and amount in Spanish', () => {
+    const values = invoice();
+    values.extras = [
+      { id: 'x1', description: ' ', amount: '' },
+      { id: 'x2', description: 'Trip', amount: 'abc' },
+    ];
+    expect(messages(values)).toEqual({
+      'extras.0.description': 'Escribe qué es el cargo.',
+      'extras.0.amount': 'Falta el monto.',
+      'extras.1.amount': 'Usa solo números, ej. 50.00',
+    });
+  });
+
+  it('are ignored on an estimate (kept, not printed or counted)', () => {
+    const values = { ...invoice(), type: 'estimate' as const };
+    values.extras = [{ id: 'x1', description: '', amount: 'abc' }];
+    const doc = documentSchema.parse(values);
+    expect(doc.extras).toEqual([]);
+  });
+
+  it('allow at most 10 lines', () => {
+    const values = invoice();
+    values.extras = Array.from({ length: 11 }, (_, i) => ({
+      id: String(i),
+      description: 'x',
+      amount: '1',
+    }));
+    expect(documentSchema.safeParse(values).success).toBe(false);
+  });
+});
+
+describe('work-process steps (SPEC §3.7b)', () => {
+  it('splits one step per line, dropping blanks and typed numbering', () => {
+    expect(
+      parseSteps('1. Move furniture\n\n  2) Sand the floor  \nStep 3: Finish\nInspect'),
+    ).toEqual(['Move furniture', 'Sand the floor', 'Finish', 'Inspect']);
+    expect(parseSteps('   \n')).toEqual([]);
+    expect(
+      parseSteps('3-coat polyurethane finish\n8:00 AM crew arrival\n2-3 days drying\n2 coats'),
+    ).toEqual(['3-coat polyurethane finish', '8:00 AM crew arrival', '2-3 days drying', '2 coats']);
+  });
+
+  it('go on estimates only', () => {
+    const steps = 'Move furniture\nSand the floor';
+    expect(documentSchema.parse({ ...valid(), steps }).steps).toEqual([
+      'Move furniture',
+      'Sand the floor',
+    ]);
+    expect(
+      documentSchema.parse({ ...valid(), type: 'invoice', depositMode: 'none', steps }).steps,
+    ).toEqual([]);
+  });
+
+  it('allow at most 15 steps of 200 characters', () => {
+    const many = Array.from({ length: 16 }, (_, i) => `Step ${String(i)} text`).join('\n');
+    expect(messages({ ...valid(), steps: many })).toEqual({
+      steps: 'Máximo 15 pasos (uno por renglón).',
+    });
+    expect(messages({ ...valid(), steps: 'x'.repeat(201) })).toEqual({
+      steps: 'Cada paso puede tener hasta 200 letras.',
+    });
+  });
+
+  it('start from the given default', () => {
+    expect(emptyForm('estimate', 'E', '2026-10-05', '30', 'Sand\nFinish').steps).toBe(
+      'Sand\nFinish',
+    );
+    expect(emptyForm('estimate', 'E', '2026-10-05', '30').steps).toBe('');
   });
 });
 

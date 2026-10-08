@@ -1,12 +1,29 @@
 /** Fixed company data printed on every PDF. Editing it from the app is Phase 2 (SPEC §3). */
 export const COMPANY = {
   name: "Sosa's Constructions",
-  owner: 'Danilo Sosa',
+  /** Printed together in the PDF header: "Danilo Sosa & Carlos Sosa". */
+  owners: ['Danilo Sosa', 'Carlos Sosa'],
   addressLine1: '29 E Providence Rd',
   addressLine2: 'Lansdowne, PA 19050',
+  /**
+   * Both numbers from Danilo's original estimate (design/project/uploads/ESTIMADO SOSAS.docx.pdf),
+   * which lists them together without saying whose each one is.
+   */
   phones: ['435-512-4801', '208-600-7776'],
   tagline: 'Hardwood floors · Lansdowne, PA',
 } as const;
+
+export const OWNERS_LINE = COMPANY.owners.join(' & ');
+
+/**
+ * Feature switches. `estimateOptions` (1–3 options per estimate, SPEC §3.11) is built and tested
+ * but turned off: after the October meeting the client chose the simple version. `woodHeader` is
+ * a thin wood-grain strip across the top of each PDF page, off until the client sees it.
+ */
+export const FEATURES: { readonly estimateOptions: boolean; readonly woodHeader: boolean } = {
+  estimateOptions: false,
+  woodHeader: false,
+};
 
 /** Brand colors shared by the app and the PDF (tokens from the Claude Design handoff). */
 export const COLORS = {
@@ -16,15 +33,21 @@ export const COLORS = {
   oak300: '#E8C58F',
   oak500: '#D9A866',
   gold500: '#C9962E',
-  orange100: '#FCEBDF',
-  /** PDF table grid and box outlines (light orange, as in Danilo's original estimate). */
-  orange200: '#F2C4A2',
-  orange400: '#EE7A30',
-  orange500: '#E06A1F',
-  /** PDF section bars: the brightest orange that keeps white text at AA (4.56:1). */
-  orange600: '#C2551A',
-  orange700: '#B5470F',
-  orange800: '#8F3709',
+  /**
+   * Brand dark red (October meeting). PROVISIONAL until the client sends the exact color; every
+   * shade is checked for AA contrast in colors.test.ts. Kept darker than `error` (#B3261E) so an
+   * error never looks like a brand accent.
+   */
+  brand100: '#F8E7E7',
+  /** PDF table grid and box outlines. */
+  brand200: '#E3B9B9',
+  brand300: '#F29186',
+  brand400: '#E5625A',
+  brand500: '#A3262E',
+  /** PDF section bars and title, with white text. */
+  brand600: '#8E1D24',
+  brand700: '#7D1A20',
+  brand800: '#5C1217',
   paper: '#F6F1EA',
   surface: '#FFFFFF',
   line: '#CDBBA7',

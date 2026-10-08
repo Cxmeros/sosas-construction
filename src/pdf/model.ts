@@ -2,6 +2,7 @@ import { COMPANY } from '../config/company';
 import { computeTotals, lineAmountCents } from '../domain/calc';
 import { formatCents, formatQty } from '../domain/money';
 import { documentFileName, formatDateUS } from '../domain/numbering';
+import { formatPhoneUS } from '../domain/phone';
 import type { DocumentData } from '../domain/types';
 
 export interface PdfRow {
@@ -16,6 +17,8 @@ export interface PdfRow {
   amountCents: number;
   /** "1,625 sq ft × $7.50" (empty for lump sum): the detail line in the two-column layout. */
   detail: string;
+  /** An invoice extra charge (SPEC §3.7c), printed under "ADDITIONAL CHARGES". */
+  kind: 'item' | 'extra';
 }
 
 export interface PdfOption {
@@ -45,7 +48,11 @@ export interface PdfModel {
   jobDescription: string;
   /** True when the estimate offers 2+ options to choose from. */
   multi: boolean;
+  /** Invoice: items show only Description | Amount (no qty, unit or unit price). */
+  simpleTable: boolean;
   options: PdfOption[];
+  /** Estimate work-process steps, printed as a numbered list (empty: no section). */
+  steps: string[];
   terms: string;
   footer: { left: string; center: string };
   fileName: string;
@@ -78,6 +85,7 @@ function buildRows(items: DocumentData['options'][number]['items']): PdfRow[] {
       detail: lump
         ? ''
         : `${formatQty(item.qtyHundredths)} ${item.unit === 'other' ? item.otherUnit || 'other' : item.unit} × ${formatCents(item.unitPriceCents)}`,
+      kind: 'item',
     };
   });
 }
@@ -86,8 +94,20 @@ export function buildPdfModel(doc: DocumentData): PdfModel {
   const invoice = doc.type === 'invoice';
   const multi = doc.options.length > 1;
 
+  const extraRows = doc.extras.map((extra): PdfRow => ({
+    key: extra.id,
+    ...splitDescription(extra.description),
+    qty: '',
+    unit: '',
+    unitPrice: '',
+    amount: formatCents(extra.amountCents),
+    amountCents: extra.amountCents,
+    detail: '',
+    kind: 'extra',
+  }));
+
   const options = doc.options.map((option, i): PdfOption => {
-    const totals = computeTotals(option.items, doc.deposit);
+    const totals = computeTotals(option.items, doc.deposit, doc.extras);
     let deposit: PdfOption['deposit'] = null;
     if (doc.deposit.mode !== 'none') {
       const pct =
@@ -107,7 +127,8 @@ export function buildPdfModel(doc: DocumentData): PdfModel {
       shortLabel,
       title: option.title,
       description: option.description,
-      rows: buildRows(option.items),
+      // Extras exist only on invoices (one option): they follow its items.
+      rows: [...buildRows(option.items), ...extraRows],
       total: formatCents(totals.totalCents),
       totalCents: totals.totalCents,
       deposit,
@@ -124,11 +145,13 @@ export function buildPdfModel(doc: DocumentData): PdfModel {
     customer: {
       name: doc.customer.name,
       address: doc.customer.address,
-      contact: [doc.customer.phone, doc.customer.email].filter(Boolean).join(' · '),
+      contact: [formatPhoneUS(doc.customer.phone), doc.customer.email].filter(Boolean).join(' · '),
     },
     jobDescription: doc.jobDescription,
     multi,
+    simpleTable: invoice,
     options,
+    steps: doc.steps,
     terms: doc.terms,
     footer: { left: `${COMPANY.name} · ${COMPANY.tagline}`, center: doc.number },
     fileName: documentFileName(doc.type, doc.number, doc.customer.name),

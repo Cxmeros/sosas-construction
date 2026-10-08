@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { FEATURES } from '../src/config/company';
 import { addItem, expectNoErrors, isMobile, item, pdfText, watchConsole } from './helpers';
 
 const today = () => {
@@ -50,92 +51,106 @@ test.beforeEach(async ({ page }) => {
   await page.goto('/');
 });
 
-test('two options side by side → PDF → invoice for the option the customer chose', async ({
-  page,
-}, info) => {
-  const mobile = isMobile(info);
-  const errors = watchConsole(page);
-  await buildTwoOptions(page, mobile);
-
-  if (mobile) {
-    await expect(page.getByText('1 · $4,200.00')).toBeVisible();
-    await expect(page.getByText('2 · $5,465.00')).toBeVisible();
-    await page.getByRole('button', { name: 'Ver PDF' }).click();
-  }
-  const preview = page.getByLabel('Vista previa del PDF');
-  await expect(preview.getByText('OPTION 1', { exact: true })).toBeVisible();
-  await expect(preview.getByText('OPTION 2', { exact: true })).toBeVisible();
-  await expect(preview.getByText('Option 1 total')).toBeVisible();
-  await expect(preview.getByText('$4,200.00')).toBeVisible();
-  await expect(preview.getByText('$5,465.00')).toBeVisible();
-  await expect(preview.getByText('Page 1 of 1')).toBeVisible();
-
-  const download = page.waitForEvent('download');
-  await page.getByRole('button', { name: mobile ? 'Descargar' : 'Descargar PDF' }).click();
-  const path = info.outputPath('options.pdf');
-  await (await download).saveAs(path);
-  const text = pdfText(path);
-  for (const s of [
-    'OPTION1',
-    'Refinishexistinghardwoodfloors',
-    'Option1total',
-    '$4,200.00',
-    'OPTION2',
-    'Installnewhardwoodflooring',
-    'Option2total',
-    '$5,465.00',
-  ]) {
-    expect(text).toContain(s);
-  }
-
-  // Convert: Danilo picks the option the customer accepted; the invoice carries only that one.
-  await page.getByRole('button', { name: 'Convertir en Invoice' }).click();
-  const dialog = page.getByRole('dialog', { name: '¿Qué opción aceptó el cliente?' });
-  await expect(dialog.getByRole('button', { name: 'Convertir en Invoice' })).toBeDisabled();
-  await dialog.getByText('Opción 2').click();
-  await dialog.getByRole('button', { name: 'Convertir en Invoice' }).click();
-  await expect(page.getByRole('status').getByText(`INV-${today()}-01`)).toBeVisible();
-
-  // An invoice asks what was actually received; the hint is 30 % of the chosen option.
-  await page.getByRole('button', { name: /Usar \$1,639\.50/ }).click();
-  await expect(page.getByLabel('Monto recibido $')).toHaveValue('1639.50');
-  if (mobile) await page.getByRole('button', { name: 'Ver PDF' }).click();
-  await expect(preview.getByText('INVOICE', { exact: true })).toBeVisible();
-  await expect(preview.getByText('INSTALL NEW HARDWOOD FLOORING')).toBeVisible();
-  await expect(preview.getByText('OPTION 1')).toHaveCount(0);
-  await expect(preview.getByText('Refinish existing hardwood floors')).toHaveCount(0);
-  await expect(preview.getByText('$5,465.00').first()).toBeVisible();
-  await expect(preview.getByText('$3,825.50')).toBeVisible();
-  await expectNoErrors(errors);
-});
-
-test('each option needs a name; an option can be removed', async ({ page }, info) => {
-  const mobile = isMobile(info);
-  await buildTwoOptions(page, mobile);
-  const second = page.getByRole('group', { name: 'Opción 2' });
-  await second.getByLabel('Nombre de la opción').fill('');
-  if (mobile) await page.getByRole('button', { name: 'Ver PDF' }).click();
-  else await page.getByRole('button', { name: 'Descargar PDF' }).click();
-  await expect(second.getByText('Escribe un nombre para la opción.')).toBeVisible();
-
-  await page.getByRole('button', { name: 'Quitar opción 2' }).click();
-  await page.getByRole('dialog').getByRole('button', { name: 'Sí, quitar' }).click();
-  await expect(page.getByRole('group', { name: 'Opción 2' })).toHaveCount(0);
-  // Back to a single option: its items are named as before, and its name stays as a heading.
-  await expect(item(page, 2, mobile).description).toHaveValue('Refinish existing hardwood floors');
-  await expect(page.getByLabel('Nombre de la sección (opcional)')).toHaveValue(
-    'Refinish existing hardwood floors',
-  );
-});
-
-test('switching to Invoice with several options asks which one', async ({ page }, info) => {
-  const mobile = isMobile(info);
-  await buildTwoOptions(page, mobile);
-  await page.getByText('Invoice', { exact: true }).first().click();
-  const dialog = page.getByRole('dialog', { name: '¿Qué opción aceptó el cliente?' });
-  await dialog.getByText('Opción 1').click();
-  await dialog.getByRole('button', { name: 'Cambiar a Invoice' }).click();
-  await expect(page.getByRole('group', { name: 'Opción 2' })).toHaveCount(0);
+test('options are turned off: no "Agregar otra opción"', async ({ page }) => {
+  test.skip(FEATURES.estimateOptions, 'only while the feature is off');
+  await addItem(page);
+  await expect(page.getByRole('button', { name: /agregar trabajo/i })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Agregar otra opción' })).toHaveCount(0);
-  await expect(page.getByLabel('Número')).toHaveValue(/^INV-/);
+});
+
+test.describe('with options on', () => {
+  // SPEC §3.11: built but switched off after the October meeting; re-enable with the flag.
+  test.skip(!FEATURES.estimateOptions, 'FEATURES.estimateOptions is off');
+
+  test('two options side by side → PDF → invoice for the option the customer chose', async ({
+    page,
+  }, info) => {
+    const mobile = isMobile(info);
+    const errors = watchConsole(page);
+    await buildTwoOptions(page, mobile);
+
+    if (mobile) {
+      await expect(page.getByText('1 · $4,200.00')).toBeVisible();
+      await expect(page.getByText('2 · $5,465.00')).toBeVisible();
+      await page.getByRole('button', { name: 'Ver PDF' }).click();
+    }
+    const preview = page.getByLabel('Vista previa del PDF');
+    await expect(preview.getByText('OPTION 1', { exact: true })).toBeVisible();
+    await expect(preview.getByText('OPTION 2', { exact: true })).toBeVisible();
+    await expect(preview.getByText('Option 1 total')).toBeVisible();
+    await expect(preview.getByText('$4,200.00')).toBeVisible();
+    await expect(preview.getByText('$5,465.00')).toBeVisible();
+    await expect(preview.getByText('Page 1 of 1')).toBeVisible();
+
+    const download = page.waitForEvent('download');
+    await page.getByRole('button', { name: mobile ? 'Descargar' : 'Descargar PDF' }).click();
+    const path = info.outputPath('options.pdf');
+    await (await download).saveAs(path);
+    const text = pdfText(path);
+    for (const s of [
+      'OPTION1',
+      'Refinishexistinghardwoodfloors',
+      'Option1total',
+      '$4,200.00',
+      'OPTION2',
+      'Installnewhardwoodflooring',
+      'Option2total',
+      '$5,465.00',
+    ]) {
+      expect(text).toContain(s);
+    }
+
+    // Convert: Danilo picks the option the customer accepted; the invoice carries only that one.
+    await page.getByRole('button', { name: 'Convertir en Invoice' }).click();
+    const dialog = page.getByRole('dialog', { name: '¿Qué opción aceptó el cliente?' });
+    await expect(dialog.getByRole('button', { name: 'Convertir en Invoice' })).toBeDisabled();
+    await dialog.getByText('Opción 2').click();
+    await dialog.getByRole('button', { name: 'Convertir en Invoice' }).click();
+    await expect(page.getByRole('status').getByText(`INV-${today()}-01`)).toBeVisible();
+
+    // An invoice asks what was actually received; the hint is 30 % of the chosen option.
+    await page.getByRole('button', { name: /Usar \$1,639\.50/ }).click();
+    await expect(page.getByLabel('Monto recibido $')).toHaveValue('1639.50');
+    if (mobile) await page.getByRole('button', { name: 'Ver PDF' }).click();
+    await expect(preview.getByText('INVOICE', { exact: true })).toBeVisible();
+    await expect(preview.getByText('INSTALL NEW HARDWOOD FLOORING')).toBeVisible();
+    await expect(preview.getByText('OPTION 1')).toHaveCount(0);
+    await expect(preview.getByText('Refinish existing hardwood floors')).toHaveCount(0);
+    await expect(preview.getByText('$5,465.00').first()).toBeVisible();
+    await expect(preview.getByText('$3,825.50')).toBeVisible();
+    await expectNoErrors(errors);
+  });
+
+  test('each option needs a name; an option can be removed', async ({ page }, info) => {
+    const mobile = isMobile(info);
+    await buildTwoOptions(page, mobile);
+    const second = page.getByRole('group', { name: 'Opción 2' });
+    await second.getByLabel('Nombre de la opción').fill('');
+    if (mobile) await page.getByRole('button', { name: 'Ver PDF' }).click();
+    else await page.getByRole('button', { name: 'Descargar PDF' }).click();
+    await expect(second.getByText('Escribe un nombre para la opción.')).toBeVisible();
+
+    await page.getByRole('button', { name: 'Quitar opción 2' }).click();
+    await page.getByRole('dialog').getByRole('button', { name: 'Sí, quitar' }).click();
+    await expect(page.getByRole('group', { name: 'Opción 2' })).toHaveCount(0);
+    // Back to a single option: its items are named as before, and its name stays as a heading.
+    await expect(item(page, 2, mobile).description).toHaveValue(
+      'Refinish existing hardwood floors',
+    );
+    await expect(page.getByLabel('Nombre de la sección (opcional)')).toHaveValue(
+      'Refinish existing hardwood floors',
+    );
+  });
+
+  test('switching to Invoice with several options asks which one', async ({ page }, info) => {
+    const mobile = isMobile(info);
+    await buildTwoOptions(page, mobile);
+    await page.getByText('Invoice', { exact: true }).first().click();
+    const dialog = page.getByRole('dialog', { name: '¿Qué opción aceptó el cliente?' });
+    await dialog.getByText('Opción 1').click();
+    await dialog.getByRole('button', { name: 'Cambiar a Invoice' }).click();
+    await expect(page.getByRole('group', { name: 'Opción 2' })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Agregar otra opción' })).toHaveCount(0);
+    await expect(page.getByLabel('Número')).toHaveValue(/^INV-/);
+  });
 });

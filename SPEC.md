@@ -17,6 +17,15 @@ Quiere llenar campos y obtener un PDF listo para mandar al cliente.
   Va en un solo lugar (`src/assets/`) para reemplazarlo sin tocar código.
 - **No hay más ejemplos de trabajos.** Las unidades deben ser flexibles (ver §3.5).
 
+### Reunión con el cliente (oct 2026)
+- El negocio tiene **dos dueños: Danilo Sosa y Carlos Sosa**. El encabezado del PDF dice
+  "Danilo Sosa & Carlos Sosa" con los dos teléfonos (`config/company.ts`).
+- **Color principal: rojo oscuro** (el de las camisas de la empresa) en lugar del naranja.
+  Valor provisional en `config/company.ts` hasta tener el código exacto; contraste AA obligatorio.
+- **Logo oficial pendiente**: se queda el provisional; el reemplazo debe ser cambiar un archivo y
+  su proporción en un solo lugar.
+- Prefirieron la **versión simple**: las opciones en el estimate (§3.11) quedan **desactivadas**.
+
 ### Supuestos
 - PDF en inglés, interfaz en español.
 - Usuarios: 1–2 personas.
@@ -24,8 +33,11 @@ Quiere llenar campos y obtener un PDF listo para mandar al cliente.
 ## 3. Alcance
 ### MVP
 1. Tipo de documento: Estimate | Invoice.
-2. Número de documento autogenerado y editable; fecha (hoy por defecto, formato MM-DD-YYYY).
+2. Número de documento autogenerado y editable; fecha (hoy por defecto, editable, formato
+   **MM/DD/YYYY** en el PDF). La fecha elegida es la que sale en el PDF (bug corregido, oct 2026).
 3. Datos del cliente: nombre (requerido), dirección, teléfono, email (opcionales).
+   El teléfono, si se escribe, debe tener **10 dígitos** (se acepta un `1`/`+1` inicial de país) y
+   en el PDF se imprime como **(XXX) XXX-XXXX**.
 4. Job description (texto libre, máx. 1 500 caracteres).
 5. Partidas (1–30):
    - description (req., máx. 200), qty, unit, unit price, amount (calculado).
@@ -40,13 +52,21 @@ Quiere llenar campos y obtener un PDF listo para mandar al cliente.
    - Invoice: "Deposit received" (monto) → "Balance due".
    - El depósito nunca puede superar el total.
 7. Terms & conditions: texto por defecto según tipo, editable.
+7b. **Pasos del proceso** (solo estimate, opcional): lista de pasos del trabajo, uno por renglón
+    (máx. 15 pasos de 200 caracteres). Se puede guardar como **texto por defecto** del aparato
+    ("Guardar como predeterminado") y cada documento lo puede editar. En el PDF sale como
+    "WORK PROCESS" numerado (Step 1, Step 2…) solo si tiene contenido.
+7c. **Cargos extra** (solo invoice): líneas simples de descripción + monto, sin cantidad ni unidad
+    (ej. "Debris disposal — $50"), máx. 10. Se suman al total del invoice (y por tanto al saldo).
 8. Vista previa del PDF → **Compartir** (Web Share API con archivo: WhatsApp, Mensajes,
    correo) con respaldo a **Descargar**.
 9. **"Convertir en Invoice"**: crea un invoice a partir del estimate actual conservando
    cliente y partidas (cambia número, tipo, fecha y términos).
 10. **Borrador automático** del documento en curso (sobrevive a cerrar la app);
     "Nuevo documento" lo limpia previa confirmación.
-11. **Opciones en el estimate** (pedido del cliente, oct 2026): de 1 a 3 opciones, cada una con
+11. **Opciones en el estimate** — **DESACTIVADO** tras la reunión (el cliente prefirió la versión
+    simple). El código se conserva detrás de `FEATURES.estimateOptions` en `config/company.ts`
+    (apagado). Diseño, por si se reactiva: de 1 a 3 opciones, cada una con
     nombre (requerido si hay 2 o más), descripción opcional, sus propias partidas (1–30) y su total.
     - El anticipo elegido se aplica al total de cada opción (monto fijo: no puede superar la opción
       más barata).
@@ -68,16 +88,20 @@ Cuentas, base de datos, historial, envío de correo desde servidor, pagos en lí
 Esto **no** es historial y debe quedar claro en el código:
 - `draft` — documento en curso (uno solo).
 - `counters` — secuencia diaria para la numeración.
-- `prefs` — último porcentaje de depósito usado.
+- `prefs` — último porcentaje de depósito usado y los pasos del proceso por defecto (§3.7b).
 Todo validado con Zod al leer; si falla, se descarta sin romper la app.
 
 ## 5. Numeración
 Formato: `EST-YYYYMMDD-NN` / `INV-YYYYMMDD-NN` (NN = secuencia del día en ese dispositivo).
 Se basa en fecha para minimizar choques si usa celular y computadora. Siempre editable.
+Mientras el número sea el automático, al cambiar la fecha del documento la parte `YYYYMMDD`
+cambia con ella (el número nunca contradice la fecha impresa).
+**Pendiente:** con dos dueños usando aparatos distintos, dos documentos del mismo día pueden
+repetir número. Por decidir con el cliente (p. ej. inicial por persona: `EST-D-…`, `EST-C-…`).
 
 ## 6. Cálculos (src/domain)
 - `lineAmountCents` según §CLAUDE.md principio 3; `lump sum` = monto ingresado.
-- `totalCents = Σ lineAmountCents`
+- `totalCents = Σ lineAmountCents` (+ Σ cargos extra en el invoice, §3.7c)
 - `depositCents = Math.round(totalCents * pct / 100)` o monto fijo (≤ total).
 - `balanceCents = totalCents − depositCents`
 - Límites: qty ≤ 1 000 000; unit price ≤ $100 000; total ≤ $10 000 000; nada negativo.
@@ -97,13 +121,19 @@ Se basa en fecha para minimizar choques si usa celular y computadora. Siempre ed
 Carta (8.5×11 in), márgenes 0.75 in, texto real y seleccionable, fuentes embebidas.
 Basado en el formato actual de Danilo, con correcciones:
 1. Encabezado: logo a la izquierda (PNG de fondo blanco: no ponerlo sobre fondos de color); título "WORK ESTIMATE" o "INVOICE" a la derecha;
-   debajo, número y fecha.
-2. Bloque empresa: DANILO SOSA · 29 E Providence Rd · Lansdowne, PA 19050 ·
+   debajo, número y fecha (MM/DD/YYYY).
+   - Opcional: franja delgada con textura de madera en el borde superior de cada página
+     (`FEATURES.woodHeader` en `config/company.ts`, **apagado por defecto**). Va dentro del margen
+     superior, sin texto encima, así el logo sigue sobre blanco y el contraste no cambia (+7 KB).
+2. Bloque empresa: **Danilo Sosa & Carlos Sosa** · 29 E Providence Rd · Lansdowne, PA 19050 ·
    435-512-4801 · 208-600-7776 (desde `config/company.ts`).
 3. **CUSTOMER INFORMATION** (el original dice "COSTUMER": corregir).
 4. JOB DESCRIPTION.
-5. Tabla: Description | Qty | Unit | Unit price | Amount. Texto largo se envuelve;
-   si hay varias páginas, se repite el encabezado de la tabla y no se parten filas.
+5. Tabla del **estimate**: Description | Qty | Unit | Unit price | Amount. Tabla del **invoice**
+   (simplificada): Description | Amount. Texto largo se envuelve; si hay varias páginas, se repite
+   el encabezado de la tabla y no se parten filas.
+5b. Invoice: cargos extra (§3.7c) en su propia tabla "ADDITIONAL CHARGES" (Description | Amount).
+5c. Estimate: pasos del proceso (§3.7b) como lista numerada "WORK PROCESS", solo si hay pasos.
 6. Totales alineados a la derecha: Total, Deposit (con %), Balance.
 7. Terms & conditions.
    - Estimate (corregido): "This is an estimate, not a quote or contract. It covers the
@@ -117,7 +147,7 @@ Basado en el formato actual de Danilo, con correcciones:
 
 ## 8. Seguridad
 - Superficie de ataque mínima: sitio estático, sin servidor ni datos en la nube.
-- Acceso restringido con **Cloudflare Access** (OTP por email, solo los correos de Danilo):
+- Acceso restringido con **Cloudflare Access** (OTP por email, solo los correos de Danilo y Carlos):
   evita que extraños generen documentos con su logo y datos.
 - CSP estricta y headers en `public/_headers` (ver CLAUDE.md).
 - Dependencias fijadas, Dependabot activado, `pnpm audit` en CI.

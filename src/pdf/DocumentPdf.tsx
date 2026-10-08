@@ -8,7 +8,8 @@ import {
   View,
   type Styles,
 } from '@react-pdf/renderer';
-import { COLORS as C, COMPANY } from '../config/company';
+import { COLORS as C, COMPANY, OWNERS_LINE } from '../config/company';
+import { logoWidth } from '../config/logo';
 import { formatCents } from '../domain/money';
 import {
   BAR,
@@ -17,9 +18,12 @@ import {
   COLS,
   COLUMNS,
   PAGE,
+  STEP_NUMBER_WIDTH,
   TABLE_GAP,
   TYPE,
+  WOOD_STRIP_HEIGHT,
   paginate,
+  segmentTables,
   type PdfPage,
   type PdfSegment,
 } from './layout';
@@ -68,12 +72,12 @@ const s = StyleSheet.create({
     fontSize: pt(TYPE.label),
     letterSpacing: pt(TYPE.label) * 0.1,
     color: '#FFFFFF',
-    backgroundColor: C.orange600,
+    backgroundColor: C.brand600,
     paddingVertical: pt(BAR.padY),
     paddingHorizontal: pt(BAR.padX),
   },
   box: {
-    backgroundColor: C.orange100,
+    backgroundColor: C.brand100,
     paddingVertical: pt(BOX.padY),
     paddingHorizontal: pt(BOX.padX),
     gap: pt(BOX.gap),
@@ -106,13 +110,13 @@ const col = (width: number, align: 'left' | 'right'): Style => ({
   paddingVertical: pt(CELL.padY),
   paddingHorizontal: pt(CELL.padX),
   borderLeftWidth: pt(1),
-  borderLeftColor: C.orange200,
+  borderLeftColor: C.brand200,
   textAlign: align,
 });
 const tableSides: Style = {
   borderLeftWidth: pt(1),
   borderRightWidth: pt(1),
-  borderColor: C.orange200,
+  borderColor: C.brand200,
 };
 
 function FullHeader({ model, logoSrc }: { model: PdfModel; logoSrc: string }) {
@@ -129,11 +133,11 @@ function FullHeader({ model, logoSrc }: { model: PdfModel; logoSrc: string }) {
         alignItems: 'flex-end',
         paddingBottom: pt(14),
         borderBottomWidth: pt(3),
-        borderBottomColor: C.orange500,
+        borderBottomColor: C.brand500,
       }}
     >
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: pt(14) }}>
-        <Image src={logoSrc} style={{ height: pt(92), width: pt((92 * 525) / 245) }} />
+        <Image src={logoSrc} style={{ height: pt(92), width: pt(logoWidth(92)) }} />
         <View
           style={{
             borderLeftWidth: pt(1),
@@ -143,7 +147,7 @@ function FullHeader({ model, logoSrc }: { model: PdfModel; logoSrc: string }) {
             color: C.inkMuted,
           }}
         >
-          <Text style={{ color: C.ink, fontSize: pt(13), fontWeight: 700 }}>{COMPANY.owner}</Text>
+          <Text style={{ color: C.ink, fontSize: pt(13), fontWeight: 700 }}>{OWNERS_LINE}</Text>
           <Text>{COMPANY.addressLine1}</Text>
           <Text>{COMPANY.addressLine2}</Text>
           {COMPANY.phones.map((p) => (
@@ -158,7 +162,7 @@ function FullHeader({ model, logoSrc }: { model: PdfModel; logoSrc: string }) {
             {
               fontSize: pt(TYPE.title),
               lineHeight: 0.95,
-              color: C.orange600,
+              color: C.brand600,
               letterSpacing: pt(TYPE.title) * 0.02,
             },
           ]}
@@ -199,10 +203,10 @@ function CompactHeader({ model, logoSrc }: { model: PdfModel; logoSrc: string })
         alignItems: 'center',
         paddingBottom: pt(10),
         borderBottomWidth: pt(3),
-        borderBottomColor: C.orange500,
+        borderBottomColor: C.brand500,
       }}
     >
-      <Image src={logoSrc} style={{ height: pt(48), width: pt((48 * 525) / 245) }} />
+      <Image src={logoSrc} style={{ height: pt(48), width: pt(logoWidth(48)) }} />
       <View style={{ alignItems: 'flex-end', gap: pt(2) }}>
         <Text
           style={[
@@ -210,7 +214,7 @@ function CompactHeader({ model, logoSrc }: { model: PdfModel; logoSrc: string })
             {
               fontSize: pt(TYPE.compactTitle),
               lineHeight: 1,
-              color: C.orange600,
+              color: C.brand600,
               letterSpacing: pt(TYPE.compactTitle) * 0.02,
             },
           ]}
@@ -225,10 +229,11 @@ function CompactHeader({ model, logoSrc }: { model: PdfModel; logoSrc: string })
   );
 }
 
-function Row({ row }: { row: PdfRow }) {
+/** `simple` (invoice): Description | Amount only. */
+function Row({ row, simple }: { row: PdfRow; simple: boolean }) {
   return (
     <View
-      style={[s.row, tableSides, { borderBottomWidth: pt(1), borderBottomColor: C.orange200 }]}
+      style={[s.row, tableSides, { borderBottomWidth: pt(1), borderBottomColor: C.brand200 }]}
       wrap={false}
     >
       <View style={s.descCell}>
@@ -237,9 +242,13 @@ function Row({ row }: { row: PdfRow }) {
           <Text style={{ fontSize: pt(TYPE.note), color: C.inkMuted }}>{row.note}</Text>
         ) : null}
       </View>
-      <Text style={col(COLS.qty, 'right')}>{row.qty}</Text>
-      <Text style={col(COLS.unit, 'left')}>{row.unit}</Text>
-      <Text style={col(COLS.unitPrice, 'right')}>{row.unitPrice}</Text>
+      {simple ? null : (
+        <>
+          <Text style={col(COLS.qty, 'right')}>{row.qty}</Text>
+          <Text style={col(COLS.unit, 'left')}>{row.unit}</Text>
+          <Text style={col(COLS.unitPrice, 'right')}>{row.unitPrice}</Text>
+        </>
+      )}
       <Text style={[col(COLS.amount, 'right'), { fontWeight: 600 }]}>{row.amount}</Text>
     </View>
   );
@@ -256,7 +265,8 @@ function Section({ label, text, style }: { label: string; text: string; style: S
   );
 }
 
-function TableHead() {
+/** `label`: "DESCRIPTION", or "ADDITIONAL CHARGES" above an invoice's extra charges. */
+function TableHead({ simple, label = 'DESCRIPTION' }: { simple: boolean; label?: string }) {
   return (
     <View
       style={[
@@ -265,18 +275,22 @@ function TableHead() {
         {
           borderTopWidth: pt(1),
           borderBottomWidth: pt(1),
-          backgroundColor: C.orange100,
-          color: C.orange800,
+          backgroundColor: C.brand100,
+          color: C.brand800,
           fontWeight: 700,
           fontSize: pt(TYPE.tableHead),
           letterSpacing: pt(TYPE.tableHead) * 0.08,
         },
       ]}
     >
-      <Text style={s.descCell}>DESCRIPTION</Text>
-      <Text style={col(COLS.qty, 'right')}>QTY</Text>
-      <Text style={col(COLS.unit, 'left')}>UNIT</Text>
-      <Text style={col(COLS.unitPrice, 'right')}>UNIT PRICE</Text>
+      <Text style={s.descCell}>{label}</Text>
+      {simple ? null : (
+        <>
+          <Text style={col(COLS.qty, 'right')}>QTY</Text>
+          <Text style={col(COLS.unit, 'left')}>UNIT</Text>
+          <Text style={col(COLS.unitPrice, 'right')}>UNIT PRICE</Text>
+        </>
+      )}
       <Text style={col(COLS.amount, 'right')}>AMOUNT</Text>
     </View>
   );
@@ -290,7 +304,7 @@ function Totals({ option, full = false }: { option: PdfOption; full?: boolean })
         alignSelf: full ? 'stretch' : 'flex-end',
         ...(full ? {} : { width: pt(340) }),
         borderWidth: pt(1.5),
-        borderColor: C.orange200,
+        borderColor: C.brand200,
       }}
       wrap={false}
     >
@@ -315,7 +329,7 @@ function Totals({ option, full = false }: { option: PdfOption; full?: boolean })
             paddingVertical: pt(9),
             paddingHorizontal: pt(14),
             borderTopWidth: pt(1),
-            borderTopColor: C.orange200,
+            borderTopColor: C.brand200,
             fontSize: pt(TYPE.totalsRow),
           }}
         >
@@ -331,8 +345,8 @@ function Totals({ option, full = false }: { option: PdfOption; full?: boolean })
           paddingVertical: pt(11),
           paddingHorizontal: pt(14),
           borderTopWidth: pt(2),
-          borderTopColor: C.orange600,
-          backgroundColor: C.orange600,
+          borderTopColor: C.brand600,
+          backgroundColor: C.brand600,
           color: '#FFFFFF',
         }}
       >
@@ -369,8 +383,8 @@ function OptionCard({ option }: { option: PdfOption }) {
             {
               borderTopWidth: pt(1),
               borderBottomWidth: pt(1),
-              backgroundColor: C.orange100,
-              color: C.orange800,
+              backgroundColor: C.brand100,
+              color: C.brand800,
               fontWeight: 700,
               fontSize: pt(TYPE.tableHead),
               letterSpacing: pt(TYPE.tableHead) * 0.08,
@@ -383,11 +397,7 @@ function OptionCard({ option }: { option: PdfOption }) {
         {option.rows.map((row) => (
           <View
             key={row.key}
-            style={[
-              s.row,
-              tableSides,
-              { borderBottomWidth: pt(1), borderBottomColor: C.orange200 },
-            ]}
+            style={[s.row, tableSides, { borderBottomWidth: pt(1), borderBottomColor: C.brand200 }]}
             wrap={false}
           >
             <View style={s.descCell}>
@@ -411,8 +421,17 @@ function OptionCard({ option }: { option: PdfOption }) {
 }
 
 /** One option's part of a page: its bar (and description), table rows, and/or totals. */
-function OptionSegment({ option, segment }: { option: PdfOption; segment: PdfSegment }) {
+function OptionSegment({
+  option,
+  segment,
+  simple,
+}: {
+  option: PdfOption;
+  segment: PdfSegment;
+  simple: boolean;
+}) {
   const continued = segment.header === 'continued';
+  const { items, extras, showItemsHead } = segmentTables(segment);
   return (
     <>
       <View>
@@ -426,9 +445,13 @@ function OptionSegment({ option, segment }: { option: PdfOption; segment: PdfSeg
         ) : null}
         {segment.showTable ? (
           <View style={{ marginTop: pt(TABLE_GAP) }}>
-            <TableHead />
-            {segment.rows.map((row) => (
-              <Row key={row.key} row={row} />
+            {showItemsHead ? <TableHead simple={simple} /> : null}
+            {items.map((row) => (
+              <Row key={row.key} row={row} simple={simple} />
+            ))}
+            {extras.length > 0 ? <TableHead simple label="ADDITIONAL CHARGES" /> : null}
+            {extras.map((row) => (
+              <Row key={row.key} row={row} simple />
             ))}
           </View>
         ) : null}
@@ -442,13 +465,29 @@ function PdfPageView({
   model,
   page,
   logoSrc,
+  woodSrc,
 }: {
   model: PdfModel;
   page: PdfPage;
   logoSrc: string;
+  woodSrc: string | undefined;
 }) {
   return (
     <Page size="LETTER" style={s.page}>
+      {woodSrc ? (
+        <Image
+          src={woodSrc}
+          fixed
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: pt(PAGE.width),
+            height: pt(WOOD_STRIP_HEIGHT),
+            objectFit: 'cover',
+          }}
+        />
+      ) : null}
       {page.fullHeader ? (
         <>
           <FullHeader model={model} logoSrc={logoSrc} />
@@ -490,6 +529,7 @@ function PdfPageView({
             key={`${option.key}-${segment.header}`}
             option={option}
             segment={segment}
+            simple={model.simpleTable}
           />
         );
       })}
@@ -521,6 +561,25 @@ function PdfPageView({
         </View>
       ) : null}
 
+      {page.steps ? (
+        <View wrap={false}>
+          <Text style={s.bar}>
+            {page.steps.from > 0 ? 'WORK PROCESS (continued)' : 'WORK PROCESS'}
+          </Text>
+          <View style={s.box}>
+            {model.steps.slice(page.steps.from, page.steps.to).map((step, k) => {
+              const n = (page.steps?.from ?? 0) + k + 1;
+              return (
+                <View key={n} style={{ flexDirection: 'row' }}>
+                  <Text style={{ width: pt(STEP_NUMBER_WIDTH), fontWeight: 700 }}>{n}.</Text>
+                  <Text style={{ flex: 1 }}>{step}</Text>
+                </View>
+              );
+            })}
+          </View>
+        </View>
+      ) : null}
+
       {page.showTerms ? (
         <Section
           label="TERMS AND CONDITIONS"
@@ -540,7 +599,16 @@ function PdfPageView({
   );
 }
 
-export function DocumentPdf({ model, logoSrc }: { model: PdfModel; logoSrc: string }) {
+export function DocumentPdf({
+  model,
+  logoSrc,
+  woodSrc,
+}: {
+  model: PdfModel;
+  logoSrc: string;
+  /** Wood strip image (`FEATURES.woodHeader`); none when undefined. */
+  woodSrc?: string;
+}) {
   const pages = paginate(model);
   return (
     <Document
@@ -551,7 +619,13 @@ export function DocumentPdf({ model, logoSrc }: { model: PdfModel; logoSrc: stri
       language="en-US"
     >
       {pages.map((page) => (
-        <PdfPageView key={page.pageNo} model={model} page={page} logoSrc={logoSrc} />
+        <PdfPageView
+          key={page.pageNo}
+          model={model}
+          page={page}
+          logoSrc={logoSrc}
+          woodSrc={woodSrc}
+        />
       ))}
     </Document>
   );

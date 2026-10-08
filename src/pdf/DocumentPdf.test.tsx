@@ -5,7 +5,15 @@ import { join, resolve } from 'node:path';
 import { renderToBuffer } from '@react-pdf/renderer';
 import { describe, expect, it } from 'vitest';
 import { DocumentPdf, registerFonts } from './DocumentPdf';
-import { LONG_ESTIMATE, OPTIONS_ESTIMATE, SAMPLE_ESTIMATE, SAMPLE_INVOICE } from './fixtures';
+import {
+  ESTIMATE_WITH_STEPS,
+  INVOICE_WITH_EXTRAS,
+  LONG_ESTIMATE,
+  OPTIONS_ESTIMATE,
+  SAMPLE_ESTIMATE,
+  SAMPLE_INVOICE,
+} from './fixtures';
+import { paginate } from './layout';
 import { buildPdfModel } from './model';
 import type { DocumentData } from '../domain/types';
 
@@ -40,6 +48,15 @@ async function renderText(
   return { text: text.replace(/\s+/g, ''), pages };
 }
 
+it('embeds the optional wood strip once, adding only a few KB', async () => {
+  const model = buildPdfModel(LONG_ESTIMATE);
+  const plain = await renderToBuffer(<DocumentPdf model={model} logoSrc={logo} />);
+  const wood = await renderToBuffer(
+    <DocumentPdf model={model} logoSrc={logo} woodSrc={join(assets, 'wood-strip.jpg')} />,
+  );
+  expect(wood.length - plain.length).toBeLessThan(15_000);
+});
+
 describe('DocumentPdf', () => {
   it('renders the SPEC §6 estimate with total, deposit and balance', async () => {
     const { text, pages } = await renderText(SAMPLE_ESTIMATE, 'estimate');
@@ -47,11 +64,11 @@ describe('DocumentPdf', () => {
     for (const s of [
       'WORK ESTIMATE',
       'EST-20261005-01',
-      '10-05-2026',
+      '10/05/2026',
       'CUSTOMER INFORMATION',
       'Margaret Kelly',
       'JOB DESCRIPTION',
-      'Danilo Sosa',
+      'Danilo Sosa & Carlos Sosa',
       '29 E Providence Rd',
       'Lansdowne, PA 19050',
       '435-512-4801',
@@ -81,6 +98,49 @@ describe('DocumentPdf', () => {
     ]) {
       expect(text).toContain(s.replace(/\s+/g, ''));
     }
+    // Simplified table: description and amount, no quantity, unit or unit price.
+    expect(text).not.toContain('UNITPRICE');
+    expect(text).not.toContain('QTY');
+    expect(text).not.toContain('1,625');
+    expect(text).not.toContain('$0.85');
+    expect(text).toContain('Installandrefinish$12,187.50');
+  });
+
+  it('prints invoice extra charges and adds them to the total', async () => {
+    const { text } = await renderText(INVOICE_WITH_EXTRAS, 'invoice-extras');
+    for (const s of [
+      'ADDITIONAL CHARGES',
+      'Debris disposal',
+      '$50.00',
+      'Extra trip for materials',
+      '$125.00',
+      '$18,531.75',
+      '$12,972.22',
+    ]) {
+      expect(text).toContain(s.replace(/\s+/g, ''));
+    }
+  });
+
+  it('prints the work-process steps numbered, only when there are steps', async () => {
+    const { text } = await renderText(ESTIMATE_WITH_STEPS, 'steps');
+    for (const s of [
+      'WORK PROCESS',
+      '1.Movefurniture',
+      '4.Sand,stainandapplythreecoatsofpolyurethane',
+    ]) {
+      expect(text).toContain(s.replace(/\s+/g, ''));
+    }
+    const plain = await renderText(SAMPLE_ESTIMATE, 'no-steps');
+    expect(plain.text).not.toContain('WORKPROCESS');
+  });
+
+  it('continues a work-process list longer than a page, with the pages the layout planned', async () => {
+    const steps = Array.from({ length: 15 }, (_, i) => `${String(i + 1)} ${'WWWW '.repeat(39)}`);
+    const doc = { ...LONG_ESTIMATE, steps };
+    const { text, pages } = await renderText(doc, 'long-steps');
+    expect(pages).toBe(paginate(buildPdfModel(doc)).length);
+    expect(text).toContain('WORKPROCESS(continued)');
+    expect(text).toContain('15.15WWWW');
   });
 
   it('paginates the long estimate with the table header repeated', async () => {

@@ -268,3 +268,113 @@ test('touch targets are at least 48 px', async ({ page }, info) => {
   );
   expect(small).toEqual([]);
 });
+
+test('the date picked in the form is the one in the downloaded PDF (date and number)', async ({
+  page,
+}, info) => {
+  const mobile = isMobile(info);
+  await fillSample(page, mobile);
+  await page.getByLabel('Fecha').fill('2026-11-20');
+  // The automatic number follows the date…
+  await expect(page.getByLabel('Número')).toHaveValue('EST-20261120-01');
+  if (mobile) await page.getByRole('button', { name: 'Ver PDF' }).click();
+  const download = page.waitForEvent('download');
+  await page.getByRole('button', { name: mobile ? 'Descargar' : 'Descargar PDF' }).click();
+  const file = await download;
+  expect(file.suggestedFilename()).toBe('Estimate_EST-20261120-01_Margaret-Kelly.pdf');
+  const path = info.outputPath('dated.pdf');
+  await file.saveAs(path);
+  const text = pdfText(path);
+  expect(text).toContain('11/20/2026');
+  expect(text).toContain('EST-20261120-01');
+  expect(text).not.toContain(`EST-${today()}`);
+
+  // …but a number Danilo typed himself is never changed.
+  if (mobile) await page.getByRole('button', { name: 'Editar' }).click();
+  await page.getByLabel('Número').fill('A-1043');
+  await page.getByLabel('Fecha').fill('2026-12-01');
+  await expect(page.getByLabel('Número')).toHaveValue('A-1043');
+});
+
+test('invoice: extra charges are added to the total and printed', async ({ page }, info) => {
+  const mobile = isMobile(info);
+  await fillSample(page, mobile);
+  // Estimates have no extra charges.
+  await expect(page.getByRole('button', { name: 'Agregar cargo extra' })).toHaveCount(0);
+
+  // On the phone, "Convertir en Invoice" is on the preview screen; it returns to the form to ask
+  // about the deposit received.
+  if (mobile) await page.getByRole('button', { name: 'Ver PDF' }).click();
+  await page.getByRole('button', { name: 'Convertir en Invoice' }).click();
+  await page.getByText('Sin anticipo', { exact: true }).click();
+  await page.getByRole('button', { name: 'Agregar cargo extra' }).click();
+  const extra = page.getByRole('listitem', { name: 'Cargo extra 1' });
+  await expect(extra.getByLabel('Descripción')).toBeFocused();
+  await extra.getByLabel('Descripción').fill('Debris disposal');
+  await extra.getByLabel('Monto $').fill('50');
+
+  if (mobile) {
+    await expect(page.getByText('$18,406.75').first()).toBeVisible();
+    await page.getByRole('button', { name: 'Ver PDF' }).click();
+  }
+  const preview = page.getByLabel('Vista previa del PDF');
+  await expect(preview.getByText('ADDITIONAL CHARGES')).toBeVisible();
+  await expect(preview.getByText('Debris disposal')).toBeVisible();
+  await expect(preview.getByText('$18,406.75').first()).toBeVisible();
+
+  const download = page.waitForEvent('download');
+  await page.getByRole('button', { name: mobile ? 'Descargar' : 'Descargar PDF' }).click();
+  const path = info.outputPath('invoice-extras.pdf');
+  await (await download).saveAs(path);
+  const text = pdfText(path);
+  for (const s of ['ADDITIONALCHARGES', 'Debrisdisposal$50.00', '$18,406.75'])
+    expect(text).toContain(s);
+});
+
+test('invoice: an extra charge needs a description and an amount', async ({ page }, info) => {
+  const mobile = isMobile(info);
+  await fillSample(page, mobile);
+  if (mobile) await page.getByRole('button', { name: 'Ver PDF' }).click();
+  await page.getByRole('button', { name: 'Convertir en Invoice' }).click();
+  await page.getByText('Sin anticipo', { exact: true }).click();
+  await page.getByRole('button', { name: 'Agregar cargo extra' }).click();
+  await page.getByRole('button', { name: mobile ? 'Ver PDF' : 'Descargar PDF' }).click();
+  const extra = page.getByRole('listitem', { name: 'Cargo extra 1' });
+  await expect(extra.getByText('Escribe qué es el cargo.')).toBeVisible();
+  await expect(extra.getByText('Falta el monto.')).toBeVisible();
+  await page.getByRole('button', { name: 'Quitar cargo extra 1' }).click();
+  await expect(page.getByRole('listitem', { name: 'Cargo extra 1' })).toHaveCount(0);
+});
+
+test('estimate: work-process steps print numbered and can be the default', async ({
+  page,
+}, info) => {
+  const mobile = isMobile(info);
+  await fillSample(page, mobile);
+  const steps = page.getByLabel('Pasos del proceso');
+  await steps.fill('Move furniture\nSand floors\n\nApply finish');
+  await page.getByRole('button', { name: 'Guardar como predeterminado' }).click();
+  await expect(page.getByRole('status').filter({ hasText: 'próximos estimates' })).toBeVisible();
+
+  if (mobile) await page.getByRole('button', { name: 'Ver PDF' }).click();
+  const preview = page.getByLabel('Vista previa del PDF');
+  await expect(preview.getByText('WORK PROCESS')).toBeVisible();
+  await expect(preview.getByText('Apply finish')).toBeVisible();
+
+  const download = page.waitForEvent('download');
+  await page.getByRole('button', { name: mobile ? 'Descargar' : 'Descargar PDF' }).click();
+  const path = info.outputPath('estimate-steps.pdf');
+  await (await download).saveAs(path);
+  const text = pdfText(path);
+  for (const s of ['WORKPROCESS', '1.Movefurniture', '2.Sandfloors', '3.Applyfinish'])
+    expect(text).toContain(s);
+
+  // The saved steps fill the next estimate; an invoice has no steps.
+  await page.getByRole('button', { name: 'Nuevo documento' }).click();
+  await page.getByRole('button', { name: 'Sí, empezar nuevo' }).click();
+  await expect(page.getByLabel('Pasos del proceso')).toHaveValue(
+    'Move furniture\nSand floors\n\nApply finish',
+  );
+  await page.getByText('Invoice', { exact: true }).first().click();
+  await expect(page.getByLabel('Pasos del proceso')).toHaveCount(0);
+});

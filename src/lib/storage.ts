@@ -10,6 +10,7 @@
  */
 import { z } from 'zod';
 import { formValuesSchema, type FormValues } from '../domain/form';
+import { LIMITS } from '../domain/limits';
 
 const KEYS = {
   draft: 'sosa.draft.v1',
@@ -17,12 +18,20 @@ const KEYS = {
   prefs: 'sosa.prefs.v1',
 } as const;
 
-/** Drafts saved before estimates had options kept a flat `items` list: wrap it as one option. */
+/**
+ * Older drafts: before options they kept a flat `items` list (wrapped as one option); before
+ * invoice extra charges they had no `extras` (an empty list).
+ */
 function migrateDraftValues(values: unknown): unknown {
-  if (!values || typeof values !== 'object' || 'options' in values || !('items' in values))
-    return values;
-  const { items, ...rest } = values;
-  return { ...rest, options: [{ id: 'option-1', title: '', description: '', items }] };
+  if (!values || typeof values !== 'object') return values;
+  let migrated: Record<string, unknown> = { ...values };
+  if (!('options' in migrated) && 'items' in migrated) {
+    const { items, ...rest } = migrated;
+    migrated = { ...rest, options: [{ id: 'option-1', title: '', description: '', items }] };
+  }
+  if (!('extras' in migrated)) migrated.extras = [];
+  if (!('steps' in migrated)) migrated.steps = '';
+  return migrated;
 }
 
 const draftSchema = z.object({
@@ -31,10 +40,14 @@ const draftSchema = z.object({
 });
 export type Draft = z.infer<typeof draftSchema>;
 
-/** Only the current day is kept: `{ "EST-20261005": 2, "INV-20261005": 1 }`. */
+/** `{ "EST-20261005": 2, "INV-20261005": 1 }`, the most recently used last. */
 const countersSchema = z.record(z.string().max(20), z.number().int().nonnegative().max(9999));
 
-const prefsSchema = z.object({ depositPercent: z.string().max(10) });
+const prefsSchema = z.object({
+  depositPercent: z.string().max(10),
+  /** Work-process steps new documents start with (SPEC §3.7b); absent until Danilo saves some. */
+  defaultSteps: z.string().max(LIMITS.stepsText).optional(),
+});
 export type Prefs = z.infer<typeof prefsSchema>;
 const DEFAULT_PREFS: Prefs = { depositPercent: '30' };
 
@@ -88,13 +101,17 @@ export function clearDraft(): void {
 }
 
 /** Returns the next sequence for `key` (e.g. "EST-20261005") and records it. */
+const MAX_COUNTERS = 100;
+
 export function nextSequence(key: string): number {
   const counters = read(KEYS.counters, countersSchema) ?? {};
   const next = (counters[key] ?? 0) + 1;
-  const day = key.slice(-8);
-  // Drop other days so the record stays tiny.
-  const kept = Object.fromEntries(Object.entries(counters).filter(([k]) => k.endsWith(day)));
-  write(KEYS.counters, { ...kept, [key]: next });
+  // Documents can be dated on other days, so several days are kept: the most recently used
+  // counters, last at the end, so the record stays small.
+  const kept = Object.entries(counters)
+    .filter(([k]) => k !== key)
+    .slice(-(MAX_COUNTERS - 1));
+  write(KEYS.counters, Object.fromEntries([...kept, [key, next]]));
   return next;
 }
 
@@ -102,6 +119,7 @@ export function loadPrefs(): Prefs {
   return read(KEYS.prefs, prefsSchema) ?? DEFAULT_PREFS;
 }
 
-export function savePrefs(prefs: Prefs): void {
-  write(KEYS.prefs, prefs);
+/** Updates only the given preferences, keeping the rest. */
+export function savePrefs(prefs: Partial<Prefs>): void {
+  write(KEYS.prefs, { ...loadPrefs(), ...prefs });
 }

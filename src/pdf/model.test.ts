@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { LONG_ESTIMATE, OPTIONS_ESTIMATE, SAMPLE_ESTIMATE, SAMPLE_INVOICE } from './fixtures';
+import {
+  ESTIMATE_WITH_STEPS,
+  INVOICE_WITH_EXTRAS,
+  LONG_ESTIMATE,
+  OPTIONS_ESTIMATE,
+  SAMPLE_ESTIMATE,
+  SAMPLE_INVOICE,
+} from './fixtures';
 import { buildPdfModel, splitDescription } from './model';
 import { paginate, type PdfPage } from './layout';
 import { countLines } from './measure';
@@ -16,8 +23,9 @@ describe('buildPdfModel', () => {
   it('builds the sample estimate (SPEC §7)', () => {
     const m = buildPdfModel(SAMPLE_ESTIMATE);
     expect(m.title).toBe('WORK ESTIMATE');
-    expect(m.date).toBe('10-05-2026');
+    expect(m.date).toBe('10/05/2026');
     expect(m.multi).toBe(false);
+    expect(m.simpleTable).toBe(false);
     expect(m.estimateRef).toBe('');
     expect(m.fileName).toBe('Estimate_EST-20261005-01_Margaret-Kelly.pdf');
     const [option] = m.options;
@@ -48,6 +56,8 @@ describe('buildPdfModel', () => {
   it('builds the invoice variant', () => {
     const m = buildPdfModel(SAMPLE_INVOICE);
     expect(m.title).toBe('INVOICE');
+    // Invoices print only Description | Amount.
+    expect(m.simpleTable).toBe(true);
     expect(m.estimateRef).toBe('EST-20261005-01');
     expect(m.options[0]?.deposit).toEqual({
       label: 'Deposit received (30%)',
@@ -65,6 +75,14 @@ describe('buildPdfModel', () => {
       buildPdfModel({ ...SAMPLE_ESTIMATE, deposit: { mode: 'fixed', cents: 100000 } }).options[0]
         ?.deposit,
     ).toEqual({ label: 'Deposit required', value: '$1,000.00' });
+  });
+
+  it('prints the customer phone as (XXX) XXX-XXXX', () => {
+    const doc = {
+      ...SAMPLE_ESTIMATE,
+      customer: { ...SAMPLE_ESTIMATE.customer, phone: '+1 610.555.0142' },
+    };
+    expect(buildPdfModel(doc).customer.contact).toMatch(/^\(610\) 555-0142/);
   });
 
   it('prints the free-text unit for "other"', () => {
@@ -92,6 +110,69 @@ describe('buildPdfModel', () => {
       ['$1,260.00', '$2,940.00'],
       ['$1,639.50', '$3,825.50'],
     ]);
+  });
+});
+
+describe('invoice extra charges', () => {
+  it('follow the items and count in the total, deposit and balance', () => {
+    const m = buildPdfModel(INVOICE_WITH_EXTRAS);
+    const rows = m.options[0]!.rows;
+    expect(rows.map((r) => r.kind)).toEqual(['item', 'item', 'item', 'item', 'extra', 'extra']);
+    expect(rows.slice(4).map((r) => [r.description, r.amount])).toEqual([
+      ['Debris disposal', '$50.00'],
+      ['Extra trip for materials', '$125.00'],
+    ]);
+    // $18,356.75 + $175 = $18,531.75; 30 % deposit received = $5,559.53.
+    expect(m.options[0]).toMatchObject({ total: '$18,531.75', balance: '$12,972.22' });
+  });
+
+  it('get their head row again when they continue on another page', () => {
+    const extras = Array.from({ length: 10 }, (_, i) => ({
+      id: `x${String(i)}`,
+      description: `Extra charge number ${String(i + 1)}`,
+      amountCents: 1000,
+    }));
+    const doc = { ...LONG_ESTIMATE, type: 'invoice' as const, extras, estimateRef: '' };
+    const pages = paginate(buildPdfModel(doc));
+    expect(rowsOf(pages).filter((r) => r.kind === 'extra')).toHaveLength(10);
+    expect(pages.at(-1)?.segments.at(-1)?.showTotals).toBe(true);
+  });
+});
+
+describe('work-process steps', () => {
+  it('print before the terms only when there are steps', () => {
+    const pages = paginate(buildPdfModel(ESTIMATE_WITH_STEPS));
+    const stepsPage = pages.findIndex((p) => p.steps !== null);
+    expect(pages.filter((p) => p.steps !== null)).toHaveLength(1);
+    expect(stepsPage).toBeGreaterThanOrEqual(0);
+    expect(stepsPage).toBeLessThanOrEqual(pages.findIndex((p) => p.showTerms));
+    expect(pages.at(-1)?.showTerms).toBe(true);
+    expect(paginate(buildPdfModel(SAMPLE_ESTIMATE)).some((p) => p.steps !== null)).toBe(false);
+  });
+
+  it('move whole to the next page when they do not fit', () => {
+    const steps = Array.from(
+      { length: 15 },
+      (_, i) => `Step ${String(i + 1)} ${'word '.repeat(30)}`,
+    );
+    const pages = paginate(buildPdfModel({ ...LONG_ESTIMATE, steps }));
+    expect(pages.filter((p) => p.steps !== null)).toHaveLength(1);
+    expect(pages.at(-1)?.showTerms).toBe(true);
+  });
+
+  it('continue on the next page when the list is longer than a page', () => {
+    // 15 steps of 200 wide characters: several lines each, more than one page.
+    const steps = Array.from({ length: 15 }, (_, i) => `${String(i + 1)} ${'WWWW '.repeat(39)}`);
+    const pages = paginate(buildPdfModel({ ...LONG_ESTIMATE, steps }));
+    const ranges = pages.flatMap((p) => (p.steps ? [p.steps] : []));
+    expect(ranges.length).toBeGreaterThan(1);
+    // Every step once, in order.
+    expect(ranges[0]?.from).toBe(0);
+    ranges.slice(1).forEach((r, i) => {
+      expect(r.from).toBe(ranges[i]?.to);
+    });
+    expect(ranges.at(-1)?.to).toBe(15);
+    expect(pages.at(-1)?.showTerms).toBe(true);
   });
 });
 

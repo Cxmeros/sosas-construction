@@ -58,15 +58,20 @@ describe('draft', () => {
 });
 
 describe('counters', () => {
-  it('counts per prefix and day, dropping old days', () => {
+  it('counts per prefix and day, keeping other days', () => {
     expect(nextSequence('EST-20261004')).toBe(1);
     expect(nextSequence('EST-20261005')).toBe(1);
     expect(nextSequence('EST-20261005')).toBe(2);
     expect(nextSequence('INV-20261005')).toBe(1);
-    expect(JSON.parse(memory.getItem('sosa.counters.v1') ?? '')).toEqual({
-      'EST-20261005': 2,
-      'INV-20261005': 1,
-    });
+    // A document dated back to the 4th continues that day's count.
+    expect(nextSequence('EST-20261004')).toBe(2);
+  });
+
+  it('keeps only the 100 most recently used counters', () => {
+    for (let d = 1; d <= 101; d += 1) nextSequence(`EST-2026${String(1000 + d)}`);
+    const saved = JSON.parse(memory.getItem('sosa.counters.v1') ?? '') as Record<string, number>;
+    expect(Object.keys(saved)).toHaveLength(100);
+    expect(saved).not.toHaveProperty('EST-20261001');
   });
 
   it('restarts from corrupt data', () => {
@@ -76,6 +81,12 @@ describe('counters', () => {
 });
 
 describe('prefs', () => {
+  it('keeps saved default steps when another preference changes', () => {
+    savePrefs({ defaultSteps: 'Sand\nFinish' });
+    savePrefs({ depositPercent: '20' });
+    expect(loadPrefs()).toEqual({ depositPercent: '20', defaultSteps: 'Sand\nFinish' });
+  });
+
   it('defaults to 30 % and remembers the last deposit', () => {
     expect(loadPrefs()).toEqual({ depositPercent: '30' });
     savePrefs({ depositPercent: '20' });
@@ -89,6 +100,8 @@ describe('draft migration', () => {
       ...emptyForm('estimate', 'EST-20261005-01', '2026-10-05', '30'),
     };
     delete rest.options;
+    delete rest.extras;
+    delete rest.steps;
     const item = {
       id: 'a',
       description: 'Install and refinish',
@@ -105,5 +118,8 @@ describe('draft migration', () => {
     expect(loadDraft()?.values.options).toEqual([
       { id: 'option-1', title: '', description: '', items: [item] },
     ]);
+    // …and drafts from before invoice extra charges get an empty list.
+    expect(loadDraft()?.values.extras).toEqual([]);
+    expect(loadDraft()?.values.steps).toBe('');
   });
 });
