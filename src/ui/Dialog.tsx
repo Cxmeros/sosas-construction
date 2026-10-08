@@ -35,7 +35,7 @@ export function Dialog({ open, onClose, labelledBy, children }: DialogProps) {
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
-      className="m-0 mt-auto w-full max-w-none border-0 border-t-[3px] border-orange-500 bg-surface p-0 text-ink backdrop:bg-[rgba(20,12,8,0.55)] lg:m-auto lg:max-w-[440px] lg:border-[1.5px] lg:border-t-[3px] lg:border-walnut-700"
+      className="m-0 mt-auto w-full max-w-none border-0 border-t-[3px] border-brand-500 bg-surface p-0 text-ink backdrop:bg-[rgba(20,12,8,0.55)] lg:m-auto lg:max-w-[440px] lg:border-[1.5px] lg:border-t-[3px] lg:border-walnut-700"
     >
       {open && <div className="flex flex-col gap-2.5 p-4">{children}</div>}
     </dialog>

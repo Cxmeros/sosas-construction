@@ -38,7 +38,7 @@ export function ChooseOptionDialog({
         {doc.options.map((option, k) => (
           <label
             key={option.id}
-            className="flex min-h-14 cursor-pointer items-center gap-3 rounded-field border-[1.5px] border-walnut-700 bg-surface px-3 has-[:checked]:bg-cream has-[:focus-visible]:outline-[3px] has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-orange-700"
+            className="flex min-h-14 cursor-pointer items-center gap-3 rounded-field border-[1.5px] border-walnut-700 bg-surface px-3 has-[:checked]:bg-cream has-[:focus-visible]:outline-[3px] has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-brand-700"
           >
             <input
               type="radio"
@@ -70,7 +70,7 @@ export function ChooseOptionDialog({
             onChoose(picked);
             setPicked(null);
           }}
-          className="min-h-12 rounded-field bg-orange-700 text-base font-bold text-white hover:bg-orange-800 disabled:opacity-50"
+          className="min-h-12 rounded-field bg-brand-700 text-base font-bold text-white hover:bg-brand-800 disabled:opacity-50"
         >
           {confirmLabel}
         </button>

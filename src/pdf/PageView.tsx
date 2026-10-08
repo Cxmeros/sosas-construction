@@ -15,24 +15,24 @@ const cond: CSSProperties = {
   fontFamily: "'Barlow Condensed', Barlow, sans-serif",
   fontWeight: 700,
 };
-/** Solid orange bar + pale orange box, as in Danilo's original estimate (mirrors DocumentPdf). */
+/** Solid brand bar + pale brand box, as in Danilo's original estimate (mirrors DocumentPdf). */
 const bar: CSSProperties = {
   ...cond,
   fontSize: TYPE.label,
   letterSpacing: '0.1em',
   color: '#FFFFFF',
-  background: C.orange600,
+  background: C.brand600,
   lineHeight: TYPE.lineHeight,
   padding: `${String(BAR.padY)}px ${String(BAR.padX)}px`,
 };
 const box: CSSProperties = {
-  background: C.orange100,
+  background: C.brand100,
   padding: `${String(BOX.padY)}px ${String(BOX.padX)}px`,
   display: 'flex',
   flexDirection: 'column',
   gap: BOX.gap,
 };
-const gridLine = `1px solid ${C.orange200}`;
+const gridLine = `1px solid ${C.brand200}`;
 const grid: CSSProperties = {
   display: 'grid',
   gridTemplateColumns: `minmax(0,1fr) ${String(COLS.qty)}px ${String(COLS.unit)}px ${String(COLS.unitPrice)}px ${String(COLS.amount)}px`,
@@ -58,7 +58,7 @@ function FullHeader({ model }: { model: PdfModel }) {
         alignItems: 'flex-end',
         gap: 24,
         paddingBottom: 14,
-        borderBottom: `3px solid ${C.orange500}`,
+        borderBottom: `3px solid ${C.brand500}`,
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
@@ -88,7 +88,7 @@ function FullHeader({ model }: { model: PdfModel }) {
             ...cond,
             fontSize: TYPE.title,
             lineHeight: 0.95,
-            color: C.orange600,
+            color: C.brand600,
             letterSpacing: '0.02em',
           }}
         >
@@ -129,7 +129,7 @@ function CompactHeader({ model }: { model: PdfModel }) {
         justifyContent: 'space-between',
         alignItems: 'center',
         paddingBottom: 10,
-        borderBottom: `3px solid ${C.orange500}`,
+        borderBottom: `3px solid ${C.brand500}`,
       }}
     >
       <img src={logoUrl} alt={COMPANY.name} style={{ height: 48, display: 'block' }} />
@@ -139,7 +139,7 @@ function CompactHeader({ model }: { model: PdfModel }) {
             ...cond,
             fontSize: TYPE.compactTitle,
             lineHeight: 1,
-            color: C.orange600,
+            color: C.brand600,
             letterSpacing: '0.02em',
           }}
         >
@@ -202,8 +202,8 @@ function TableHead({ simple, label = 'DESCRIPTION' }: { simple: boolean; label?:
       style={{
         ...(simple ? simpleGrid : grid),
         border: gridLine,
-        background: C.orange100,
-        color: C.orange800,
+        background: C.brand100,
+        color: C.brand800,
         fontWeight: 700,
         fontSize: TYPE.tableHead,
         letterSpacing: '0.08em',
@@ -230,7 +230,7 @@ function Totals({ option, full = false }: { option: PdfOption; full?: boolean })
         width: full ? 'auto' : 340,
         display: 'flex',
         flexDirection: 'column',
-        border: `1.5px solid ${C.orange200}`,
+        border: `1.5px solid ${C.brand200}`,
       }}
     >
       <div
@@ -251,7 +251,7 @@ function Totals({ option, full = false }: { option: PdfOption; full?: boolean })
             display: 'flex',
             justifyContent: 'space-between',
             padding: '9px 14px',
-            borderTop: `1px solid ${C.orange200}`,
+            borderTop: `1px solid ${C.brand200}`,
             fontSize: TYPE.totalsRow,
           }}
         >
@@ -266,8 +266,8 @@ function Totals({ option, full = false }: { option: PdfOption; full?: boolean })
           alignItems: 'baseline',
           gap: 12,
           padding: '11px 14px',
-          borderTop: `2px solid ${C.orange600}`,
-          background: C.orange600,
+          borderTop: `2px solid ${C.brand600}`,
+          background: C.brand600,
           color: '#FFFFFF',
         }}
       >
@@ -305,8 +305,8 @@ function OptionCard({ option }: { option: PdfOption }) {
           style={{
             ...columnGrid,
             border: gridLine,
-            background: C.orange100,
-            color: C.orange800,
+            background: C.brand100,
+            color: C.brand800,
             fontWeight: 700,
             fontSize: TYPE.tableHead,
             letterSpacing: '0.08em',

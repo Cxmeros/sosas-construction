@@ -71,7 +71,7 @@ export function MobilePreview({
           }
         />
       </main>
-      <div className="flex flex-none flex-col gap-3 border-t-[3px] border-orange-500 p-3 pb-[calc(12px+env(safe-area-inset-bottom))]">
+      <div className="flex flex-none flex-col gap-3 border-t-[3px] border-brand-500 p-3 pb-[calc(12px+env(safe-area-inset-bottom))]">
         {/* What the customer will see, readable in sunlight before sending. */}
         <dl className="m-0 grid grid-cols-[1fr_auto] items-baseline gap-x-3 gap-y-0.5 px-1 tabular-nums">
           <dt className="sr-only">Para</dt>
@@ -99,7 +99,7 @@ export function MobilePreview({
               {doc.deposit.mode !== 'none' && (
                 <>
                   <dt className="text-[15px] text-oak-300">{labels.balance}</dt>
-                  <dd className="m-0 text-right font-cond text-[22px] font-bold text-orange-300">
+                  <dd className="m-0 text-right font-cond text-[22px] font-bold text-brand-300">
                     {formatCents(totals[0]?.balanceCents ?? 0)}
                   </dd>
                 </>
@@ -111,7 +111,7 @@ export function MobilePreview({
           type="button"
           onClick={onShare}
           disabled={busy !== null}
-          className="btn-cond flex min-h-16 flex-col items-center justify-center rounded-field bg-orange-400 text-ink hover:bg-orange-300 disabled:opacity-70"
+          className="btn-cond flex min-h-16 flex-col items-center justify-center rounded-field bg-brand-400 text-ink hover:bg-brand-300 disabled:opacity-70"
         >
           <span className="flex items-center gap-2.5 text-[22px]">
             <ShareIcon strokeWidth={1.75} />

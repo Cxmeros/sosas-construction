@@ -46,8 +46,8 @@ const lh = (size: number) => size * TYPE.lineHeight;
 const CONTENT_BOTTOM = PAGE.height - PAGE.footerBottom - 26 - 18;
 
 /**
- * Section style from Danilo's original estimate: a solid orange bar with the label, then a pale
- * orange box with the content.
+ * Section style from Danilo's original estimate: a solid brand-color bar with the label, then a pale
+ * tinted box with the content.
  */
 export const BAR = { padY: 4, padX: 10 } as const;
 export const BOX = { padY: 10, padX: 12, gap: 4 } as const;

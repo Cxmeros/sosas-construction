@@ -262,7 +262,7 @@ export function App() {
             type="button"
             onClick={share}
             disabled={actions.busy !== null}
-            className="btn-cond min-h-12 rounded-field bg-orange-700 px-[22px] text-xl text-white hover:bg-orange-800 disabled:opacity-70"
+            className="btn-cond min-h-12 rounded-field bg-brand-700 px-[22px] text-xl text-white hover:bg-brand-800 disabled:opacity-70"
           >
             {actions.busy === 'share' ? 'Creando…' : 'Compartir'}
           </button>
@@ -348,7 +348,7 @@ export function App() {
           }}
         />
       </main>
-      <div className="on-dark flex flex-none items-center justify-between gap-3 border-t-[3px] border-orange-500 bg-walnut-900 pt-2.5 pr-3 pb-[calc(14px+env(safe-area-inset-bottom))] pl-4">
+      <div className="on-dark flex flex-none items-center justify-between gap-3 border-t-[3px] border-brand-500 bg-walnut-900 pt-2.5 pr-3 pb-[calc(14px+env(safe-area-inset-bottom))] pl-4">
         {multi ? (
           <div className="flex min-w-0 flex-col tabular-nums">
             <span className="text-[13px] font-semibold tracking-[0.08em] text-oak-300 uppercase">
@@ -382,7 +382,7 @@ export function App() {
         <button
           type="button"
           onClick={openPreview}
-          className="btn-cond flex min-h-14 items-center gap-2 rounded-field bg-orange-400 px-5 text-[22px] text-ink hover:bg-orange-300"
+          className="btn-cond flex min-h-14 items-center gap-2 rounded-field bg-brand-400 px-5 text-[22px] text-ink hover:bg-brand-300"
         >
           <FileIcon strokeWidth={1.75} /> Ver PDF
         </button>

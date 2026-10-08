@@ -129,7 +129,7 @@ export function OptionsEditor({
           aria-label={`Opción ${String(k + 1)}`}
           className="flex flex-col border-[1.5px] border-walnut-700 bg-paper"
         >
-          <div className="flex items-center justify-between bg-orange-700 pl-4 text-white">
+          <div className="flex items-center justify-between bg-brand-700 pl-4 text-white">
             <h3 className="btn-cond m-0 text-xl">Opción {k + 1}</h3>
             <button
               type="button"
@@ -137,7 +137,7 @@ export function OptionsEditor({
                 setRemoving(k);
               }}
               aria-label={`Quitar opción ${String(k + 1)}`}
-              className="flex min-h-12 items-center gap-1.5 px-3.5 text-[15px] font-semibold text-white hover:bg-orange-800"
+              className="flex min-h-12 items-center gap-1.5 px-3.5 text-[15px] font-semibold text-white hover:bg-brand-800"
             >
               <TrashIcon size={20} /> Quitar
             </button>

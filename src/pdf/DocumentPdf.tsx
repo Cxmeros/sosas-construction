@@ -69,12 +69,12 @@ const s = StyleSheet.create({
     fontSize: pt(TYPE.label),
     letterSpacing: pt(TYPE.label) * 0.1,
     color: '#FFFFFF',
-    backgroundColor: C.orange600,
+    backgroundColor: C.brand600,
     paddingVertical: pt(BAR.padY),
     paddingHorizontal: pt(BAR.padX),
   },
   box: {
-    backgroundColor: C.orange100,
+    backgroundColor: C.brand100,
     paddingVertical: pt(BOX.padY),
     paddingHorizontal: pt(BOX.padX),
     gap: pt(BOX.gap),
@@ -107,13 +107,13 @@ const col = (width: number, align: 'left' | 'right'): Style => ({
   paddingVertical: pt(CELL.padY),
   paddingHorizontal: pt(CELL.padX),
   borderLeftWidth: pt(1),
-  borderLeftColor: C.orange200,
+  borderLeftColor: C.brand200,
   textAlign: align,
 });
 const tableSides: Style = {
   borderLeftWidth: pt(1),
   borderRightWidth: pt(1),
-  borderColor: C.orange200,
+  borderColor: C.brand200,
 };
 
 function FullHeader({ model, logoSrc }: { model: PdfModel; logoSrc: string }) {
@@ -130,7 +130,7 @@ function FullHeader({ model, logoSrc }: { model: PdfModel; logoSrc: string }) {
         alignItems: 'flex-end',
         paddingBottom: pt(14),
         borderBottomWidth: pt(3),
-        borderBottomColor: C.orange500,
+        borderBottomColor: C.brand500,
       }}
     >
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: pt(14) }}>
@@ -159,7 +159,7 @@ function FullHeader({ model, logoSrc }: { model: PdfModel; logoSrc: string }) {
             {
               fontSize: pt(TYPE.title),
               lineHeight: 0.95,
-              color: C.orange600,
+              color: C.brand600,
               letterSpacing: pt(TYPE.title) * 0.02,
             },
           ]}
@@ -200,7 +200,7 @@ function CompactHeader({ model, logoSrc }: { model: PdfModel; logoSrc: string })
         alignItems: 'center',
         paddingBottom: pt(10),
         borderBottomWidth: pt(3),
-        borderBottomColor: C.orange500,
+        borderBottomColor: C.brand500,
       }}
     >
       <Image src={logoSrc} style={{ height: pt(48), width: pt((48 * 525) / 245) }} />
@@ -211,7 +211,7 @@ function CompactHeader({ model, logoSrc }: { model: PdfModel; logoSrc: string })
             {
               fontSize: pt(TYPE.compactTitle),
               lineHeight: 1,
-              color: C.orange600,
+              color: C.brand600,
               letterSpacing: pt(TYPE.compactTitle) * 0.02,
             },
           ]}
@@ -230,7 +230,7 @@ function CompactHeader({ model, logoSrc }: { model: PdfModel; logoSrc: string })
 function Row({ row, simple }: { row: PdfRow; simple: boolean }) {
   return (
     <View
-      style={[s.row, tableSides, { borderBottomWidth: pt(1), borderBottomColor: C.orange200 }]}
+      style={[s.row, tableSides, { borderBottomWidth: pt(1), borderBottomColor: C.brand200 }]}
       wrap={false}
     >
       <View style={s.descCell}>
@@ -272,8 +272,8 @@ function TableHead({ simple, label = 'DESCRIPTION' }: { simple: boolean; label?:
         {
           borderTopWidth: pt(1),
           borderBottomWidth: pt(1),
-          backgroundColor: C.orange100,
-          color: C.orange800,
+          backgroundColor: C.brand100,
+          color: C.brand800,
           fontWeight: 700,
           fontSize: pt(TYPE.tableHead),
           letterSpacing: pt(TYPE.tableHead) * 0.08,
@@ -301,7 +301,7 @@ function Totals({ option, full = false }: { option: PdfOption; full?: boolean })
         alignSelf: full ? 'stretch' : 'flex-end',
         ...(full ? {} : { width: pt(340) }),
         borderWidth: pt(1.5),
-        borderColor: C.orange200,
+        borderColor: C.brand200,
       }}
       wrap={false}
     >
@@ -326,7 +326,7 @@ function Totals({ option, full = false }: { option: PdfOption; full?: boolean })
             paddingVertical: pt(9),
             paddingHorizontal: pt(14),
             borderTopWidth: pt(1),
-            borderTopColor: C.orange200,
+            borderTopColor: C.brand200,
             fontSize: pt(TYPE.totalsRow),
           }}
         >
@@ -342,8 +342,8 @@ function Totals({ option, full = false }: { option: PdfOption; full?: boolean })
           paddingVertical: pt(11),
           paddingHorizontal: pt(14),
           borderTopWidth: pt(2),
-          borderTopColor: C.orange600,
-          backgroundColor: C.orange600,
+          borderTopColor: C.brand600,
+          backgroundColor: C.brand600,
           color: '#FFFFFF',
         }}
       >
@@ -380,8 +380,8 @@ function OptionCard({ option }: { option: PdfOption }) {
             {
               borderTopWidth: pt(1),
               borderBottomWidth: pt(1),
-              backgroundColor: C.orange100,
-              color: C.orange800,
+              backgroundColor: C.brand100,
+              color: C.brand800,
               fontWeight: 700,
               fontSize: pt(TYPE.tableHead),
               letterSpacing: pt(TYPE.tableHead) * 0.08,
@@ -394,11 +394,7 @@ function OptionCard({ option }: { option: PdfOption }) {
         {option.rows.map((row) => (
           <View
             key={row.key}
-            style={[
-              s.row,
-              tableSides,
-              { borderBottomWidth: pt(1), borderBottomColor: C.orange200 },
-            ]}
+            style={[s.row, tableSides, { borderBottomWidth: pt(1), borderBottomColor: C.brand200 }]}
             wrap={false}
           >
             <View style={s.descCell}>

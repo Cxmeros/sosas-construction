@@ -121,7 +121,7 @@ export function ItemsEditor({
         ref={undoButton}
         type="button"
         onClick={doUndo}
-        className={`flex min-h-12 flex-none items-center gap-1.5 px-3.5 text-base font-bold tracking-[0.04em] uppercase ${desktop ? 'text-orange-400' : 'text-orange-800'}`}
+        className={`flex min-h-12 flex-none items-center gap-1.5 px-3.5 text-base font-bold tracking-[0.04em] uppercase ${desktop ? 'text-brand-400' : 'text-brand-800'}`}
       >
         <UndoIcon size={20} />
         Deshacer
@@ -138,7 +138,7 @@ export function ItemsEditor({
       <button
         type="button"
         onClick={add}
-        className="btn-cond flex min-h-[52px] items-center justify-center gap-2 self-stretch bg-orange-700 text-xl text-white hover:bg-orange-800"
+        className="btn-cond flex min-h-[52px] items-center justify-center gap-2 self-stretch bg-brand-700 text-xl text-white hover:bg-brand-800"
       >
         <PlusIcon /> Agregar primer trabajo
       </button>
@@ -301,7 +301,7 @@ function MobileCard({ form, optionIndex, multi, index, count, item, onMove, onDe
         className={`flex items-center gap-1 border-b border-line-faint pl-3 ${hasError ? 'bg-error-bg' : 'bg-paper'}`}
       >
         <span
-          className={`flex-1 font-cond text-xl font-bold ${hasError ? 'text-error' : 'text-orange-800'}`}
+          className={`flex-1 font-cond text-xl font-bold ${hasError ? 'text-error' : 'text-brand-800'}`}
         >
           #{index + 1}
         </span>
@@ -458,7 +458,7 @@ function DesktopRow({
         const from = Number(e.dataTransfer.getData('text/plain'));
         if (Number.isInteger(from) && from !== index) onDropFrom(from);
       }}
-      className={`border-b border-line-faint p-2 hover:bg-paper-hover ${dragOver ? 'bg-orange-100' : ''}`}
+      className={`border-b border-line-faint p-2 hover:bg-paper-hover ${dragOver ? 'bg-brand-100' : ''}`}
     >
       <div className="items-grid items-center">
         <button

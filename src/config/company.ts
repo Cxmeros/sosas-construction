@@ -31,15 +31,21 @@ export const COLORS = {
   oak300: '#E8C58F',
   oak500: '#D9A866',
   gold500: '#C9962E',
-  orange100: '#FCEBDF',
-  /** PDF table grid and box outlines (light orange, as in Danilo's original estimate). */
-  orange200: '#F2C4A2',
-  orange400: '#EE7A30',
-  orange500: '#E06A1F',
-  /** PDF section bars: the brightest orange that keeps white text at AA (4.56:1). */
-  orange600: '#C2551A',
-  orange700: '#B5470F',
-  orange800: '#8F3709',
+  /**
+   * Brand dark red (October meeting). PROVISIONAL until the client sends the exact color; every
+   * shade is checked for AA contrast in colors.test.ts. Kept darker than `error` (#B3261E) so an
+   * error never looks like a brand accent.
+   */
+  brand100: '#F8E7E7',
+  /** PDF table grid and box outlines. */
+  brand200: '#E3B9B9',
+  brand300: '#F29186',
+  brand400: '#E5625A',
+  brand500: '#A3262E',
+  /** PDF section bars and title, with white text. */
+  brand600: '#8E1D24',
+  brand700: '#7D1A20',
+  brand800: '#5C1217',
   paper: '#F6F1EA',
   surface: '#FFFFFF',
   line: '#CDBBA7',

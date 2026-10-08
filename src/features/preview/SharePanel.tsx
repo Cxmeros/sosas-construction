@@ -69,7 +69,7 @@ export function SharePanel({ file, onClose }: { file: PdfFile | null; onClose: (
             open(mail);
           }}
         >
-          <span className="size-3 flex-none bg-orange-700" aria-hidden="true" />
+          <span className="size-3 flex-none bg-brand-700" aria-hidden="true" />
           <span className="min-w-0 break-words">Correo · {doc?.customer.email}</span>
         </button>
       )}
