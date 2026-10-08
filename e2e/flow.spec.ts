@@ -285,7 +285,7 @@ test('the date picked in the form is the one in the downloaded PDF (date and num
   const path = info.outputPath('dated.pdf');
   await file.saveAs(path);
   const text = pdfText(path);
-  expect(text).toContain('11-20-2026');
+  expect(text).toContain('11/20/2026');
   expect(text).toContain('EST-20261120-01');
   expect(text).not.toContain(`EST-${today()}`);
 

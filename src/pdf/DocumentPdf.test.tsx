@@ -47,7 +47,7 @@ describe('DocumentPdf', () => {
     for (const s of [
       'WORK ESTIMATE',
       'EST-20261005-01',
-      '10-05-2026',
+      '10/05/2026',
       'CUSTOMER INFORMATION',
       'Margaret Kelly',
       'JOB DESCRIPTION',

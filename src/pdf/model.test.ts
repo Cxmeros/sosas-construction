@@ -16,7 +16,7 @@ describe('buildPdfModel', () => {
   it('builds the sample estimate (SPEC §7)', () => {
     const m = buildPdfModel(SAMPLE_ESTIMATE);
     expect(m.title).toBe('WORK ESTIMATE');
-    expect(m.date).toBe('10-05-2026');
+    expect(m.date).toBe('10/05/2026');
     expect(m.multi).toBe(false);
     expect(m.estimateRef).toBe('');
     expect(m.fileName).toBe('Estimate_EST-20261005-01_Margaret-Kelly.pdf');
