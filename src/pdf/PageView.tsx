@@ -162,11 +162,17 @@ function Section({ label, children }: { label: string; children: ReactNode }) {
   );
 }
 
-function Row({ row }: { row: PdfRow }) {
+const simpleGrid: CSSProperties = {
+  display: 'grid',
+  gridTemplateColumns: `minmax(0,1fr) ${String(COLS.amount)}px`,
+};
+
+/** `simple` (invoice): Description | Amount only. */
+function Row({ row, simple }: { row: PdfRow; simple: boolean }) {
   return (
     <div
       style={{
-        ...grid,
+        ...(simple ? simpleGrid : grid),
         borderLeft: gridLine,
         borderRight: gridLine,
         borderBottom: gridLine,
@@ -177,19 +183,23 @@ function Row({ row }: { row: PdfRow }) {
         <span style={{ fontWeight: 500 }}>{row.description}</span>
         {row.note && <span style={{ fontSize: TYPE.note, color: C.inkMuted }}>{row.note}</span>}
       </span>
-      <span style={cell('right')}>{row.qty}</span>
-      <span style={cell('left')}>{row.unit}</span>
-      <span style={cell('right')}>{row.unitPrice}</span>
+      {!simple && (
+        <>
+          <span style={cell('right')}>{row.qty}</span>
+          <span style={cell('left')}>{row.unit}</span>
+          <span style={cell('right')}>{row.unitPrice}</span>
+        </>
+      )}
       <span style={{ ...cell('right'), fontWeight: 600 }}>{row.amount}</span>
     </div>
   );
 }
 
-function TableHead() {
+function TableHead({ simple }: { simple: boolean }) {
   return (
     <div
       style={{
-        ...grid,
+        ...(simple ? simpleGrid : grid),
         border: gridLine,
         background: C.orange100,
         color: C.orange800,
@@ -199,9 +209,13 @@ function TableHead() {
       }}
     >
       <span style={cell('left', true)}>DESCRIPTION</span>
-      <span style={cell('right')}>QTY</span>
-      <span style={cell('left')}>UNIT</span>
-      <span style={cell('right')}>UNIT PRICE</span>
+      {!simple && (
+        <>
+          <span style={cell('right')}>QTY</span>
+          <span style={cell('left')}>UNIT</span>
+          <span style={cell('right')}>UNIT PRICE</span>
+        </>
+      )}
       <span style={cell('right')}>AMOUNT</span>
     </div>
   );
@@ -331,7 +345,15 @@ function OptionCard({ option }: { option: PdfOption }) {
 }
 
 /** One option's part of a page: its bar (and description), table rows, and/or totals. */
-function OptionSegment({ option, segment }: { option: PdfOption; segment: PdfSegment }) {
+function OptionSegment({
+  option,
+  segment,
+  simple,
+}: {
+  option: PdfOption;
+  segment: PdfSegment;
+  simple: boolean;
+}) {
   const continued = segment.header === 'continued';
   return (
     <>
@@ -346,9 +368,9 @@ function OptionSegment({ option, segment }: { option: PdfOption; segment: PdfSeg
         )}
         {segment.showTable && (
           <div style={{ display: 'flex', flexDirection: 'column', marginTop: TABLE_GAP }}>
-            <TableHead />
+            <TableHead simple={simple} />
             {segment.rows.map((row) => (
-              <Row key={row.key} row={row} />
+              <Row key={row.key} row={row} simple={simple} />
             ))}
           </div>
         )}
@@ -415,6 +437,7 @@ export function PageView({ model, page }: { model: PdfModel; page: PdfPage }) {
               key={`${option.key}-${segment.header}`}
               option={option}
               segment={segment}
+              simple={model.simpleTable}
             />
           );
         })}

@@ -18,6 +18,7 @@ describe('buildPdfModel', () => {
     expect(m.title).toBe('WORK ESTIMATE');
     expect(m.date).toBe('10/05/2026');
     expect(m.multi).toBe(false);
+    expect(m.simpleTable).toBe(false);
     expect(m.estimateRef).toBe('');
     expect(m.fileName).toBe('Estimate_EST-20261005-01_Margaret-Kelly.pdf');
     const [option] = m.options;
@@ -48,6 +49,8 @@ describe('buildPdfModel', () => {
   it('builds the invoice variant', () => {
     const m = buildPdfModel(SAMPLE_INVOICE);
     expect(m.title).toBe('INVOICE');
+    // Invoices print only Description | Amount.
+    expect(m.simpleTable).toBe(true);
     expect(m.estimateRef).toBe('EST-20261005-01');
     expect(m.options[0]?.deposit).toEqual({
       label: 'Deposit received (30%)',

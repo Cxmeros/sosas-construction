@@ -225,7 +225,8 @@ function CompactHeader({ model, logoSrc }: { model: PdfModel; logoSrc: string })
   );
 }
 
-function Row({ row }: { row: PdfRow }) {
+/** `simple` (invoice): Description | Amount only. */
+function Row({ row, simple }: { row: PdfRow; simple: boolean }) {
   return (
     <View
       style={[s.row, tableSides, { borderBottomWidth: pt(1), borderBottomColor: C.orange200 }]}
@@ -237,9 +238,13 @@ function Row({ row }: { row: PdfRow }) {
           <Text style={{ fontSize: pt(TYPE.note), color: C.inkMuted }}>{row.note}</Text>
         ) : null}
       </View>
-      <Text style={col(COLS.qty, 'right')}>{row.qty}</Text>
-      <Text style={col(COLS.unit, 'left')}>{row.unit}</Text>
-      <Text style={col(COLS.unitPrice, 'right')}>{row.unitPrice}</Text>
+      {simple ? null : (
+        <>
+          <Text style={col(COLS.qty, 'right')}>{row.qty}</Text>
+          <Text style={col(COLS.unit, 'left')}>{row.unit}</Text>
+          <Text style={col(COLS.unitPrice, 'right')}>{row.unitPrice}</Text>
+        </>
+      )}
       <Text style={[col(COLS.amount, 'right'), { fontWeight: 600 }]}>{row.amount}</Text>
     </View>
   );
@@ -256,7 +261,7 @@ function Section({ label, text, style }: { label: string; text: string; style: S
   );
 }
 
-function TableHead() {
+function TableHead({ simple }: { simple: boolean }) {
   return (
     <View
       style={[
@@ -274,9 +279,13 @@ function TableHead() {
       ]}
     >
       <Text style={s.descCell}>DESCRIPTION</Text>
-      <Text style={col(COLS.qty, 'right')}>QTY</Text>
-      <Text style={col(COLS.unit, 'left')}>UNIT</Text>
-      <Text style={col(COLS.unitPrice, 'right')}>UNIT PRICE</Text>
+      {simple ? null : (
+        <>
+          <Text style={col(COLS.qty, 'right')}>QTY</Text>
+          <Text style={col(COLS.unit, 'left')}>UNIT</Text>
+          <Text style={col(COLS.unitPrice, 'right')}>UNIT PRICE</Text>
+        </>
+      )}
       <Text style={col(COLS.amount, 'right')}>AMOUNT</Text>
     </View>
   );
@@ -411,7 +420,15 @@ function OptionCard({ option }: { option: PdfOption }) {
 }
 
 /** One option's part of a page: its bar (and description), table rows, and/or totals. */
-function OptionSegment({ option, segment }: { option: PdfOption; segment: PdfSegment }) {
+function OptionSegment({
+  option,
+  segment,
+  simple,
+}: {
+  option: PdfOption;
+  segment: PdfSegment;
+  simple: boolean;
+}) {
   const continued = segment.header === 'continued';
   return (
     <>
@@ -426,9 +443,9 @@ function OptionSegment({ option, segment }: { option: PdfOption; segment: PdfSeg
         ) : null}
         {segment.showTable ? (
           <View style={{ marginTop: pt(TABLE_GAP) }}>
-            <TableHead />
+            <TableHead simple={simple} />
             {segment.rows.map((row) => (
-              <Row key={row.key} row={row} />
+              <Row key={row.key} row={row} simple={simple} />
             ))}
           </View>
         ) : null}
@@ -490,6 +507,7 @@ function PdfPageView({
             key={`${option.key}-${segment.header}`}
             option={option}
             segment={segment}
+            simple={model.simpleTable}
           />
         );
       })}

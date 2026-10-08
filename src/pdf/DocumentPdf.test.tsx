@@ -81,6 +81,12 @@ describe('DocumentPdf', () => {
     ]) {
       expect(text).toContain(s.replace(/\s+/g, ''));
     }
+    // Simplified table: description and amount, no quantity, unit or unit price.
+    expect(text).not.toContain('UNITPRICE');
+    expect(text).not.toContain('QTY');
+    expect(text).not.toContain('1,625');
+    expect(text).not.toContain('$0.85');
+    expect(text).toContain('Installandrefinish$12,187.50');
   });
 
   it('paginates the long estimate with the table header repeated', async () => {

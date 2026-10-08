@@ -76,9 +76,12 @@ export function customerHeight(model: PdfModel): number {
   return h;
 }
 
-export function rowHeight(row: PdfRow): number {
+/** Invoice table: Description | Amount. */
+export const SIMPLE_DESC_COL_WIDTH = PAGE.contentWidth - COLS.amount;
+
+export function rowHeight(row: PdfRow, simple = false): number {
   // Table side borders (2) and the description cell's own padding.
-  const width = DESC_COL_WIDTH - 2 - 2 * CELL.padX;
+  const width = (simple ? SIMPLE_DESC_COL_WIDTH : DESC_COL_WIDTH) - 2 - 2 * CELL.padX;
   const main = Math.max(1, countLines(row.description, width, TYPE.body, true)) * lh(TYPE.body);
   const note = countLines(row.note, width, TYPE.note) * lh(TYPE.note);
   return 2 * CELL.padY + main + note + 1;
@@ -213,13 +216,13 @@ export function paginate(model: PdfModel): PdfPage[] {
         PAGE.gap +
         optionHeaderHeight(option, false) +
         TABLE_HEAD +
-        (first ? rowHeight(first) : PAGE.gap + totalsHeight(option));
+        (first ? rowHeight(first, model.simpleTable) : PAGE.gap + totalsHeight(option));
       // Never leave an option's bar alone at the bottom of a page.
       if (!fits(start) && (page.segments.length > 0 || page.fullHeader)) breakPage();
       let current = open(i, 'full', true);
 
       for (const row of option.rows) {
-        const h = rowHeight(row);
+        const h = rowHeight(row, model.simpleTable);
         if (current.rows.length > 0 && !fits(h)) {
           breakPage();
           current = open(i, 'continued', true);

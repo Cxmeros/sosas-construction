@@ -45,6 +45,8 @@ export interface PdfModel {
   jobDescription: string;
   /** True when the estimate offers 2+ options to choose from. */
   multi: boolean;
+  /** Invoice: items show only Description | Amount (no qty, unit or unit price). */
+  simpleTable: boolean;
   options: PdfOption[];
   terms: string;
   footer: { left: string; center: string };
@@ -128,6 +130,7 @@ export function buildPdfModel(doc: DocumentData): PdfModel {
     },
     jobDescription: doc.jobDescription,
     multi,
+    simpleTable: invoice,
     options,
     terms: doc.terms,
     footer: { left: `${COMPANY.name} · ${COMPANY.tagline}`, center: doc.number },
