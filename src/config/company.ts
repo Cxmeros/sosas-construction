@@ -13,33 +13,20 @@ export const COMPANY = {
 
 /**
  * The ONLY reference to the logo, for the app and the PDF. Provisional until the official logo
- * arrives: replace the file (and these numbers if its size changes).
+ * arrives: replace the file.
  */
-export const LOGO = { src: logoUrl, file: 'logo-ai-red.jpg', width: 572, height: 762 } as const;
+export const LOGO = { src: logoUrl, file: 'logo-ai-red.jpg' } as const;
 
-/** Brand tokens from the Claude Design v2 handoff, shared by the app and the PDF. */
+/** Brand tokens the PDF uses (design v2); the app reads the same values from styles.css. */
 export const COLORS = {
-  walnut900: '#2A1A10',
   walnut700: '#3A2416',
-  walnut500: '#6B4226',
-  oak300: '#E8C58F',
-  oak500: '#D9A866',
-  gold500: '#C9962E',
-  red100: '#F6E4E1',
   /** Header rule. */
   red500: '#9E1F1F',
   /** Titles and labels: 10:1 on white. */
   red700: '#7F1A1A',
-  red800: '#5C1212',
-  crimsonCta: '#A51C30',
-  paper: '#F6F1EA',
-  surface: '#FFFFFF',
   line: '#CDBBA7',
   lineSoft: '#D8CBBB',
   fieldBorder: '#7A6656',
   ink: '#1F1712',
   inkMuted: '#5C4A3D',
-  error: '#B3261E',
-  errorBg: '#FBE9E7',
-  success: '#2F6B3A',
 } as const;

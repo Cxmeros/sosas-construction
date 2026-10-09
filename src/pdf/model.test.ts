@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { LONG_ESTIMATE, SAMPLE_ESTIMATE, SAMPLE_INVOICE } from './fixtures';
-import { buildPdfModel, splitDescription } from './model';
+import { buildPdfModel } from './model';
 import { paginate, processStartPage, type DocPage, type PdfPage } from './layout';
 
 const docPages = (pages: PdfPage[]) => pages.filter((p): p is DocPage => p.kind === 'document');
@@ -63,17 +63,6 @@ describe('buildPdfModel', () => {
       items: [{ ...SAMPLE_ESTIMATE.items[0]!, unit: 'other' as const, otherUnit: 'rooms' }],
     };
     expect(buildPdfModel(doc).rows[0]?.unit).toBe('rooms');
-  });
-});
-
-describe('splitDescription', () => {
-  it.each([
-    ['Refinish steps — 15 steps', 'Refinish steps', '15 steps'],
-    ['Refinish steps – 15 steps', 'Refinish steps', '15 steps'],
-    ['Refinish steps -- 15 steps', 'Refinish steps', '15 steps'],
-    ['Water-based finish', 'Water-based finish', ''],
-  ])('%s', (input, description, note) => {
-    expect(splitDescription(input)).toEqual({ description, note });
   });
 });
 

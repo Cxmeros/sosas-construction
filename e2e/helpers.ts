@@ -11,7 +11,8 @@ export const SAMPLE_ITEMS = [
   { description: 'Install and refinish', unit: 'sq ft', qty: '1625', price: '7.50' },
   { description: 'Refinish scraper hardwood floors', unit: 'sq ft', qty: '447', price: '4' },
   {
-    description: 'Refinish steps and handrails — 15 steps, 10 sticks',
+    description: 'Refinish steps and handrails',
+    detail: '15 steps, 10 sticks',
     unit: 'lump sum',
     amount: '3000',
   },
@@ -36,6 +37,7 @@ export function item(page: Page, n: number, mobile: boolean) {
     const card = page.getByRole('listitem', { name: `Trabajo ${String(n)}` });
     return {
       description: card.getByLabel('Descripción'),
+      detail: card.getByLabel('Detalle (opcional)'),
       unit: card.getByRole('combobox'),
       otherUnit: card.getByLabel('Escribe la unidad'),
       qty: card.getByLabel('Cantidad'),
@@ -45,6 +47,7 @@ export function item(page: Page, n: number, mobile: boolean) {
   }
   return {
     description: page.getByLabel(`Descripción trabajo ${String(n)}`),
+    detail: page.getByLabel(`Detalle trabajo ${String(n)} (opcional)`),
     unit: page.getByLabel(`Unidad trabajo ${String(n)}`),
     otherUnit: page.getByLabel(`Unidad escrita trabajo ${String(n)}`),
     qty: page.getByLabel(`Cantidad trabajo ${String(n)}`),
@@ -71,6 +74,7 @@ export async function fillSample(page: Page, mobile: boolean) {
     await addItem(page);
     const it = item(page, i + 1, mobile);
     await it.description.fill(row.description);
+    if ('detail' in row) await it.detail.fill(row.detail);
     await it.unit.selectOption(row.unit);
     if ('amount' in row) await it.amount.fill(row.amount);
     else {

@@ -44,18 +44,6 @@ export interface PdfModel {
   fileName: string;
 }
 
-/** " — " (also " – " or " -- ") in old descriptions: main line and gray note. */
-const NOTE_SEPARATOR = /\s+(?:—|–|--)\s+/;
-
-export function splitDescription(description: string): { description: string; note: string } {
-  const match = NOTE_SEPARATOR.exec(description);
-  if (!match) return { description, note: '' };
-  return {
-    description: description.slice(0, match.index).trim(),
-    note: description.slice(match.index + match[0].length).trim(),
-  };
-}
-
 export function buildPdfModel(doc: DocumentData): PdfModel {
   const invoice = doc.type === 'invoice';
   const totals = documentTotals(doc);
@@ -63,12 +51,10 @@ export function buildPdfModel(doc: DocumentData): PdfModel {
   const rows = doc.items.map((item): PdfRow => {
     const lump = item.unit === 'lump sum';
     const cents = lineAmountCents(item);
-    const split = item.detail
-      ? { description: item.description, note: item.detail }
-      : splitDescription(item.description);
     return {
       key: item.id,
-      ...split,
+      description: item.description,
+      note: item.detail,
       qty: lump ? '—' : formatQty(item.qtyHundredths),
       unit: item.unit === 'other' ? item.otherUnit || 'other' : item.unit,
       unitPrice: lump ? '—' : formatCents(item.unitPriceCents),
