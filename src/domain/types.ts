@@ -29,15 +29,6 @@ export interface Customer {
   email: string;
 }
 
-/** One way of doing the job, with its own items and total (an estimate offers 1–3). */
-export interface EstimateOption {
-  id: string;
-  /** Short name, e.g. "Refinish existing hardwood floors". Required when there are 2+ options. */
-  title: string;
-  description: string;
-  items: LineItem[];
-}
-
 export interface DocumentData {
   type: DocType;
   number: string;
@@ -47,8 +38,7 @@ export interface DocumentData {
   estimateRef: string;
   customer: Customer;
   jobDescription: string;
-  /** Always at least one; an invoice has exactly one (the option the customer accepted). */
-  options: EstimateOption[];
+  items: LineItem[];
   deposit: Deposit;
   terms: string;
 }

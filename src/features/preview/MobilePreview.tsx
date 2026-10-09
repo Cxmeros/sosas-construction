@@ -7,8 +7,7 @@ import { PdfPreview } from './PdfPreview';
 
 interface Props {
   doc: DocumentData;
-  /** One per option. */
-  totals: Totals[];
+  totals: Totals;
   busy: 'share' | 'download' | null;
   notice: Notice | null;
   onNoticeDone: () => void;
@@ -78,32 +77,16 @@ export function MobilePreview({
           <dd className="col-span-2 m-0 truncate text-[17px] font-semibold text-white">
             Para {doc.customer.name}
           </dd>
-          {totals.length > 1 ? (
-            totals.map((t, k) => (
-              <div key={k} className="contents">
-                <dt className="truncate text-[15px] text-oak-300">
-                  Opción {k + 1}
-                  {doc.options[k]?.title ? ` · ${doc.options[k].title}` : ''}
-                </dt>
-                <dd className="m-0 text-right font-cond text-[22px] font-bold text-white">
-                  {formatCents(t.totalCents)}
-                </dd>
-              </div>
-            ))
-          ) : (
+          <dt className="text-[15px] text-oak-300">Total</dt>
+          <dd className="m-0 text-right font-cond text-[22px] font-bold text-white">
+            {formatCents(totals.totalCents)}
+          </dd>
+          {doc.deposit.mode !== 'none' && (
             <>
-              <dt className="text-[15px] text-oak-300">Total</dt>
-              <dd className="m-0 text-right font-cond text-[22px] font-bold text-white">
-                {formatCents(totals[0]?.totalCents ?? 0)}
+              <dt className="text-[15px] text-oak-300">{labels.balance}</dt>
+              <dd className="m-0 text-right font-cond text-[22px] font-bold text-orange-300">
+                {formatCents(totals.balanceCents)}
               </dd>
-              {doc.deposit.mode !== 'none' && (
-                <>
-                  <dt className="text-[15px] text-oak-300">{labels.balance}</dt>
-                  <dd className="m-0 text-right font-cond text-[22px] font-bold text-orange-300">
-                    {formatCents(totals[0]?.balanceCents ?? 0)}
-                  </dd>
-                </>
-              )}
             </>
           )}
         </dl>

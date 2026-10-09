@@ -29,19 +29,11 @@ function freshForm(): FormValues {
   );
 }
 
-/** The deposit the estimate asked for on one option, in cents, or null when there is none. */
-function requestedDeposit(values: FormValues, optionIndex: number): number | null {
+/** The deposit the estimate asked for, in cents, or null when there is none. */
+function requestedDeposit(values: FormValues): number | null {
   const doc = toLenientDocument(values);
-  const option = doc.options[optionIndex];
-  if (!option) return null;
-  const { depositCents } = computeTotals(option.items, doc.deposit);
+  const { depositCents } = computeTotals(doc.items, doc.deposit);
   return depositCents > 0 ? depositCents : null;
-}
-
-/** Keeps only the option the customer accepted (an invoice has exactly one). */
-function keepOption(values: FormValues, optionIndex: number): FormValues['options'] {
-  const option = values.options[optionIndex] ?? values.options[0];
-  return option ? [option] : values.options;
 }
 
 /** Something the user actually typed; a blank item row alone doesn't count. */
@@ -49,12 +41,8 @@ function hasContent(values: FormValues): boolean {
   return (
     values.customer.name.trim() !== '' ||
     values.jobDescription.trim() !== '' ||
-    values.options.some(
-      (o) =>
-        o.title.trim() !== '' ||
-        o.items.some((i) =>
-          [i.description, i.qty, i.unitPrice, i.lumpSum].some((v) => v.trim() !== ''),
-        ),
+    values.items.some((i) =>
+      [i.description, i.qty, i.unitPrice, i.lumpSum].some((v) => v.trim() !== ''),
     )
   );
 }
@@ -123,9 +111,8 @@ export function useDocument() {
    */
   const [depositHint, setDepositHint] = useState<number | null>(null);
 
-  /** `optionIndex`: when switching to invoice with several options, the one the customer chose. */
   const setType = useCallback(
-    (type: DocType, optionIndex = 0) => {
+    (type: DocType) => {
       const current = getValues();
       if (current.type === type) return;
       const opts = { shouldDirty: true, shouldValidate: form.formState.isSubmitted };
@@ -140,13 +127,10 @@ export function useDocument() {
       if (type === 'estimate') {
         setValue('estimateRef', '', opts);
         setDepositHint(null);
-      } else {
-        if (current.options.length > 1) setValue('options', keepOption(current, optionIndex), opts);
-        if (current.depositMode !== 'none' && current.depositMode !== 'fixed') {
-          setDepositHint(requestedDeposit(current, optionIndex));
-          setValue('depositMode', 'fixed', opts);
-          setValue('depositFixed', '', opts);
-        }
+      } else if (current.depositMode !== 'none' && current.depositMode !== 'fixed') {
+        setDepositHint(requestedDeposit(current));
+        setValue('depositMode', 'fixed', opts);
+        setValue('depositFixed', '', opts);
       }
       setValue('type', type, opts);
     },
@@ -158,36 +142,29 @@ export function useDocument() {
     null,
   );
 
-  /**
-   * SPEC §3.9: keeps customer and items; changes number, type, date and terms. With several
-   * options, only the one the customer accepted (`optionIndex`) goes on the invoice.
-   */
-  const convertToInvoice = useCallback(
-    (optionIndex = 0) => {
-      const current = getValues();
-      beforeConvert.current = { values: current, numbers: { ...numbers.current } };
-      const today = toIsoDate(new Date());
-      const number = allocateNumber('invoice', today);
-      numbers.current = { invoice: number };
-      const asked = current.depositMode !== 'none';
-      setDepositHint(asked ? requestedDeposit(current, optionIndex) : null);
-      const values: FormValues = {
-        ...current,
-        options: keepOption(current, optionIndex),
-        type: 'invoice',
-        number,
-        date: today,
-        estimateRef: current.type === 'estimate' ? current.number : current.estimateRef,
-        terms: DEFAULT_TERMS.invoice,
-        depositMode: asked ? 'fixed' : 'none',
-        depositFixed: '',
-      };
-      reset(values);
-      persist(values);
-      return { number, askDeposit: asked };
-    },
-    [getValues, reset, persist],
-  );
+  /** SPEC §3.9: keeps customer and items; changes number, type, date and terms. */
+  const convertToInvoice = useCallback(() => {
+    const current = getValues();
+    beforeConvert.current = { values: current, numbers: { ...numbers.current } };
+    const today = toIsoDate(new Date());
+    const number = allocateNumber('invoice', today);
+    numbers.current = { invoice: number };
+    const asked = current.depositMode !== 'none';
+    setDepositHint(asked ? requestedDeposit(current) : null);
+    const values: FormValues = {
+      ...current,
+      type: 'invoice',
+      number,
+      date: today,
+      estimateRef: current.type === 'estimate' ? current.number : current.estimateRef,
+      terms: DEFAULT_TERMS.invoice,
+      depositMode: asked ? 'fixed' : 'none',
+      depositFixed: '',
+    };
+    reset(values);
+    persist(values);
+    return { number, askDeposit: asked };
+  }, [getValues, reset, persist]);
 
   const undoConvert = useCallback(() => {
     const before = beforeConvert.current;

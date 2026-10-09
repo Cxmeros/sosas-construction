@@ -30,17 +30,10 @@ export function watchConsole(page: Page): string[] {
   return errors;
 }
 
-/**
- * Inputs of item `n` (1-based), on the mobile cards or the desktop table. With several options,
- * `option` (1-based) says which option the item belongs to.
- */
-export function item(page: Page, n: number, mobile: boolean, option?: number) {
-  const name = option ? `opción ${String(option)}, trabajo ${String(n)}` : `trabajo ${String(n)}`;
+/** Inputs of item `n` (1-based), on the mobile cards or the desktop table. */
+export function item(page: Page, n: number, mobile: boolean) {
   if (mobile) {
-    const card = page.getByRole('listitem', {
-      name: name.charAt(0).toUpperCase() + name.slice(1),
-      exact: true,
-    });
+    const card = page.getByRole('listitem', { name: `Trabajo ${String(n)}` });
     return {
       description: card.getByLabel('Descripción'),
       unit: card.getByRole('combobox'),
@@ -51,12 +44,12 @@ export function item(page: Page, n: number, mobile: boolean, option?: number) {
     };
   }
   return {
-    description: page.getByLabel(`Descripción ${name}`, { exact: true }),
-    unit: page.getByLabel(`Unidad ${name}`, { exact: true }),
-    otherUnit: page.getByLabel(`Unidad escrita ${name}`, { exact: true }),
-    qty: page.getByLabel(`Cantidad ${name}`, { exact: true }),
-    price: page.getByLabel(`Precio ${name}`, { exact: true }),
-    amount: page.getByLabel(`Monto ${name}`, { exact: true }),
+    description: page.getByLabel(`Descripción trabajo ${String(n)}`),
+    unit: page.getByLabel(`Unidad trabajo ${String(n)}`),
+    otherUnit: page.getByLabel(`Unidad escrita trabajo ${String(n)}`),
+    qty: page.getByLabel(`Cantidad trabajo ${String(n)}`),
+    price: page.getByLabel(`Precio trabajo ${String(n)}`),
+    amount: page.getByLabel(`Monto trabajo ${String(n)}`),
   };
 }
 

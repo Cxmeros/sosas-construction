@@ -1,10 +1,9 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import logoUrl from './assets/logo-placeholder.png';
 import { COMPANY } from './config/company';
-import { optionTotals } from './domain/calc';
+import { computeTotals } from './domain/calc';
 import { formatCents } from './domain/money';
 import type { DocumentData } from './domain/types';
-import { ChooseOptionDialog } from './features/document-form/ChooseOptionDialog';
 import { DocumentForm } from './features/document-form/DocumentForm';
 import { depositLabels } from './features/document-form/DepositSection';
 import { useDocument } from './features/document-form/useDocument';
@@ -33,13 +32,10 @@ export function App() {
   const desktop = useIsDesktop();
   const state = useDocument();
   const { form, doc, savedAt, recovered } = state;
-  const totals = optionTotals(doc);
-  const multi = totals.length > 1;
+  const totals = computeTotals(doc.items, doc.deposit);
   const actions = usePdfActions();
   const [screen, setScreen] = useState<'form' | 'preview'>('form');
   const [confirm, setConfirm] = useState<'new' | 'discard' | null>(null);
-  /** Asking which option the customer accepted, before turning the estimate into an invoice. */
-  const [choosing, setChoosing] = useState<'convert' | 'type' | null>(null);
   const [notice, setNotice] = useState<Notice | null>(null);
   const formScroll = useRef<HTMLElement>(null);
   const savedScroll = useRef(0);
@@ -88,11 +84,7 @@ export function App() {
     withValid((d) => void actions.download(d));
   };
   const convert = () => {
-    if (doc.options.length > 1) setChoosing('convert');
-    else convertOption(0);
-  };
-  const convertOption = (optionIndex: number) => {
-    const { number, askDeposit } = state.convertToInvoice(optionIndex);
+    const { number, askDeposit } = state.convertToInvoice();
     setNotice({
       text: askDeposit
         ? `Ahora es el Invoice ${number}. Indica el monto del anticipo recibido.`
@@ -127,10 +119,7 @@ export function App() {
 
   const recoveredWhat = recovered
     ? recovered.values.customer.name.trim() ||
-      recovered.values.options
-        .flatMap((o) => o.items)
-        .find((i) => i.description.trim())
-        ?.description.trim() ||
+      recovered.values.items.find((i) => i.description.trim())?.description.trim() ||
       'sin cliente todavía'
     : '';
   // Non-blocking: the form stays usable; this only offers a clean start.
@@ -180,20 +169,6 @@ export function App() {
         onConfirm={startNew}
         onCancel={() => {
           setConfirm(null);
-        }}
-      />
-      <ChooseOptionDialog
-        open={choosing !== null}
-        doc={doc}
-        totals={totals}
-        confirmLabel={choosing === 'type' ? 'Cambiar a Invoice' : 'Convertir en Invoice'}
-        onChoose={(k) => {
-          if (choosing === 'type') state.setType('invoice', k);
-          else convertOption(k);
-          setChoosing(null);
-        }}
-        onCancel={() => {
-          setChoosing(null);
         }}
       />
       <SharePanel file={actions.fallback} onClose={actions.closeFallback} />
@@ -276,14 +251,7 @@ export function App() {
           <div className="flex min-h-0 flex-col overflow-y-auto">
             {recoveredBanner}
             <main className="scroll-py-6 px-8 pt-6 pb-8">
-              <DocumentForm
-                state={state}
-                totals={totals}
-                desktop
-                onChooseOptionForInvoice={() => {
-                  setChoosing('type');
-                }}
-              />
+              <DocumentForm state={state} totals={totals} desktop />
             </main>
           </div>
           <aside className="flex flex-col items-center gap-2.5 overflow-y-auto bg-walnut-400 p-5">
@@ -339,46 +307,26 @@ export function App() {
       {recoveredBanner}
       <NoticeToast notice={notice} onDone={clearNotice} className="flex-none" />
       <main ref={formScroll} className="flex-1 scroll-py-6 overflow-y-auto px-4 pt-4 pb-6">
-        <DocumentForm
-          state={state}
-          totals={totals}
-          desktop={false}
-          onChooseOptionForInvoice={() => {
-            setChoosing('type');
-          }}
-        />
+        <DocumentForm state={state} totals={totals} desktop={false} />
       </main>
       <div className="on-dark flex flex-none items-center justify-between gap-3 border-t-[3px] border-orange-500 bg-walnut-900 pt-2.5 pr-3 pb-[calc(14px+env(safe-area-inset-bottom))] pl-4">
-        {multi ? (
-          <div className="flex min-w-0 flex-col tabular-nums">
-            <span className="text-[13px] font-semibold tracking-[0.08em] text-oak-300 uppercase">
-              Total por opción
-            </span>
-            {totals.map((t, k) => (
-              <span key={k} className="font-cond text-[21px] leading-tight font-bold text-white">
-                <span className="text-oak-300">{k + 1} ·</span> {formatCents(t.totalCents)}
-              </span>
-            ))}
-          </div>
-        ) : (
-          <div className="flex flex-col tabular-nums">
-            <span className="text-[13px] font-semibold tracking-[0.08em] text-oak-300 uppercase">
-              Total
-            </span>
-            <span className="font-cond text-[32px] leading-none font-bold text-white">
-              {formatCents(totals[0]?.totalCents ?? 0)}
-            </span>
-            <span className="text-[13px] text-oak-300">
-              {(totals[0]?.totalCents ?? 0) === 0
-                ? (doc.options[0]?.items.length ?? 0) > 0
-                  ? 'Completa los trabajos'
-                  : 'Agrega trabajos'
-                : doc.deposit.mode === 'none'
-                  ? 'Sin anticipo'
-                  : `${labels.balance}: ${formatCents(totals[0]?.balanceCents ?? 0)}`}
-            </span>
-          </div>
-        )}
+        <div className="flex flex-col tabular-nums">
+          <span className="text-[13px] font-semibold tracking-[0.08em] text-oak-300 uppercase">
+            Total
+          </span>
+          <span className="font-cond text-[32px] leading-none font-bold text-white">
+            {formatCents(totals.totalCents)}
+          </span>
+          <span className="text-[13px] text-oak-300">
+            {totals.totalCents === 0
+              ? doc.items.length > 0
+                ? 'Completa los trabajos'
+                : 'Agrega trabajos'
+              : doc.deposit.mode === 'none'
+                ? 'Sin anticipo'
+                : `${labels.balance}: ${formatCents(totals.balanceCents)}`}
+          </span>
+        </div>
         <button
           type="button"
           onClick={openPreview}

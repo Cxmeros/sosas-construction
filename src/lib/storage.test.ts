@@ -82,28 +82,3 @@ describe('prefs', () => {
     expect(loadPrefs()).toEqual({ depositPercent: '20' });
   });
 });
-
-describe('draft migration', () => {
-  it('wraps a pre-options draft (flat items) as a single option', () => {
-    const rest: Record<string, unknown> = {
-      ...emptyForm('estimate', 'EST-20261005-01', '2026-10-05', '30'),
-    };
-    delete rest.options;
-    const item = {
-      id: 'a',
-      description: 'Install and refinish',
-      unit: 'sq ft',
-      otherUnit: '',
-      qty: '1625',
-      unitPrice: '7.50',
-      lumpSum: '',
-    };
-    memory.setItem(
-      'sosa.draft.v1',
-      JSON.stringify({ savedAt: 5, values: { ...rest, items: [item] } }),
-    );
-    expect(loadDraft()?.values.options).toEqual([
-      { id: 'option-1', title: '', description: '', items: [item] },
-    ]);
-  });
-});

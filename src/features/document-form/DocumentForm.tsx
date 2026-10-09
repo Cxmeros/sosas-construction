@@ -1,13 +1,14 @@
 import type { FieldErrors } from 'react-hook-form';
 import type { FormValues } from '../../domain/form';
 import { LIMITS } from '../../domain/limits';
+import { formatCents } from '../../domain/money';
 import { formatDateUS } from '../../domain/numbering';
 import type { DocType, Totals } from '../../domain/types';
 import { AlertIcon } from '../../ui/Icons';
 import type { DocumentState } from './useDocument';
 import { DepositSection } from './DepositSection';
 import { errorAt, Field, invalidProps, Section, SectionTitle, Segmented } from './fields';
-import { OptionsEditor } from './OptionsEditor';
+import { ItemsEditor } from './ItemsEditor';
 
 const DOC_OPTIONS: readonly { value: DocType; label: string }[] = [
   { value: 'estimate', label: 'Estimate' },
@@ -50,21 +51,17 @@ export function DocumentForm({
   state,
   totals,
   desktop,
-  onChooseOptionForInvoice,
 }: {
   state: DocumentState;
-  /** One per option. */
-  totals: Totals[];
+  totals: Totals;
   desktop: boolean;
-  /** Switching to Invoice with several options: ask which one the customer accepted. */
-  onChooseOptionForInvoice: () => void;
 }) {
   const { form, values, doc, setType, depositHint } = state;
   const { register, formState } = form;
   const errors = formState.errors;
   const err = (path: string) => errorAt(errors, path);
   const errorCount = formState.isSubmitted ? countErrors(errors) : 0;
-  const isBlank = !values.customer.name.trim() && values.options.every((o) => o.items.length === 0);
+  const isBlank = !values.customer.name.trim() && values.items.length === 0;
 
   const typeSwitch = (
     <Segmented
@@ -72,10 +69,7 @@ export function DocumentForm({
       legend="Tipo de documento"
       options={DOC_OPTIONS}
       value={values.type}
-      onChange={(type) => {
-        if (type === 'invoice' && values.options.length > 1) onChooseOptionForInvoice();
-        else setType(type);
-      }}
+      onChange={setType}
       className="grid grid-cols-2 border-[1.5px] border-walnut-700"
       itemClassName={`btn-cond ${desktop ? 'min-h-12 text-[19px]' : 'min-h-[52px] text-xl'}`}
     />
@@ -196,7 +190,7 @@ export function DocumentForm({
           </span>
           {jobDescription}
         </label>
-        <OptionsEditor form={form} desktop invoice={values.type === 'invoice'} totals={totals} />
+        <ItemsEditor form={form} desktop totalLabel={formatCents(totals.totalCents)} />
         <div className="grid grid-cols-2 gap-6">
           <DepositSection form={form} doc={doc} totals={totals} desktop hintCents={depositHint} />
           <label className="label gap-3">
@@ -248,12 +242,7 @@ export function DocumentForm({
           {jobDescription}
         </label>
       </Section>
-      <OptionsEditor
-        form={form}
-        desktop={false}
-        invoice={values.type === 'invoice'}
-        totals={totals}
-      />
+      <ItemsEditor form={form} desktop={false} totalLabel={formatCents(totals.totalCents)} />
       <DepositSection
         form={form}
         doc={doc}

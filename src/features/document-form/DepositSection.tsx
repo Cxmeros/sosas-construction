@@ -40,8 +40,7 @@ export function DepositSection({
 }: {
   form: Form;
   doc: DocumentData;
-  /** One per option. */
-  totals: Totals[];
+  totals: Totals;
   desktop: boolean;
   /** Deposit the estimate asked for, offered as a one-tap answer on the invoice. */
   hintCents?: number | null;
@@ -119,75 +118,33 @@ export function DepositSection({
           Usar {formatCents(hintCents)} (anticipo solicitado en el estimate)
         </button>
       )}
-      {totals.length === 1 && totals[0] ? (
-        <Summary
-          totals={totals[0]}
-          invoice={invoice}
-          labels={labels}
-          showDeposit={mode !== 'none'}
-          desktop={desktop}
-        />
-      ) : (
-        totals.map((t, k) => (
-          <div key={k} className="flex flex-col gap-1">
-            <span className="text-[15px] font-semibold text-walnut-700">
-              Opción {k + 1}
-              {doc.options[k]?.title ? ` · ${doc.options[k].title}` : ''}
-            </span>
-            <Summary
-              totals={t}
-              invoice={invoice}
-              labels={labels}
-              showDeposit={mode !== 'none'}
-              desktop
-            />
+      <div className={`flex flex-col tabular-nums ${desktop ? '' : 'border-t border-line'}`}>
+        {!desktop && (
+          <div className="flex justify-between py-2.5 text-base">
+            <span>Total</span>
+            <span className="font-semibold">{formatCents(totals.totalCents)}</span>
           </div>
-        ))
-      )}
-    </Section>
-  );
-}
-
-function Summary({
-  totals,
-  invoice,
-  labels,
-  showDeposit,
-  desktop,
-}: {
-  totals: Totals;
-  invoice: boolean;
-  labels: ReturnType<typeof depositLabels>;
-  showDeposit: boolean;
-  desktop: boolean;
-}) {
-  return (
-    <div className={`flex flex-col tabular-nums ${desktop ? '' : 'border-t border-line'}`}>
-      {!desktop && (
-        <div className="flex justify-between py-2.5 text-base">
-          <span>Total</span>
-          <span className="font-semibold">{formatCents(totals.totalCents)}</span>
-        </div>
-      )}
-      {showDeposit && (
+        )}
+        {mode !== 'none' && (
+          <div
+            className={`flex justify-between text-base ${desktop ? 'py-2' : 'border-t border-dashed border-line py-2.5'}`}
+          >
+            <span>{labels.deposit}</span>
+            <span className="font-semibold">
+              {invoice && totals.depositCents > 0 ? '−' : ''}
+              {formatCents(totals.depositCents)}
+            </span>
+          </div>
+        )}
         <div
-          className={`flex justify-between text-base ${desktop ? 'py-2' : 'border-t border-dashed border-line py-2.5'}`}
+          className={`flex items-baseline justify-between px-3 text-white ${desktop ? 'py-2' : 'py-2.5'} ${invoice ? 'bg-orange-700' : 'bg-walnut-900'}`}
         >
-          <span>{labels.deposit}</span>
-          <span className="font-semibold">
-            {invoice && totals.depositCents > 0 ? '−' : ''}
-            {formatCents(totals.depositCents)}
+          <span className="font-semibold">{labels.balance}</span>
+          <span className={`font-cond font-bold ${desktop ? 'text-[22px]' : 'text-2xl'}`}>
+            {formatCents(totals.balanceCents)}
           </span>
         </div>
-      )}
-      <div
-        className={`flex items-baseline justify-between px-3 text-white ${desktop ? 'py-2' : 'py-2.5'} ${invoice ? 'bg-orange-700' : 'bg-walnut-900'}`}
-      >
-        <span className="font-semibold">{labels.balance}</span>
-        <span className={`font-cond font-bold ${desktop ? 'text-[22px]' : 'text-2xl'}`}>
-          {formatCents(totals.balanceCents)}
-        </span>
       </div>
-    </div>
+    </Section>
   );
 }

@@ -88,8 +88,8 @@ Quiere llenar campos y obtener un PDF listo para mandar al cliente.
 14. **Deshacer**: quitar un trabajo, un paso o un cargo muestra "… eliminado · DESHACER" 6 s.
 15. **Invoice**: los trabajos salen solo con descripción (+ detalle) y monto; "Estimate ref." en el
     encabezado si viene de una conversión.
-11. **Opciones en el estimate** (DESACTIVADO en esta versión con `FEATURES.estimateOptions` en
-    `config/company.ts`; el código se conserva): de 1 a 3 opciones, cada una con
+11. **Opciones en el estimate** (NO va en esta versión: se revirtió de `main` y el código se conserva
+    en la rama `feat/estimate-options`): de 1 a 3 opciones, cada una con
     nombre (requerido si hay 2 o más), descripción opcional, sus propias partidas (1–30) y su total.
     - El anticipo elegido se aplica al total de cada opción (monto fijo: no puede superar la opción
       más barata).

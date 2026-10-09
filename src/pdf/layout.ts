@@ -1,5 +1,5 @@
 import { countLines } from './measure';
-import type { PdfModel, PdfOption, PdfRow } from './model';
+import type { PdfModel, PdfRow } from './model';
 
 /**
  * Page geometry in CSS px at 96 dpi (Letter = 816 × 1056), straight from the Claude Design
@@ -58,11 +58,9 @@ const FULL_HEADER = 92 + 14 + 3;
 const COMPACT_HEADER = 48 + 10 + 3;
 const BAR_HEIGHT = lh(TYPE.label) + 2 * BAR.padY;
 const BOX_TEXT_WIDTH = PAGE.contentWidth - 2 * BOX.padX;
-/** Space between an option's bar (or description box) and its table. */
-export const TABLE_GAP = 6;
+const TABLE_LABEL = BAR_HEIGHT + 6;
 const TABLE_HEAD = 1 + 2 * CELL.padY + lh(TYPE.tableHead) + 1;
-/** "Continued on page N" line, its own block below the content. */
-const CONTINUED = PAGE.gap + lh(TYPE.note);
+const CONTINUED = 8 + lh(TYPE.note);
 
 /** Bar + box with `lines` lines of text at `size`. */
 const sectionHeight = (lines: number, size: number) => BAR_HEIGHT + 2 * BOX.padY + lines * lh(size);
@@ -84,64 +82,15 @@ export function rowHeight(row: PdfRow): number {
   return 2 * CELL.padY + main + note + 1;
 }
 
-/** Bar with the option label, plus its description box when it has one (full header only). */
-function optionHeaderHeight(option: PdfOption, continued: boolean): number {
-  const lines = continued ? 0 : countLines(option.description, BOX_TEXT_WIDTH, TYPE.body);
-  return BAR_HEIGHT + (lines ? 2 * BOX.padY + lines * lh(TYPE.body) : 0) + TABLE_GAP;
-}
-
-function totalsHeight(option: PdfOption): number {
-  return (
+function totalsAndTermsHeight(model: PdfModel): number {
+  const totals =
     3 +
     (18 + lh(TYPE.totalsTotal)) +
-    (option.deposit ? 1 + 18 + lh(TYPE.totalsRow) : 0) +
-    (2 + 22 + 30)
-  );
-}
-
-function termsHeight(model: PdfModel): number {
-  const lines = countLines(model.terms, BOX_TEXT_WIDTH, TYPE.terms);
-  return lines ? sectionHeight(lines, TYPE.terms) : 0;
-}
-
-/** Two-option layout: side-by-side cards, each with a Description | Amount table. */
-export const COLUMNS = { gap: 16, amount: 96 } as const;
-export const COLUMN_WIDTH = (PAGE.contentWidth - COLUMNS.gap) / 2;
-const COLUMN_DESC_WIDTH = COLUMN_WIDTH - 2 - COLUMNS.amount - 2 * CELL.padX;
-const COLUMN_TEXT_WIDTH = COLUMN_WIDTH - 2 * BOX.padX;
-
-function columnRowHeight(row: PdfRow): number {
-  const main =
-    Math.max(1, countLines(row.description, COLUMN_DESC_WIDTH, TYPE.body, true)) * lh(TYPE.body);
-  const note = countLines(row.note, COLUMN_DESC_WIDTH, TYPE.note) * lh(TYPE.note);
-  const detail = row.detail ? lh(TYPE.note) : 0;
-  return 2 * CELL.padY + main + note + detail + 1;
-}
-
-/** Height of one option card in the two-column layout. */
-function cardHeight(option: PdfOption): number {
-  const titleLines = countLines(option.title, COLUMN_TEXT_WIDTH, TYPE.customerName, true);
-  const descLines = countLines(option.description, COLUMN_TEXT_WIDTH, TYPE.body);
-  const box =
-    titleLines || descLines
-      ? 2 * BOX.padY +
-        titleLines * lh(TYPE.customerName) +
-        (titleLines && descLines ? BOX.gap : 0) +
-        descLines * lh(TYPE.body)
-      : 0;
-  const rows = option.rows.reduce((sum, r) => sum + columnRowHeight(r), 0);
-  return BAR_HEIGHT + box + TABLE_GAP + TABLE_HEAD + rows + PAGE.gap + totalsHeight(option);
-}
-
-/** What one option contributes to one page. */
-export interface PdfSegment {
-  option: number;
-  /** "full" with description on the option's first page; "continued" on later pages. */
-  header: 'full' | 'continued';
-  /** Table head (and these rows). False on a page with only the option's totals. */
-  showTable: boolean;
-  rows: PdfRow[];
-  showTotals: boolean;
+    (model.deposit ? 1 + 18 + lh(TYPE.totalsRow) : 0) +
+    (2 + 22 + 30);
+  const termsLines = countLines(model.terms, BOX_TEXT_WIDTH, TYPE.terms);
+  const terms = termsLines ? PAGE.gap + sectionHeight(termsLines, TYPE.terms) : 0;
+  return PAGE.gap + totals + terms;
 }
 
 export interface PdfPage {
@@ -149,116 +98,56 @@ export interface PdfPage {
   pageCount: number;
   /** Page 1 has the full header; the rest a compact one. */
   fullHeader: boolean;
-  /** Two options side by side as cards (segments[0] and segments[1], complete). */
-  columns: boolean;
-  segments: PdfSegment[];
-  showTerms: boolean;
-  /**
-   * Set on every page but the last: "Continued on page N", with the subtotal of the page's rows
-   * when the document has a single option (a subtotal across options would mean nothing).
-   */
-  continued: { subtotalCents: number | null; nextPage: number } | null;
+  /** False only on a page that carries just the totals (the table ended on the previous page). */
+  showTable: boolean;
+  rows: PdfRow[];
+  showTotals: boolean;
+  /** Set on every page but the last: "Subtotal this page … Continued on page N". */
+  continued: { subtotalCents: number; nextPage: number } | null;
 }
 
 /**
- * Splits the document into Letter pages. Rows are never split. Each option starts with its bar
- * kept together with the table head and first row; the table head repeats when an option continues
- * on a new page; an option's totals box moves whole. Terms come last.
+ * Splits the document into Letter pages. Rows are never split; the table header repeats on every
+ * page; totals and terms stay together, moving whole to a new page when they don't fit.
  */
 export function paginate(model: PdfModel): PdfPage[] {
-  type Draft = Omit<PdfPage, 'pageNo' | 'pageCount' | 'continued'>;
+  type Draft = { fullHeader: boolean; showTable: boolean; rows: PdfRow[] };
   const drafts: Draft[] = [];
 
-  let y = PAGE.padTop + FULL_HEADER + PAGE.gap + customerHeight(model);
+  let y = PAGE.padTop + FULL_HEADER + PAGE.gap + customerHeight(model) + PAGE.gap;
   const descLines = countLines(model.jobDescription, BOX_TEXT_WIDTH, TYPE.jobDescription);
-  if (descLines) y += PAGE.gap + sectionHeight(descLines, TYPE.jobDescription);
-  let page: Draft = { fullHeader: true, columns: false, segments: [], showTerms: false };
+  if (descLines) y += sectionHeight(descLines, TYPE.jobDescription) + PAGE.gap;
+  y += TABLE_LABEL + TABLE_HEAD;
+  let page: Draft = { fullHeader: true, showTable: true, rows: [] };
 
-  /** Room left, always keeping space for the "Continued on page N" line. */
-  const fits = (h: number) => y + h + CONTINUED <= CONTENT_BOTTOM;
-  const breakPage = () => {
+  const startNewPage = (showTable: boolean) => {
     drafts.push(page);
-    page = { fullHeader: false, columns: false, segments: [], showTerms: false };
-    y = PAGE.padTop + COMPACT_HEADER;
-  };
-  const open = (option: number, header: PdfSegment['header'], showTable: boolean) => {
-    const opt = model.options[option];
-    if (!opt) throw new Error('option out of range');
-    y += PAGE.gap + optionHeaderHeight(opt, header === 'continued') + (showTable ? TABLE_HEAD : 0);
-    const segment: PdfSegment = { option, header, showTable, rows: [], showTotals: false };
-    page.segments.push(segment);
-    return segment;
+    page = { fullHeader: false, showTable, rows: [] };
+    y = PAGE.padTop + COMPACT_HEADER + PAGE.gap + (showTable ? TABLE_LABEL + TABLE_HEAD : 0);
   };
 
-  const [a, b] = model.options;
-  const sideBySide =
-    model.options.length === 2 && a && b ? PAGE.gap + Math.max(cardHeight(a), cardHeight(b)) : null;
-  // Two options go side by side, like a comparison, when both fit whole on the first page.
-  if (sideBySide !== null && fits(sideBySide)) {
-    page.columns = true;
-    model.options.forEach((option, i) => {
-      page.segments.push({
-        option: i,
-        header: 'full',
-        showTable: true,
-        rows: option.rows,
-        showTotals: true,
-      });
-    });
-    y += sideBySide;
-  } else
-    model.options.forEach((option, i) => {
-      const first = option.rows[0];
-      const start =
-        PAGE.gap +
-        optionHeaderHeight(option, false) +
-        TABLE_HEAD +
-        (first ? rowHeight(first) : PAGE.gap + totalsHeight(option));
-      // Never leave an option's bar alone at the bottom of a page.
-      if (!fits(start) && (page.segments.length > 0 || page.fullHeader)) breakPage();
-      let current = open(i, 'full', true);
-
-      for (const row of option.rows) {
-        const h = rowHeight(row);
-        if (current.rows.length > 0 && !fits(h)) {
-          breakPage();
-          current = open(i, 'continued', true);
-        }
-        current.rows.push(row);
-        y += h;
-      }
-
-      const t = PAGE.gap + totalsHeight(option);
-      if (!fits(t)) {
-        breakPage();
-        current = open(i, 'continued', false);
-      }
-      current.showTotals = true;
-      y += t;
-    });
-
-  const terms = termsHeight(model);
-  if (terms) {
-    // The last page needs no "continued" line, so terms may use that space.
-    if (y + PAGE.gap + terms > CONTENT_BOTTOM) breakPage();
-    page.showTerms = true;
+  for (const row of model.rows) {
+    const h = rowHeight(row);
+    // Always keep room for the "Continued on page N" line.
+    if (page.rows.length > 0 && y + h + CONTINUED > CONTENT_BOTTOM) startNewPage(true);
+    page.rows.push(row);
+    y += h;
   }
+
+  if (y + totalsAndTermsHeight(model) > CONTENT_BOTTOM) startNewPage(false);
   drafts.push(page);
 
   const pageCount = drafts.length;
   return drafts.map((d, i) => {
     const last = i === pageCount - 1;
-    const rows = d.segments.flatMap((s) => s.rows);
     return {
       ...d,
       pageNo: i + 1,
       pageCount,
+      showTotals: last,
       continued: last
         ? null
-        : {
-            subtotalCents: model.multi ? null : rows.reduce((sum, r) => sum + r.amountCents, 0),
-            nextPage: i + 2,
-          },
+        : { subtotalCents: d.rows.reduce((sum, r) => sum + r.amountCents, 0), nextPage: i + 2 },
     };
   });
 }

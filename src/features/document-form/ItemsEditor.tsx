@@ -28,33 +28,22 @@ function UnitOptions() {
   );
 }
 
-/** How an item is named for screen readers and buttons: "trabajo 2" or "opción 1, trabajo 2". */
-export function itemName(optionIndex: number, multi: boolean, n: number): string {
-  return multi ? `opción ${String(optionIndex + 1)}, trabajo ${String(n)}` : `trabajo ${String(n)}`;
-}
-
 export function ItemsEditor({
   form,
   desktop,
   totalLabel,
-  optionIndex = 0,
-  multi = false,
 }: {
   form: Form;
   desktop: boolean;
   totalLabel: string;
-  optionIndex?: number;
-  /** Several options: the option block carries the heading, items are named per option. */
-  multi?: boolean;
 }) {
   const { control, watch, formState, setFocus, clearErrors } = form;
-  const base = `options.${optionIndex}.items` as const;
   const { fields, append, remove, move, insert } = useFieldArray({
     control,
-    name: base,
+    name: 'items',
     keyName: 'key',
   });
-  const items = watch(base);
+  const items = watch('items');
   const errors = formState.errors;
   const [undo, setUndo] = useState<{ item: FormItem; index: number } | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -73,8 +62,8 @@ export function ItemsEditor({
     append(emptyItem(), { shouldFocus: false });
     setTimeout(() => {
       // A new, untouched item is not an error yet, even after a failed "Ver PDF".
-      clearErrors(`${base}.${n}`);
-      setFocus(`${base}.${n}.description`);
+      clearErrors(`items.${n}`);
+      setFocus(`items.${n}.description`);
     }, 0);
   };
 
@@ -99,7 +88,7 @@ export function ItemsEditor({
     setUndo(null);
   };
 
-  const listError = errorAt(errors, `${base}.root`) ?? errorAt(errors, base);
+  const listError = errorAt(errors, 'items.root') ?? errorAt(errors, 'items');
   const full = fields.length >= LIMITS.maxItems;
   const countLabel = fields.length === 1 ? '1 trabajo' : `${String(fields.length)} trabajos`;
 
@@ -147,17 +136,11 @@ export function ItemsEditor({
 
   if (desktop) {
     return (
-      <section
-        className="flex flex-col gap-3"
-        aria-labelledby={multi ? undefined : 'items-title'}
-        aria-label={multi ? `Trabajos de la opción ${String(optionIndex + 1)}` : undefined}
-      >
-        {!multi && (
-          <div id="items-title">
-            <SectionTitle n="04">Trabajos</SectionTitle>
-          </div>
-        )}
-        <FieldError path={base} message={listError} />
+      <section className="flex flex-col gap-3" aria-labelledby="items-title">
+        <div id="items-title">
+          <SectionTitle n="04">Trabajos</SectionTitle>
+        </div>
+        <FieldError path="items" message={listError} />
         {fields.length === 0 ? (
           <>
             {empty}
@@ -180,8 +163,6 @@ export function ItemsEditor({
                 <DesktopRow
                   key={field.key}
                   form={form}
-                  optionIndex={optionIndex}
-                  multi={multi}
                   index={index}
                   count={fields.length}
                   item={items[index] ?? field}
@@ -221,27 +202,19 @@ export function ItemsEditor({
   }
 
   return (
-    <section
-      className="flex flex-col gap-3"
-      aria-labelledby={multi ? undefined : 'items-title-m'}
-      aria-label={multi ? `Trabajos de la opción ${String(optionIndex + 1)}` : undefined}
-    >
-      {!multi && (
-        <div id="items-title-m">
-          <SectionTitle n="04" aside={fields.length > 0 ? countLabel : undefined}>
-            Trabajos
-          </SectionTitle>
-        </div>
-      )}
-      <FieldError path={base} message={listError} />
+    <section className="flex flex-col gap-3" aria-labelledby="items-title-m">
+      <div id="items-title-m">
+        <SectionTitle n="04" aside={fields.length > 0 ? countLabel : undefined}>
+          Trabajos
+        </SectionTitle>
+      </div>
+      <FieldError path="items" message={listError} />
       {empty}
       <ol className="m-0 flex list-none flex-col gap-3 p-0">
         {fields.map((field, index) => (
           <MobileCard
             key={field.key}
             form={form}
-            optionIndex={optionIndex}
-            multi={multi}
             index={index}
             count={fields.length}
             item={items[index] ?? field}
@@ -273,8 +246,6 @@ export function ItemsEditor({
 
 interface RowProps {
   form: Form;
-  optionIndex: number;
-  multi: boolean;
   index: number;
   count: number;
   item: FormItem;
@@ -282,10 +253,9 @@ interface RowProps {
   onDelete: () => void;
 }
 
-function MobileCard({ form, optionIndex, multi, index, count, item, onMove, onDelete }: RowProps) {
+function MobileCard({ form, index, count, item, onMove, onDelete }: RowProps) {
   const { register, formState } = form;
-  const p = (f: keyof FormItem) => `options.${optionIndex}.items.${index}.${f}` as const;
-  const name = itemName(optionIndex, multi, index + 1);
+  const p = (f: keyof FormItem) => `items.${index}.${f}` as const;
   const err = (f: keyof FormItem) => errorAt(formState.errors, p(f));
   const lump = item.unit === 'lump sum';
   const hasError = (['description', 'otherUnit', 'qty', 'unitPrice', 'lumpSum'] as const).some(
@@ -295,7 +265,7 @@ function MobileCard({ form, optionIndex, multi, index, count, item, onMove, onDe
   return (
     <li
       className={`flex flex-col bg-surface ${hasError ? 'border-2 border-error' : 'border border-line'}`}
-      aria-label={name.charAt(0).toUpperCase() + name.slice(1)}
+      aria-label={`Trabajo ${String(index + 1)}`}
     >
       <div
         className={`flex items-center gap-1 border-b border-line-faint pl-3 ${hasError ? 'bg-error-bg' : 'bg-paper'}`}
@@ -307,7 +277,7 @@ function MobileCard({ form, optionIndex, multi, index, count, item, onMove, onDe
         </span>
         <button
           type="button"
-          aria-label={`Subir ${name}`}
+          aria-label={`Subir trabajo ${String(index + 1)}`}
           onClick={() => {
             onMove(index - 1);
           }}
@@ -318,7 +288,7 @@ function MobileCard({ form, optionIndex, multi, index, count, item, onMove, onDe
         </button>
         <button
           type="button"
-          aria-label={`Bajar ${name}`}
+          aria-label={`Bajar trabajo ${String(index + 1)}`}
           onClick={() => {
             onMove(index + 1);
           }}
@@ -329,7 +299,7 @@ function MobileCard({ form, optionIndex, multi, index, count, item, onMove, onDe
         </button>
         <button
           type="button"
-          aria-label={`Eliminar ${name}`}
+          aria-label={`Eliminar trabajo ${String(index + 1)}`}
           onClick={onDelete}
           className="grid size-12 place-items-center border-l border-line-faint text-error"
         >
@@ -414,8 +384,6 @@ function MobileCard({ form, optionIndex, multi, index, count, item, onMove, onDe
 
 function DesktopRow({
   form,
-  optionIndex,
-  multi,
   index,
   count,
   item,
@@ -424,8 +392,7 @@ function DesktopRow({
   onDropFrom,
 }: RowProps & { onDropFrom: (from: number) => void }) {
   const { register, formState } = form;
-  const p = (f: keyof FormItem) => `options.${optionIndex}.items.${index}.${f}` as const;
-  const name = itemName(optionIndex, multi, index + 1);
+  const p = (f: keyof FormItem) => `items.${index}.${f}` as const;
   const err = (f: keyof FormItem) => errorAt(formState.errors, p(f));
   const lump = item.unit === 'lump sum';
   const [dragOver, setDragOver] = useState(false);
@@ -469,14 +436,14 @@ function DesktopRow({
             e.dataTransfer.setData('text/plain', String(index));
           }}
           onKeyDown={onHandleKey}
-          aria-label={`Mover ${name} (flechas arriba y abajo)`}
+          aria-label={`Mover trabajo ${String(index + 1)} (flechas arriba y abajo)`}
           title="Arrastra para reordenar"
           className="grid h-12 cursor-grab place-items-center text-field"
         >
           <GripIcon size={20} />
         </button>
         <textarea
-          aria-label={`Descripción ${name}`}
+          aria-label={`Descripción trabajo ${String(index + 1)}`}
           rows={1}
           maxLength={200}
           className="field min-h-12 resize-none px-2.5 text-base field-sizing-content"
@@ -485,14 +452,14 @@ function DesktopRow({
         />
         {lump ? (
           <input
-            aria-label={`Cantidad ${name}`}
+            aria-label={`Cantidad trabajo ${String(index + 1)}`}
             value="—"
             disabled
             className="field num px-2.5 text-base"
           />
         ) : (
           <input
-            aria-label={`Cantidad ${name}`}
+            aria-label={`Cantidad trabajo ${String(index + 1)}`}
             inputMode="decimal"
             autoComplete="off"
             maxLength={20}
@@ -503,7 +470,7 @@ function DesktopRow({
         )}
         <div className="flex min-w-0 flex-col gap-1">
           <select
-            aria-label={`Unidad ${name}`}
+            aria-label={`Unidad trabajo ${String(index + 1)}`}
             className="field px-1.5 text-base"
             {...register(p('unit'))}
           >
@@ -511,7 +478,7 @@ function DesktopRow({
           </select>
           {item.unit === 'other' && (
             <input
-              aria-label={`Unidad escrita ${name}`}
+              aria-label={`Unidad escrita trabajo ${String(index + 1)}`}
               placeholder="ej. rooms"
               maxLength={15}
               className="field px-2.5 text-base"
@@ -522,14 +489,14 @@ function DesktopRow({
         </div>
         {lump ? (
           <input
-            aria-label={`Precio ${name}`}
+            aria-label={`Precio trabajo ${String(index + 1)}`}
             value="—"
             disabled
             className="field num px-2.5 text-base"
           />
         ) : (
           <input
-            aria-label={`Precio ${name}`}
+            aria-label={`Precio trabajo ${String(index + 1)}`}
             inputMode="decimal"
             autoComplete="off"
             maxLength={20}
@@ -540,7 +507,7 @@ function DesktopRow({
         )}
         {lump ? (
           <input
-            aria-label={`Monto ${name}`}
+            aria-label={`Monto trabajo ${String(index + 1)}`}
             inputMode="decimal"
             autoComplete="off"
             maxLength={20}
@@ -553,7 +520,7 @@ function DesktopRow({
         )}
         <button
           type="button"
-          aria-label={`Eliminar ${name}`}
+          aria-label={`Eliminar trabajo ${String(index + 1)}`}
           onClick={onDelete}
           className="grid size-12 place-items-center text-error hover:bg-error-bg"
         >

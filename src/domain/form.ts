@@ -9,7 +9,6 @@ import {
   type Deposit,
   type DocType,
   type DocumentData,
-  type EstimateOption,
   type LineItem,
 } from './types';
 
@@ -35,29 +34,19 @@ export const formValuesSchema = z.object({
     email: text(LIMITS.email),
   }),
   jobDescription: text(LIMITS.jobDescription),
-  options: z
+  items: z
     .array(
       z.object({
         id: text(40),
-        title: text(LIMITS.optionTitle),
-        description: text(LIMITS.optionDescription),
-        items: z
-          .array(
-            z.object({
-              id: text(40),
-              description: text(LIMITS.itemDescription),
-              unit: z.enum(UNITS),
-              otherUnit: text(LIMITS.otherUnit),
-              qty: numeric,
-              unitPrice: numeric,
-              lumpSum: numeric,
-            }),
-          )
-          .max(LIMITS.maxItems),
+        description: text(LIMITS.itemDescription),
+        unit: z.enum(UNITS),
+        otherUnit: text(LIMITS.otherUnit),
+        qty: numeric,
+        unitPrice: numeric,
+        lumpSum: numeric,
       }),
     )
-    .min(1)
-    .max(LIMITS.maxOptions),
+    .max(LIMITS.maxItems),
   depositMode: z.enum(DEPOSIT_MODES),
   depositPercent: numeric,
   depositFixed: numeric,
@@ -65,8 +54,7 @@ export const formValuesSchema = z.object({
 });
 
 export type FormValues = z.infer<typeof formValuesSchema>;
-export type FormOption = FormValues['options'][number];
-export type FormItem = FormOption['items'][number];
+export type FormItem = FormValues['items'][number];
 
 export function emptyItem(): FormItem {
   return {
@@ -78,10 +66,6 @@ export function emptyItem(): FormItem {
     unitPrice: '',
     lumpSum: '',
   };
-}
-
-export function emptyOption(items: FormItem[] = []): FormOption {
-  return { id: crypto.randomUUID(), title: '', description: '', items };
 }
 
 export function emptyForm(
@@ -97,7 +81,7 @@ export function emptyForm(
     estimateRef: '',
     customer: { name: '', address: '', phone: '', email: '' },
     jobDescription: '',
-    options: [emptyOption()],
+    items: [],
     depositMode: depositPercent === '20' || depositPercent === '30' ? depositPercent : 'percent',
     depositPercent,
     depositFixed: '',
@@ -154,12 +138,7 @@ export function toLenientDocument(values: FormValues): DocumentData {
       email: values.customer.email.trim(),
     },
     jobDescription: values.jobDescription.trim(),
-    options: values.options.map((option): EstimateOption => ({
-      id: option.id,
-      title: option.title.trim(),
-      description: option.description.trim(),
-      items: option.items.map(toLenientItem),
-    })),
+    items: values.items.map(toLenientItem),
     deposit: depositOf(values),
     terms: values.terms.trim(),
   };
@@ -202,49 +181,37 @@ export function validateForm(values: FormValues): Issue[] {
   if (values.customer.email.trim() && !EMAIL.test(values.customer.email.trim()))
     add(['customer', 'email'], 'Revisa el correo, ej. nombre@correo.com');
 
-  const multi = values.options.length > 1;
-  if (multi && values.type === 'invoice')
-    add(['options'], 'Un invoice lleva una sola opción: la que aceptó el cliente.');
+  if (values.items.length < LIMITS.minItems) add(['items'], 'Agrega al menos un trabajo.');
+
+  values.items.forEach((item, i) => {
+    const at = (field: string) => ['items', i, field];
+    if (!item.description.trim()) add(at('description'), 'Escribe qué trabajo es.');
+    if (item.unit === 'other' && !item.otherUnit.trim()) add(at('otherUnit'), 'Escribe la unidad.');
+
+    if (item.unit === 'lump sum') {
+      const cents = parseMoneyToCents(item.lumpSum);
+      if (!item.lumpSum.trim()) add(at('lumpSum'), 'Falta el monto.');
+      else if (cents === null) add(at('lumpSum'), 'Usa solo números, ej. 3000.00');
+      else if (cents > LIMITS.maxTotalCents) add(at('lumpSum'), 'Máximo $10,000,000.');
+      return;
+    }
+
+    const qty = parseQtyToHundredths(item.qty);
+    if (!item.qty.trim()) add(at('qty'), 'Falta la cantidad.');
+    else if (qty === null) add(at('qty'), 'Usa solo números, ej. 1625 o 12.5');
+    else if (qty === 0) add(at('qty'), 'La cantidad debe ser mayor que 0.');
+    else if (qty > LIMITS.maxQtyHundredths) add(at('qty'), 'Máximo 1,000,000.');
+
+    const unitLabel = item.unit === 'other' ? item.otherUnit.trim() || 'unidad' : item.unit;
+    const price = parseMoneyToCents(item.unitPrice);
+    if (!item.unitPrice.trim()) add(at('unitPrice'), `Falta el precio por ${unitLabel}.`);
+    else if (price === null) add(at('unitPrice'), 'Usa solo números, ej. 7.50');
+    else if (price > LIMITS.maxUnitPriceCents) add(at('unitPrice'), 'Máximo $100,000.');
+  });
 
   const doc = toLenientDocument(values);
-  const totals = doc.options.map((o) => computeTotals(o.items, { mode: 'none' }).totalCents);
-
-  values.options.forEach((option, k) => {
-    const base = ['options', k];
-    if (multi && !option.title.trim()) add([...base, 'title'], 'Escribe un nombre para la opción.');
-    if (option.items.length < LIMITS.minItems)
-      add([...base, 'items'], 'Agrega al menos un trabajo.');
-
-    option.items.forEach((item, i) => {
-      const at = (field: string) => [...base, 'items', i, field];
-      if (!item.description.trim()) add(at('description'), 'Escribe qué trabajo es.');
-      if (item.unit === 'other' && !item.otherUnit.trim())
-        add(at('otherUnit'), 'Escribe la unidad.');
-
-      if (item.unit === 'lump sum') {
-        const cents = parseMoneyToCents(item.lumpSum);
-        if (!item.lumpSum.trim()) add(at('lumpSum'), 'Falta el monto.');
-        else if (cents === null) add(at('lumpSum'), 'Usa solo números, ej. 3000.00');
-        else if (cents > LIMITS.maxTotalCents) add(at('lumpSum'), 'Máximo $10,000,000.');
-        return;
-      }
-
-      const qty = parseQtyToHundredths(item.qty);
-      if (!item.qty.trim()) add(at('qty'), 'Falta la cantidad.');
-      else if (qty === null) add(at('qty'), 'Usa solo números, ej. 1625 o 12.5');
-      else if (qty === 0) add(at('qty'), 'La cantidad debe ser mayor que 0.');
-      else if (qty > LIMITS.maxQtyHundredths) add(at('qty'), 'Máximo 1,000,000.');
-
-      const unitLabel = item.unit === 'other' ? item.otherUnit.trim() || 'unidad' : item.unit;
-      const price = parseMoneyToCents(item.unitPrice);
-      if (!item.unitPrice.trim()) add(at('unitPrice'), `Falta el precio por ${unitLabel}.`);
-      else if (price === null) add(at('unitPrice'), 'Usa solo números, ej. 7.50');
-      else if (price > LIMITS.maxUnitPriceCents) add(at('unitPrice'), 'Máximo $100,000.');
-    });
-
-    if ((totals[k] ?? 0) > LIMITS.maxTotalCents)
-      add([...base, 'items'], 'El total no puede pasar de $10,000,000.');
-  });
+  const { totalCents } = computeTotals(doc.items, { mode: 'none' });
+  if (totalCents > LIMITS.maxTotalCents) add(['items'], 'El total no puede pasar de $10,000,000.');
 
   if (values.depositMode === 'percent') {
     const pct = parsePercent(values.depositPercent);
@@ -253,16 +220,9 @@ export function validateForm(values: FormValues): Issue[] {
   }
   if (values.depositMode === 'fixed') {
     const cents = parseMoneyToCents(values.depositFixed);
-    // With several options the same fixed deposit applies to each, so it must fit the smallest.
-    const smallest = Math.min(...totals);
     if (cents === null) add(['depositFixed'], 'Escribe el monto del anticipo.');
-    else if (cents > smallest)
-      add(
-        ['depositFixed'],
-        multi
-          ? 'El anticipo no puede ser mayor que el total de ninguna opción.'
-          : 'El anticipo no puede ser mayor que el total.',
-      );
+    else if (cents > totalCents)
+      add(['depositFixed'], 'El anticipo no puede ser mayor que el total.');
   }
 
   return issues;

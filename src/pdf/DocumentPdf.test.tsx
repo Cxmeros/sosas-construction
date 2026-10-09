@@ -5,7 +5,7 @@ import { join, resolve } from 'node:path';
 import { renderToBuffer } from '@react-pdf/renderer';
 import { describe, expect, it } from 'vitest';
 import { DocumentPdf, registerFonts } from './DocumentPdf';
-import { LONG_ESTIMATE, OPTIONS_ESTIMATE, SAMPLE_ESTIMATE, SAMPLE_INVOICE } from './fixtures';
+import { LONG_ESTIMATE, SAMPLE_ESTIMATE, SAMPLE_INVOICE } from './fixtures';
 import { buildPdfModel } from './model';
 import type { DocumentData } from '../domain/types';
 
@@ -91,30 +91,5 @@ describe('DocumentPdf', () => {
     expect(text).toContain('Continuedonpage2');
     expect(text).toContain('(continued)');
     expect(text.match(/UNITPRICE/g)).toHaveLength(2);
-  });
-
-  it('renders two options side by side, each with title, description and totals', async () => {
-    const { text, pages } = await renderText(OPTIONS_ESTIMATE, 'options');
-    expect(pages).toBe(1);
-    for (const s of [
-      'OPTION 1',
-      'Refinish existing hardwood floors',
-      'Sand and refinish the existing hardwood floors',
-      'Option 1 total',
-      '$4,200.00',
-      '$2,940.00',
-      'OPTION 2',
-      'Install new hardwood flooring',
-      'Option 2 total',
-      '$5,465.00',
-      '$3,825.50',
-      'TERMS AND CONDITIONS',
-      'Page 1 of 1',
-    ]) {
-      expect(text).toContain(s.replace(/\s+/g, ''));
-    }
-    // Side by side: each card has a Description | Amount table.
-    expect(text).not.toContain('UNITPRICE');
-    expect(text.match(/AMOUNT/g)).toHaveLength(2);
   });
 });

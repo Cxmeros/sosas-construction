@@ -2,9 +2,9 @@ import type { CSSProperties, ReactNode } from 'react';
 import { COLORS as C, COMPANY } from '../config/company';
 import { formatCents } from '../domain/money';
 import logoUrl from '../assets/logo-placeholder.png';
-import { BAR, BOX, CELL, COLS, COLUMNS, PAGE, TABLE_GAP, TYPE } from './layout';
-import type { PdfPage, PdfSegment } from './layout';
-import type { PdfModel, PdfOption, PdfRow } from './model';
+import { BAR, BOX, CELL, COLS, PAGE, TYPE } from './layout';
+import type { PdfPage } from './layout';
+import type { PdfModel, PdfRow } from './model';
 
 /**
  * HTML twin of DocumentPdf, at 816 × 1056 CSS px (Letter at 96 dpi), for the live preview.
@@ -185,179 +185,6 @@ function Row({ row }: { row: PdfRow }) {
   );
 }
 
-function TableHead() {
-  return (
-    <div
-      style={{
-        ...grid,
-        border: gridLine,
-        background: C.orange100,
-        color: C.orange800,
-        fontWeight: 700,
-        fontSize: TYPE.tableHead,
-        letterSpacing: '0.08em',
-      }}
-    >
-      <span style={cell('left', true)}>DESCRIPTION</span>
-      <span style={cell('right')}>QTY</span>
-      <span style={cell('left')}>UNIT</span>
-      <span style={cell('right')}>UNIT PRICE</span>
-      <span style={cell('right')}>AMOUNT</span>
-    </div>
-  );
-}
-
-function Totals({ option, full = false }: { option: PdfOption; full?: boolean }) {
-  return (
-    <div
-      style={{
-        alignSelf: full ? 'stretch' : 'flex-end',
-        width: full ? 'auto' : 340,
-        display: 'flex',
-        flexDirection: 'column',
-        border: `1.5px solid ${C.orange200}`,
-      }}
-    >
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          padding: '9px 14px',
-          fontSize: TYPE.totalsTotal,
-          fontWeight: 700,
-        }}
-      >
-        <span>{option.shortLabel ? `${option.shortLabel} total` : 'Total'}</span>
-        <span>{option.total}</span>
-      </div>
-      {option.deposit && (
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            padding: '9px 14px',
-            borderTop: `1px solid ${C.orange200}`,
-            fontSize: TYPE.totalsRow,
-          }}
-        >
-          <span>{option.deposit.label}</span>
-          <span style={{ fontWeight: 600 }}>{option.deposit.value}</span>
-        </div>
-      )}
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'baseline',
-          gap: 12,
-          padding: '11px 14px',
-          borderTop: `2px solid ${C.orange600}`,
-          background: C.orange600,
-          color: '#FFFFFF',
-        }}
-      >
-        <span style={{ fontWeight: 700, fontSize: TYPE.totalsRow }}>{option.balanceLabel}</span>
-        <span style={{ ...cond, fontSize: TYPE.balance, lineHeight: 1 }}>{option.balance}</span>
-      </div>
-    </div>
-  );
-}
-
-const columnGrid: CSSProperties = {
-  display: 'grid',
-  gridTemplateColumns: `minmax(0,1fr) ${String(COLUMNS.amount)}px`,
-};
-
-/** Two-option layout: one option as a card, like a side-by-side comparison. */
-function OptionCard({ option }: { option: PdfOption }) {
-  return (
-    <div style={{ flex: '1 1 0', minWidth: 0, display: 'flex', flexDirection: 'column' }}>
-      <span style={bar}>{option.shortLabel.toUpperCase()}</span>
-      {(option.title || option.description) && (
-        <div style={box}>
-          {option.title && (
-            <strong style={{ fontSize: TYPE.customerName, lineHeight: TYPE.lineHeight }}>
-              {option.title}
-            </strong>
-          )}
-          {option.description && (
-            <span style={{ whiteSpace: 'pre-wrap' }}>{option.description}</span>
-          )}
-        </div>
-      )}
-      <div style={{ display: 'flex', flexDirection: 'column', marginTop: TABLE_GAP }}>
-        <div
-          style={{
-            ...columnGrid,
-            border: gridLine,
-            background: C.orange100,
-            color: C.orange800,
-            fontWeight: 700,
-            fontSize: TYPE.tableHead,
-            letterSpacing: '0.08em',
-          }}
-        >
-          <span style={cell('left', true)}>DESCRIPTION</span>
-          <span style={cell('right')}>AMOUNT</span>
-        </div>
-        {option.rows.map((row) => (
-          <div
-            key={row.key}
-            style={{
-              ...columnGrid,
-              borderLeft: gridLine,
-              borderRight: gridLine,
-              borderBottom: gridLine,
-            }}
-          >
-            <span style={{ ...cell('left', true), display: 'flex', flexDirection: 'column' }}>
-              <span style={{ fontWeight: 500 }}>{row.description}</span>
-              {row.note && (
-                <span style={{ fontSize: TYPE.note, color: C.inkMuted }}>{row.note}</span>
-              )}
-              {row.detail && (
-                <span style={{ fontSize: TYPE.note, color: C.inkMuted }}>{row.detail}</span>
-              )}
-            </span>
-            <span style={{ ...cell('right'), fontWeight: 600 }}>{row.amount}</span>
-          </div>
-        ))}
-      </div>
-      {/* Pushes both cards' totals to the same line. */}
-      <div style={{ flex: '1 0 auto', minHeight: PAGE.gap }} />
-      <Totals option={option} full />
-    </div>
-  );
-}
-
-/** One option's part of a page: its bar (and description), table rows, and/or totals. */
-function OptionSegment({ option, segment }: { option: PdfOption; segment: PdfSegment }) {
-  const continued = segment.header === 'continued';
-  return (
-    <>
-      <div style={{ display: 'flex', flexDirection: 'column' }}>
-        <span style={bar}>
-          {continued ? `${option.shortLabel || option.label} (continued)` : option.label}
-        </span>
-        {!continued && option.description && (
-          <div style={box}>
-            <p style={{ margin: 0, whiteSpace: 'pre-wrap' }}>{option.description}</p>
-          </div>
-        )}
-        {segment.showTable && (
-          <div style={{ display: 'flex', flexDirection: 'column', marginTop: TABLE_GAP }}>
-            <TableHead />
-            {segment.rows.map((row) => (
-              <Row key={row.key} row={row} />
-            ))}
-          </div>
-        )}
-      </div>
-      {segment.showTotals && <Totals option={option} />}
-    </>
-  );
-}
-
 export function PageView({ model, page }: { model: PdfModel; page: PdfPage }) {
   return (
     <div
@@ -399,62 +226,125 @@ export function PageView({ model, page }: { model: PdfModel; page: PdfPage }) {
         <CompactHeader model={model} />
       )}
 
-      {page.columns && (
-        <div style={{ display: 'flex', gap: COLUMNS.gap, alignItems: 'stretch' }}>
-          {model.options.map((option) => (
-            <OptionCard key={option.key} option={option} />
+      {page.showTable && (
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <span style={{ ...bar, marginBottom: 6 }}>SERVICES AND MATERIALS</span>
+          <div
+            style={{
+              ...grid,
+              border: gridLine,
+              background: C.orange100,
+              color: C.orange800,
+              fontWeight: 700,
+              fontSize: TYPE.tableHead,
+              letterSpacing: '0.08em',
+            }}
+          >
+            <span style={cell('left', true)}>DESCRIPTION</span>
+            <span style={cell('right')}>QTY</span>
+            <span style={cell('left')}>UNIT</span>
+            <span style={cell('right')}>UNIT PRICE</span>
+            <span style={cell('right')}>AMOUNT</span>
+          </div>
+          {page.rows.map((row) => (
+            <Row key={row.key} row={row} />
           ))}
-        </div>
-      )}
-      {!page.columns &&
-        page.segments.map((segment) => {
-          const option = model.options[segment.option];
-          if (!option) return null;
-          return (
-            <OptionSegment
-              key={`${option.key}-${segment.header}`}
-              option={option}
-              segment={segment}
-            />
-          );
-        })}
-
-      {page.continued && (
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            fontSize: TYPE.note,
-            color: C.inkMuted,
-          }}
-        >
-          <span>
-            {page.continued.subtotalCents !== null && (
-              <>
+          {page.continued && (
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                paddingTop: 8,
+                fontSize: TYPE.note,
+                color: C.inkMuted,
+              }}
+            >
+              <span>
                 Subtotal this page:{' '}
                 <strong style={{ color: C.ink }}>
                   {formatCents(page.continued.subtotalCents)}
                 </strong>
-              </>
-            )}
-          </span>
-          <strong style={{ color: C.ink }}>Continued on page {page.continued.nextPage} ›</strong>
+              </span>
+              <strong style={{ color: C.ink }}>
+                Continued on page {page.continued.nextPage} ›
+              </strong>
+            </div>
+          )}
         </div>
       )}
 
-      {page.showTerms && (
-        <Section label="TERMS AND CONDITIONS">
-          <p
+      {page.showTotals && (
+        <>
+          <div
             style={{
-              margin: 0,
-              fontSize: TYPE.terms,
-              color: C.walnut700,
-              whiteSpace: 'pre-wrap',
+              alignSelf: 'flex-end',
+              width: 340,
+              display: 'flex',
+              flexDirection: 'column',
+              border: `1.5px solid ${C.orange200}`,
             }}
           >
-            {model.terms}
-          </p>
-        </Section>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                padding: '9px 14px',
+                fontSize: TYPE.totalsTotal,
+                fontWeight: 700,
+              }}
+            >
+              <span>Total</span>
+              <span>{model.total}</span>
+            </div>
+            {model.deposit && (
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  padding: '9px 14px',
+                  borderTop: `1px solid ${C.orange200}`,
+                  fontSize: TYPE.totalsRow,
+                }}
+              >
+                <span>{model.deposit.label}</span>
+                <span style={{ fontWeight: 600 }}>{model.deposit.value}</span>
+              </div>
+            )}
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'baseline',
+                gap: 12,
+                padding: '11px 14px',
+                borderTop: `2px solid ${C.orange600}`,
+                background: C.orange600,
+                color: '#FFFFFF',
+              }}
+            >
+              <span style={{ fontWeight: 700, fontSize: TYPE.totalsRow }}>
+                {model.balanceLabel}
+              </span>
+              <span style={{ ...cond, fontSize: TYPE.balance, lineHeight: 1 }}>
+                {model.balance}
+              </span>
+            </div>
+          </div>
+          {model.terms && (
+            <Section label="TERMS AND CONDITIONS">
+              <p
+                style={{
+                  margin: 0,
+                  fontSize: TYPE.terms,
+                  color: C.walnut700,
+                  whiteSpace: 'pre-wrap',
+                }}
+              >
+                {model.terms}
+              </p>
+            </Section>
+          )}
+        </>
       )}
 
       <div
