@@ -37,7 +37,7 @@
   src: url('./assets/fonts/barlow-condensed-latin-700-normal.woff') format('woff');
 }
 
-/* Design tokens from the Claude Design handoff (design/project/Sosa App.dc.html §7). */
+/* Design tokens from the Claude Design v2 handoff (design/project/Sosa App.dc.html, 07 Tokens). */
 @theme {
   --font-sans: 'Barlow', system-ui, sans-serif;
   --font-cond: 'Barlow Condensed', 'Barlow', system-ui, sans-serif;
@@ -49,12 +49,11 @@
   --color-oak-300: #e8c58f;
   --color-oak-500: #d9a866;
   --color-gold-500: #c9962e;
-  --color-orange-100: #fcebdf;
-  --color-orange-400: #ee7a30;
-  --color-orange-300: #f49456;
-  --color-orange-500: #e06a1f;
-  --color-orange-700: #b5470f;
-  --color-orange-800: #8f3709;
+  --color-red-100: #f6e4e1;
+  --color-red-500: #9e1f1f;
+  --color-red-700: #7f1a1a;
+  --color-red-800: #5c1212;
+  --color-crimson-cta: #a51c30;
   --color-cream: #f7e7cc;
   --color-paper: #f6f1ea;
   --color-paper-hover: #fbf6ef;
@@ -97,12 +96,12 @@
     cursor: pointer;
   }
   :focus-visible {
-    outline: 3px solid var(--color-orange-700);
+    outline: 3px solid var(--color-red-700);
     outline-offset: 2px;
   }
-  /* On dark bars the focus ring switches to the light orange to keep 3:1. */
+  /* On dark bars the focus ring switches to light oak to keep 3:1. */
   .on-dark :focus-visible {
-    outline-color: var(--color-orange-400);
+    outline-color: var(--color-oak-300);
   }
   ::placeholder {
     color: var(--color-placeholder);
@@ -161,9 +160,9 @@
     letter-spacing: 0.02em;
     color: var(--color-walnut-700);
   }
-  /* Darker than the brand orange so it holds up in sunlight (7:1 on paper). */
+  /* Brand red: 10:1 on white, holds up in sunlight. */
   .section-title > .n {
-    color: var(--color-orange-800);
+    color: var(--color-red-700);
   }
   .btn-cond {
     font-family: var(--font-cond);

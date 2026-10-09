@@ -1,16 +1,15 @@
-import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
+import { useRef, useState, type KeyboardEvent } from 'react';
 import { useFieldArray, type UseFormReturn } from 'react-hook-form';
 import { lineAmountCents } from '../../domain/calc';
 import { emptyItem, toLenientItem, type FormItem, type FormValues } from '../../domain/form';
 import { LIMITS } from '../../domain/limits';
 import { formatCents } from '../../domain/money';
 import { UNITS, type DocumentData } from '../../domain/types';
-import { DownIcon, GripIcon, PlusIcon, TrashIcon, UndoIcon, UpIcon } from '../../ui/Icons';
+import { DownIcon, GripIcon, PlusIcon, TrashIcon, UpIcon } from '../../ui/Icons';
+import { removedLabel, useUndoRemove } from '../../ui/useUndoRemove';
 import { errorAt, Field, FieldError, invalidProps, SectionTitle } from './fields';
 
 type Form = UseFormReturn<FormValues, unknown, DocumentData>;
-
-const UNDO_MS = 10_000;
 
 function amountOf(item: FormItem): string {
   return formatCents(lineAmountCents(toLenientItem(item)));
@@ -45,17 +44,10 @@ export function ItemsEditor({
   });
   const items = watch('items');
   const errors = formState.errors;
-  const [undo, setUndo] = useState<{ item: FormItem; index: number } | null>(null);
-  const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
-  const undoButton = useRef<HTMLButtonElement>(null);
   const addButton = useRef<HTMLButtonElement>(null);
-
-  useEffect(
-    () => () => {
-      clearTimeout(timer.current);
-    },
-    [],
-  );
+  const undo = useUndoRemove<FormItem>((index, item) => {
+    insert(Math.min(index, fields.length), item);
+  }, addButton);
 
   const add = () => {
     const n = fields.length;
@@ -71,52 +63,14 @@ export function ItemsEditor({
     const item = items[index];
     if (!item) return;
     remove(index);
-    clearTimeout(timer.current);
-    setUndo({ item, index });
-    // Keep keyboard and screen-reader users in place: focus moves to "Deshacer".
-    setTimeout(() => undoButton.current?.focus(), 0);
-    timer.current = setTimeout(() => {
-      if (document.activeElement === undoButton.current) addButton.current?.focus();
-      setUndo(null);
-    }, UNDO_MS);
-  };
-
-  const doUndo = () => {
-    if (!undo) return;
-    clearTimeout(timer.current);
-    insert(Math.min(undo.index, fields.length), undo.item);
-    setUndo(null);
+    undo.offer(index, item, removedLabel(item.description, `Trabajo #${String(index + 1)}`));
   };
 
   const listError = errorAt(errors, 'items.root') ?? errorAt(errors, 'items');
   const full = fields.length >= LIMITS.maxItems;
   const countLabel = fields.length === 1 ? '1 trabajo' : `${String(fields.length)} trabajos`;
 
-  const undoToast = undo && (
-    <div
-      role="status"
-      className={
-        desktop
-          ? 'flex min-w-0 items-center gap-1 bg-ink pl-3.5 text-white'
-          : 'fixed right-3 bottom-[calc(96px+env(safe-area-inset-bottom))] left-3 z-20 flex items-center justify-between border-2 border-walnut-900 bg-surface pr-1 pl-4 text-ink shadow-[0_12px_32px_rgba(31,23,18,0.35)]'
-      }
-    >
-      <span className="min-w-0 truncate text-base">
-        {undo.item.description.trim()
-          ? `“${undo.item.description.trim()}” eliminado`
-          : `Trabajo #${String(undo.index + 1)} eliminado`}
-      </span>
-      <button
-        ref={undoButton}
-        type="button"
-        onClick={doUndo}
-        className={`flex min-h-12 flex-none items-center gap-1.5 px-3.5 text-base font-bold tracking-[0.04em] uppercase ${desktop ? 'text-orange-400' : 'text-orange-800'}`}
-      >
-        <UndoIcon size={20} />
-        Deshacer
-      </button>
-    </div>
-  );
+  const undoToast = undo.toast(desktop);
 
   const empty = fields.length === 0 && (
     <div className="flex flex-col items-center gap-3 border-[1.5px] border-dashed border-field px-4 py-6 text-center">
@@ -127,7 +81,7 @@ export function ItemsEditor({
       <button
         type="button"
         onClick={add}
-        className="btn-cond flex min-h-[52px] items-center justify-center gap-2 self-stretch bg-orange-700 text-xl text-white hover:bg-orange-800"
+        className="btn-cond flex min-h-[52px] items-center justify-center gap-2 self-stretch bg-crimson-cta text-xl text-white hover:bg-red-700"
       >
         <PlusIcon /> Agregar primer trabajo
       </button>
@@ -144,7 +98,7 @@ export function ItemsEditor({
         {fields.length === 0 ? (
           <>
             {empty}
-            {undo && <div className="self-start">{undoToast}</div>}
+            {undo.active && <div className="self-start">{undoToast}</div>}
           </>
         ) : (
           <div className="border border-line bg-surface">
@@ -271,7 +225,7 @@ function MobileCard({ form, index, count, item, onMove, onDelete }: RowProps) {
         className={`flex items-center gap-1 border-b border-line-faint pl-3 ${hasError ? 'bg-error-bg' : 'bg-paper'}`}
       >
         <span
-          className={`flex-1 font-cond text-xl font-bold ${hasError ? 'text-error' : 'text-orange-800'}`}
+          className={`flex-1 font-cond text-xl font-bold ${hasError ? 'text-error' : 'text-red-700'}`}
         >
           #{index + 1}
         </span>
@@ -314,6 +268,14 @@ function MobileCard({ form, index, count, item, onMove, onDelete }: RowProps) {
             className="field"
             {...invalidProps(p('description'), err('description'))}
             {...register(p('description'))}
+          />
+        </Field>
+        <Field label="Detalle (opcional)" path={p('detail')} error={undefined}>
+          <input
+            maxLength={200}
+            placeholder="ej. 15 steps, 10 sticks"
+            className="field"
+            {...register(p('detail'))}
           />
         </Field>
         <Field label="Unidad" path={p('unit')} error={undefined}>
@@ -425,7 +387,7 @@ function DesktopRow({
         const from = Number(e.dataTransfer.getData('text/plain'));
         if (Number.isInteger(from) && from !== index) onDropFrom(from);
       }}
-      className={`border-b border-line-faint p-2 hover:bg-paper-hover ${dragOver ? 'bg-orange-100' : ''}`}
+      className={`border-b border-line-faint p-2 hover:bg-paper-hover ${dragOver ? 'bg-red-100' : ''}`}
     >
       <div className="items-grid items-center">
         <button
@@ -442,14 +404,23 @@ function DesktopRow({
         >
           <GripIcon size={20} />
         </button>
-        <textarea
-          aria-label={`Descripción trabajo ${String(index + 1)}`}
-          rows={1}
-          maxLength={200}
-          className="field min-h-12 resize-none px-2.5 text-base field-sizing-content"
-          {...invalidProps(p('description'), err('description'))}
-          {...register(p('description'))}
-        />
+        <div className="flex min-w-0 flex-col gap-1">
+          <textarea
+            aria-label={`Descripción trabajo ${String(index + 1)}`}
+            rows={1}
+            maxLength={200}
+            className="field min-h-12 resize-none px-2.5 text-base field-sizing-content"
+            {...invalidProps(p('description'), err('description'))}
+            {...register(p('description'))}
+          />
+          <input
+            aria-label={`Detalle trabajo ${String(index + 1)} (opcional)`}
+            maxLength={200}
+            placeholder="Detalle (opcional)"
+            className="field px-2.5 text-sm"
+            {...register(p('detail'))}
+          />
+        </div>
         {lump ? (
           <input
             aria-label={`Cantidad trabajo ${String(index + 1)}`}

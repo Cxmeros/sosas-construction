@@ -1,5 +1,5 @@
 import { formatCents } from '../../domain/money';
-import { computeTotals } from '../../domain/calc';
+import { documentTotals } from '../../domain/calc';
 import { downloadBlob, mailtoUrl, whatsappUrl } from '../../lib/share';
 import { Dialog } from '../../ui/Dialog';
 import { DownloadIcon } from '../../ui/Icons';
@@ -14,7 +14,7 @@ export function SharePanel({ file, onClose }: { file: PdfFile | null; onClose: (
   const doc = file?.doc;
   const name = doc?.customer.name ?? '';
   const kind = doc?.type === 'invoice' ? 'invoice' : 'work estimate';
-  const total = doc ? formatCents(computeTotals(doc.items, doc.deposit).balanceCents) : '';
+  const total = doc ? formatCents(documentTotals(doc).balanceCents) : '';
   const greeting = `Hello ${name}, here is your ${kind} ${doc?.number ?? ''} from ${COMPANY.name}. Balance: ${total}. The PDF is attached.`;
   const wa = doc ? whatsappUrl(doc.customer.phone, greeting) : null;
   const mail = doc
@@ -43,7 +43,8 @@ export function SharePanel({ file, onClose }: { file: PdfFile | null; onClose: (
         Enviar a {name}
       </h2>
       <p className="m-0 text-[15px] text-ink-muted">
-        Este aparato no puede compartir archivos. Se descarga el PDF: adjúntalo en el mensaje.
+        Este aparato no puede compartir archivos. Al elegir una opción se descarga el PDF: adjunta
+        el PDF descargado en el mensaje.
       </p>
       {wa && (
         <button
@@ -65,7 +66,7 @@ export function SharePanel({ file, onClose }: { file: PdfFile | null; onClose: (
             open(mail);
           }}
         >
-          <span className="size-3 flex-none bg-orange-700" aria-hidden="true" />
+          <span className="size-3 flex-none bg-crimson-cta" aria-hidden="true" />
           <span className="min-w-0 break-words">Correo · {doc?.customer.email}</span>
         </button>
       )}

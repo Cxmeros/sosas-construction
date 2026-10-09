@@ -1,5 +1,5 @@
 import type { FieldErrors } from 'react-hook-form';
-import type { FormValues } from '../../domain/form';
+import { formatPhone, type FormValues } from '../../domain/form';
 import { LIMITS } from '../../domain/limits';
 import { formatCents } from '../../domain/money';
 import { formatDateUS } from '../../domain/numbering';
@@ -7,6 +7,8 @@ import type { DocType, Totals } from '../../domain/types';
 import { AlertIcon } from '../../ui/Icons';
 import type { DocumentState } from './useDocument';
 import { DepositSection } from './DepositSection';
+import { ExtrasSection } from './ExtrasSection';
+import { ProcessSection } from './ProcessSection';
 import { errorAt, Field, invalidProps, Section, SectionTitle, Segmented } from './fields';
 import { ItemsEditor } from './ItemsEditor';
 
@@ -57,6 +59,7 @@ export function DocumentForm({
   desktop: boolean;
 }) {
   const { form, values, doc, setType } = state;
+  const invoice = values.type === 'invoice';
   const { register, formState } = form;
   const errors = formState.errors;
   const err = (path: string) => errorAt(errors, path);
@@ -131,7 +134,12 @@ export function DocumentForm({
           placeholder={isBlank ? '(610) 555-0000' : undefined}
           className="field"
           {...invalidProps('customer.phone', err('customer.phone'))}
-          {...register('customer.phone')}
+          {...register('customer.phone', {
+            // Shown as (XXX) XXX-XXXX once typed (SPEC §3.3).
+            onBlur: (e: { target: HTMLInputElement }) => {
+              form.setValue('customer.phone', formatPhone(e.target.value));
+            },
+          })}
         />
       </Field>
       <Field label="Email" path="customer.email" error={err('customer.email')}>
@@ -190,12 +198,13 @@ export function DocumentForm({
           </span>
           {jobDescription}
         </label>
-        <ItemsEditor form={form} desktop totalLabel={formatCents(totals.totalCents)} />
+        <ItemsEditor form={form} desktop totalLabel={formatCents(totals.workCents)} />
+        {invoice && <ExtrasSection form={form} desktop n="05" />}
         <div className="grid grid-cols-2 gap-6">
-          <DepositSection form={form} doc={doc} totals={totals} desktop />
+          <DepositSection form={form} doc={doc} totals={totals} desktop n={invoice ? '06' : '05'} />
           <label className="label gap-3">
             <span className="section-title">
-              <span className="n">06</span>Términos
+              <span className="n">07</span>Términos
             </span>
             {terms}
             <span className="text-sm font-normal text-ink-muted">
@@ -203,6 +212,7 @@ export function DocumentForm({
             </span>
           </label>
         </div>
+        {!invoice && <ProcessSection form={form} desktop n="06" />}
       </div>
     );
   }
@@ -242,10 +252,18 @@ export function DocumentForm({
           {jobDescription}
         </label>
       </Section>
-      <ItemsEditor form={form} desktop={false} totalLabel={formatCents(totals.totalCents)} />
-      <DepositSection form={form} doc={doc} totals={totals} desktop={false} />
+      <ItemsEditor form={form} desktop={false} totalLabel={formatCents(totals.workCents)} />
+      {invoice && <ExtrasSection form={form} desktop={false} n="05" />}
+      <DepositSection
+        form={form}
+        doc={doc}
+        totals={totals}
+        desktop={false}
+        n={invoice ? '06' : '05'}
+      />
+      {!invoice && <ProcessSection form={form} desktop={false} n="06" />}
       <Section desktop={false}>
-        <SectionTitle n="06">Términos</SectionTitle>
+        <SectionTitle n="07">Términos</SectionTitle>
         {terms}
         <span className="text-sm text-ink-muted">Este texto sale en inglés en el PDF.</span>
       </Section>

@@ -30,11 +30,13 @@ export function DepositSection({
   doc,
   totals,
   desktop,
+  n,
 }: {
   form: Form;
   doc: DocumentData;
   totals: Totals;
   desktop: boolean;
+  n: string;
 }) {
   const { register, setValue, watch, formState, getValues } = form;
   const mode = watch('depositMode');
@@ -52,7 +54,7 @@ export function DepositSection({
 
   return (
     <Section desktop={desktop}>
-      <SectionTitle n="05">{labels.title}</SectionTitle>
+      <SectionTitle n={n}>{labels.title}</SectionTitle>
       <Segmented
         name="depositMode"
         legend={labels.title}
@@ -113,7 +115,7 @@ export function DepositSection({
           </div>
         )}
         <div
-          className={`flex items-baseline justify-between px-3 text-white ${desktop ? 'py-2' : 'py-2.5'} ${invoice ? 'bg-orange-700' : 'bg-walnut-900'}`}
+          className={`flex items-baseline justify-between px-3 text-white ${desktop ? 'py-2' : 'py-2.5'} ${invoice ? 'bg-crimson-cta' : 'bg-walnut-900'}`}
         >
           <span className="font-semibold">{labels.balance}</span>
           <span className={`font-cond font-bold ${desktop ? 'text-[22px]' : 'text-2xl'}`}>
