@@ -12,61 +12,99 @@
 <link rel="stylesheet" href="_ds/industry-f1167009-4538-4574-a0f0-5283778e251b/styles.css">
 <style>
 body{margin:0;background:#E4DACD;color:#1F1712;font-family:Barlow, system-ui, sans-serif;-webkit-font-smoothing:antialiased}
-a{color:#B5470F}a:hover{color:#8F3709}
+a{color:#7F1A1A}a:hover{color:#5C1212}
 </style>
 </helmet>
 <div style="padding:56px;display:flex;flex-direction:column;gap:56px;min-width:1800px">
-  <header style="display:flex;flex-direction:column;gap:6px;border-bottom:3px solid #E06A1F;padding-bottom:20px;max-width:1752px">
-    <div style="font-size:15px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#B5470F">Sosa's Constructions · Plantilla PDF</div>
+  <header style="display:flex;flex-direction:column;gap:6px;border-bottom:3px solid #9E1F1F;padding-bottom:20px;max-width:1752px">
+    <div style="font-size:15px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#7F1A1A">Sosa's Constructions · Plantilla PDF · v2 (reunión con Danilo)</div>
     <h1 style="margin:0;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:56px;line-height:1;color:#2A1A10">Carta 8.5 × 11 in · Estimate e Invoice</h1>
-    <p style="margin:0;font-size:17px;color:#5C4A3D;max-width:820px;text-wrap:pretty">816 × 1056 px a 96 dpi, márgenes 0.5 in laterales. Jerarquía por peso y líneas, no por rellenos: se lee igual en blanco y negro (ver <a href="#d">D</a>). Sin TAX.</p>
+    <p style="margin:0;font-size:17px;color:#5C4A3D;max-width:900px;text-wrap:pretty">Cambios: Danilo y Carlos en el encabezado con sus dos teléfonos, logo provisional, rojo oscuro de marca, fecha MM/DD/YYYY, “Work Process” opcional en hoja aparte (<a href="#a2">A2–A3</a>) e invoice simplificado con “Additional Charges”. Variante con madera en <a href="#e">E</a>.</p>
   </header>
 
   <section data-screen-label="Una página" style="display:flex;gap:48px;flex-wrap:wrap;align-items:flex-start">
     <div id="a" style="display:flex;flex-direction:column;gap:12px">
-      <div style="display:flex;gap:8px;align-items:center"><span style="background:#2A1A10;color:#FFFFFF;font-weight:700;font-size:14px;padding:4px 8px">A</span><span style="font-weight:600;font-size:15px">Work Estimate · 1 página</span></div>
-      <div style="box-shadow:0 12px 32px rgba(31,23,18,.22)"><dc-import name="Sosa PDF" doc="{{ est }}" hint-size="816px,1056px"></dc-import></div>
+      <div style="display:flex;gap:8px;align-items:center"><span style="background:#2A1A10;color:#FFFFFF;font-weight:700;font-size:14px;padding:4px 8px">A</span><span style="font-weight:600;font-size:15px">Work Estimate · detalle completo</span></div>
+      <div style="box-shadow:0 12px 32px rgba(31,23,18,.22)"><dc-import name="Sosa PDF" balance-style="{{ balanceStyle }}" doc="{{ est }}" page-count="{{ estPageCount }}" process-page="{{ 2 }}" hint-size="816px,1056px"></dc-import></div>
     </div>
+    <sc-for list="{{ estProcPages }}" as="pg" hint-placeholder-count="2">
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;gap:8px;align-items:center"><span style="background:#2A1A10;color:#FFFFFF;font-weight:700;font-size:14px;padding:4px 8px">{{ pg.label }}</span><span style="font-weight:600;font-size:15px">Work Process · hojas aparte, solo si se activa</span></div>
+      <div style="box-shadow:0 12px 32px rgba(31,23,18,.22)"><dc-import name="Sosa PDF" balance-style="{{ balanceStyle }}" doc="{{ est }}" part="process" process-start="{{ pg.start }}" process-end="{{ pg.end }}" page-no="{{ pg.pageNo }}" page-count="{{ estPageCount }}" hint-size="816px,1056px"></dc-import></div>
+    </div>
+    </sc-for>
+    <div id="a2" style="display:flex;flex-direction:column;gap:8px;max-width:520px;padding-top:40px">
+      <span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:22px;text-transform:uppercase;color:#3A2416">Work Process largo</span>
+      <p style="margin:0;font-size:15px;color:#5C4A3D;text-wrap:pretty">Basado en el ejemplo de la competencia: pasos de 50–80 palabras con materiales, granos de lija y tiempos de secado. Cada paso tiene título corto (opcional) + explicación sin límite. Si no cabe en una hoja, sigue en la siguiente sin partir un paso. Arriba, una nota inicial opcional para aclarar supuestos (“si al quitar la alfombra encontramos daños, lo hablamos antes”).</p>
+      <p style="margin:0;font-size:15px;color:#5C4A3D;text-wrap:pretty">Con el interruptor apagado, estas hojas y el aviso “See page 2” desaparecen.</p>
+    </div>
+  </section>
+
+  <section data-screen-label="Invoice" style="display:flex;gap:48px;flex-wrap:wrap;align-items:flex-start">
     <div id="b" style="display:flex;flex-direction:column;gap:12px">
-      <div style="display:flex;gap:8px;align-items:center"><span style="background:#2A1A10;color:#FFFFFF;font-weight:700;font-size:14px;padding:4px 8px">B</span><span style="font-weight:600;font-size:15px">Invoice · 1 página (con referencia al estimate)</span></div>
-      <div style="box-shadow:0 12px 32px rgba(31,23,18,.22)"><dc-import name="Sosa PDF" doc="{{ inv }}" hint-size="816px,1056px"></dc-import></div>
+      <div style="display:flex;gap:8px;align-items:center"><span style="background:#2A1A10;color:#FFFFFF;font-weight:700;font-size:14px;padding:4px 8px">B</span><span style="font-weight:600;font-size:15px">Invoice · solo descripción y monto + Additional Charges</span></div>
+      <div style="box-shadow:0 12px 32px rgba(31,23,18,.22)"><dc-import name="Sosa PDF" balance-style="{{ balanceStyle }}" doc="{{ inv }}" hint-size="816px,1056px"></dc-import></div>
+    </div>
+  </section>
+
+  <section id="e" data-screen-label="Variante madera" style="display:flex;flex-direction:column;gap:16px">
+    <div style="display:flex;flex-direction:column;gap:6px;max-width:1100px">
+      <div style="display:flex;gap:8px;align-items:center"><span style="background:#2A1A10;color:#FFFFFF;font-weight:700;font-size:14px;padding:4px 8px">E</span><span style="font-weight:600;font-size:15px">Opcional · madera en el encabezado</span></div>
+      <p style="margin:0;font-size:15px;color:#1F1712;text-wrap:pretty">Mi opinión: la textura dibujada (E1) no se lee como madera, parecen rayas. Además, el logo ya es de madera, y ponerle madera detrás compite con él. Si quieren madera, que sea una <strong>foto real de un piso hecho por ellos</strong>, con poca superficie. Puse una textura de roble provisional; si arrastran una foto de un piso suyo a E2 o E3, la reemplaza en ambas. Mi recomendación es E2, o quedarse con la lisa.</p>
+    </div>
+    <div style="display:flex;gap:48px;align-items:flex-start;flex-wrap:wrap">
+      <div style="display:flex;flex-direction:column;gap:10px;width:816px">
+        <div style="display:flex;gap:8px;align-items:center"><span style="background:#2A1A10;color:#FFFFFF;font-weight:700;font-size:14px;padding:4px 8px">E1</span><span style="font-weight:600;font-size:15px">Textura dibujada (la anterior)</span></div>
+        <div style="box-shadow:0 12px 32px rgba(31,23,18,.22)"><dc-import name="Sosa PDF" balance-style="{{ balanceStyle }}" doc="{{ est }}" header="wood" page-count="{{ estPageCount }}" process-page="{{ 2 }}" hint-size="816px,1056px"></dc-import></div>
+        <p style="margin:0;font-size:15px;color:#5C4A3D;text-wrap:pretty">Descartaría esta: se ve falsa y llena de color de borde a borde, lo que gasta tinta en impresoras caseras.</p>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;width:816px">
+        <div style="display:flex;gap:8px;align-items:center"><span style="background:#2A1A10;color:#FFFFFF;font-weight:700;font-size:14px;padding:4px 8px">E2</span><span style="font-weight:600;font-size:15px">Franja de foto · recomendada</span></div>
+        <div style="box-shadow:0 12px 32px rgba(31,23,18,.22)"><dc-import name="Sosa PDF" balance-style="{{ balanceStyle }}" doc="{{ est }}" header="strip" page-count="{{ estPageCount }}" process-page="{{ 2 }}" hint-size="816px,1056px"></dc-import></div>
+        <p style="margin:0;font-size:15px;color:#5C4A3D;text-wrap:pretty">Una franja de 22 px arriba, como el canto de una tabla. Da el toque de madera, casi no gasta tinta y deja el encabezado limpio. En casa la impresora deja un margen blanco arriba; la franja queda más fina, pero se sigue viendo.</p>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;width:816px">
+        <div style="display:flex;gap:8px;align-items:center"><span style="background:#2A1A10;color:#FFFFFF;font-weight:700;font-size:14px;padding:4px 8px">E3</span><span style="font-weight:600;font-size:15px">Banda de foto oscurecida</span></div>
+        <div style="box-shadow:0 12px 32px rgba(31,23,18,.22)"><dc-import name="Sosa PDF" balance-style="{{ balanceStyle }}" doc="{{ est }}" header="band" page-count="{{ estPageCount }}" process-page="{{ 2 }}" hint-size="816px,1056px"></dc-import></div>
+        <p style="margin:0;font-size:15px;color:#5C4A3D;text-wrap:pretty">La más vistosa: el logo, que tiene fondo negro, se integra mejor sobre la foto oscura que sobre el blanco. Contras: es pesada para imprimir y en blanco y negro se vuelve una mancha gris. Mejor para el PDF que se manda por WhatsApp que para el papel.</p>
+      </div>
     </div>
   </section>
 
   <section id="c" data-screen-label="Dos páginas" style="display:flex;flex-direction:column;gap:12px">
-    <div style="display:flex;gap:8px;align-items:center"><span style="background:#2A1A10;color:#FFFFFF;font-weight:700;font-size:14px;padding:4px 8px">C</span><span style="font-weight:600;font-size:15px">Work Estimate largo · la tabla pasa a la página 2 y repite su encabezado</span></div>
+    <div style="display:flex;gap:8px;align-items:center"><span style="background:#2A1A10;color:#FFFFFF;font-weight:700;font-size:14px;padding:4px 8px">C</span><span style="font-weight:600;font-size:15px">Work Estimate largo · la tabla pasa a la página 2; totales, Work Process y términos van juntos</span></div>
     <div style="display:flex;gap:48px;align-items:flex-start">
-      <div style="box-shadow:0 12px 32px rgba(31,23,18,.22)"><dc-import name="Sosa PDF" doc="{{ long }}" rows="{{ longP1 }}" part="first" page-no="{{ 1 }}" page-count="{{ 2 }}" hint-size="816px,1056px"></dc-import></div>
-      <div style="box-shadow:0 12px 32px rgba(31,23,18,.22)"><dc-import name="Sosa PDF" doc="{{ long }}" rows="{{ longP2 }}" part="last" page-no="{{ 2 }}" page-count="{{ 2 }}" hint-size="816px,1056px"></dc-import></div>
+      <div style="box-shadow:0 12px 32px rgba(31,23,18,.22)"><dc-import name="Sosa PDF" balance-style="{{ balanceStyle }}" doc="{{ long }}" rows="{{ longP1 }}" part="first" page-no="{{ 1 }}" page-count="{{ 2 }}" hint-size="816px,1056px"></dc-import></div>
+      <div style="box-shadow:0 12px 32px rgba(31,23,18,.22)"><dc-import name="Sosa PDF" balance-style="{{ balanceStyle }}" doc="{{ long }}" rows="{{ longP2 }}" part="last" page-no="{{ 2 }}" page-count="{{ 2 }}" hint-size="816px,1056px"></dc-import></div>
     </div>
-    <p style="margin:0;font-size:15px;color:#5C4A3D;max-width:820px;text-wrap:pretty">Regla de corte: nunca partir una fila; los totales y términos van juntos (si no caben, pasan completos a la siguiente página). Página 2+ usa encabezado compacto con número, fecha y cliente.</p>
+    <p style="margin:0;font-size:15px;color:#5C4A3D;max-width:900px;text-wrap:pretty">Regla de corte: nunca partir una fila; totales + Work Process + términos van juntos (si no caben, pasan completos a la siguiente página). Página 2+ usa encabezado compacto. Si se activa Work Process, va como hoja final.</p>
   </section>
 
   <section id="d" data-screen-label="Blanco y negro" style="display:flex;flex-direction:column;gap:12px">
     <div style="display:flex;gap:8px;align-items:center"><span style="background:#2A1A10;color:#FFFFFF;font-weight:700;font-size:14px;padding:4px 8px">D</span><span style="font-weight:600;font-size:15px">Prueba de impresión en blanco y negro</span></div>
     <div style="display:flex;gap:48px;align-items:flex-start">
-      <div style="filter:grayscale(1);box-shadow:0 12px 32px rgba(31,23,18,.22)"><dc-import name="Sosa PDF" doc="{{ est }}" hint-size="816px,1056px"></dc-import></div>
-      <div style="filter:grayscale(1);box-shadow:0 12px 32px rgba(31,23,18,.22)"><dc-import name="Sosa PDF" doc="{{ inv }}" hint-size="816px,1056px"></dc-import></div>
+      <div style="filter:grayscale(1);box-shadow:0 12px 32px rgba(31,23,18,.22)"><dc-import name="Sosa PDF" balance-style="{{ balanceStyle }}" doc="{{ est }}" page-count="{{ estPageCount }}" process-page="{{ 2 }}" hint-size="816px,1056px"></dc-import></div>
+      <div style="filter:grayscale(1);box-shadow:0 12px 32px rgba(31,23,18,.22)"><dc-import name="Sosa PDF" balance-style="{{ balanceStyle }}" doc="{{ inv }}" hint-size="816px,1056px"></dc-import></div>
     </div>
   </section>
 
   <section data-screen-label="Especificación" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;max-width:1752px">
-    <div class="blueprint" style="padding:20px;border-color:#CDBBA7;display:flex;flex-direction:column;gap:8px"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+    <div style="padding:20px;border:1px solid #CDBBA7;display:flex;flex-direction:column;gap:8px">
       <h3 style="margin:0;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:22px;text-transform:uppercase;color:#3A2416">Tipografía PDF</h3>
-      <p style="margin:0;font-size:15px;text-wrap:pretty">Título 44 Cond 700 · etiquetas de sección 14 Cond 700 +10 % tracking · cuerpo 13.5 Barlow 400 · tabla 13.5, encabezado 11.5 bold · saldo 26 Cond 700 · pie 11.5. Cifras tabulares. Incrustar Barlow y Barlow Condensed en el PDF.</p>
+      <p style="margin:0;font-size:15px;text-wrap:pretty">Título 44 Cond 700 · nombres en encabezado 19 Cond 700 · etiquetas de sección 17 Cond 700 +8 % · cuerpo 13.5 Barlow · tabla 13.5, encabezado 11.5 bold · saldo 26 Cond 700 · pie 11.5. Cifras tabulares.</p>
     </div>
-    <div class="blueprint" style="padding:20px;border-color:#CDBBA7;display:flex;flex-direction:column;gap:8px"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+    <div style="padding:20px;border:1px solid #CDBBA7;display:flex;flex-direction:column;gap:8px">
       <h3 style="margin:0;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:22px;text-transform:uppercase;color:#3A2416">Color e impresión</h3>
-      <p style="margin:0;font-size:15px;text-wrap:pretty">Solo dos tintas de marca: <code>#B5470F</code> (títulos, etiquetas) y <code>#E06A1F</code> (filete del encabezado). Texto <code>#1F1712</code>, líneas <code>#CDBBA7</code>/<code>#D8CBBB</code>, saldo sobre <code>#FCEBDF</code>. Sin rellenos grandes: ahorra tinta y se mantiene legible en gris.</p>
+      <p style="margin:0;font-size:15px;text-wrap:pretty">Rojo de marca <code>#7F1A1A</code> (títulos y etiquetas, 10:1 sobre blanco) y <code>#9E1F1F</code> (filete del encabezado). Saldo sobre <code>#F6E4E1</code>. Logo provisional en <code>assets/logo-ai-red.jpg</code>: al llegar el oficial se reemplaza ese archivo.</p>
     </div>
-    <div class="blueprint" style="padding:20px;border-color:#CDBBA7;display:flex;flex-direction:column;gap:8px"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+    <div style="padding:20px;border:1px solid #CDBBA7;display:flex;flex-direction:column;gap:8px">
       <h3 style="margin:0;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:22px;text-transform:uppercase;color:#3A2416">Datos</h3>
-      <p style="margin:0;font-size:15px;text-wrap:pretty">Número <code>EST|INV-AAAAMMDD-NN</code>, fecha <code>MM-DD-YYYY</code>. Lump sum: Qty y Unit price “—”. Descripción con “ — ” se parte en línea principal + nota gris. Invoice muestra “Estimate ref.” cuando viene de un estimate.</p>
+      <p style="margin:0;font-size:15px;text-wrap:pretty">Fecha <code>MM/DD/YYYY</code>. Estimate: Qty | Unit | Unit price. Invoice: solo Description | Amount. Additional charges: descripción + monto, se suman al total; el anticipo recibido se calcula sobre el trabajo, no sobre los extras. Work Process: hoja aparte al final, solo si está activado.</p>
     </div>
   </section>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script>
+<script type="text/x-dc" data-dc-script data-props="{&quot;balanceStyle&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;solid&quot;,&quot;tint&quot;],&quot;default&quot;:&quot;solid&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Saldo&quot;}}">
 const money = n => '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const client = { name: 'Margaret Kelly', address: '412 Owen Ave, Lansdowne, PA 19050', phone: '(610) 555-0142', email: 'mkelly.home@gmail.com' };
 const row = (desc, unit, qty, price, lump) => lump != null
@@ -79,44 +117,62 @@ const BASE = [
   row('Refinish steps and handrails — 15 steps, 10 sticks', 0, 0, 0, 3000),
 ];
 const LONG = [
-  row('Floor protection and dust containment', 0, 0, 0, 450),
-  BASE[0],
-  row('Subfloor repair and leveling', 'sq ft', 220, 3.25),
-  row('Moisture barrier underlayment', 'sq ft', 1625, 0.45),
-  BASE[1],
-  BASE[2],
-  row('Stain application — Provincial, 1 coat', 'sq ft', 2072, 0.75),
-  BASE[3],
-  row('Stair nosing replacement', 'each', 15, 28),
-  row('Quarter round install', 'linear ft', 380, 2.25),
-  row('Baseboard removal and reinstall', 'linear ft', 380, 1.5),
-  row('Transition strips', 'each', 6, 45),
-  row('Floor register cutouts', 'each', 9, 18),
-  row('Furniture moving', 'hours', 6, 65),
-  row('Closet floor install', 'sq ft', 64, 7.5),
-  row('Water-based polyurethane topcoat — 3 coats', 'sq ft', 2072, 1.2),
-  row('Debris haul-away and dumpster', 0, 0, 0, 650),
-  row('Final cleaning', 0, 0, 0, 200),
+  row('Floor protection and dust containment', 0, 0, 0, 450), BASE[0],
+  row('Subfloor repair and leveling', 'sq ft', 220, 3.25), row('Moisture barrier underlayment', 'sq ft', 1625, 0.45),
+  BASE[1], BASE[2], row('Stain application — Provincial, 1 coat', 'sq ft', 2072, 0.75), BASE[3],
+  row('Stair nosing replacement', 'each', 15, 28), row('Quarter round install', 'linear ft', 380, 2.25),
+  row('Baseboard removal and reinstall', 'linear ft', 380, 1.5), row('Transition strips', 'each', 6, 45),
+  row('Floor register cutouts', 'each', 9, 18), row('Furniture moving', 'hours', 6, 65),
+  row('Closet floor install', 'sq ft', 64, 7.5), row('Water-based polyurethane topcoat — 3 coats', 'sq ft', 2072, 1.2),
+  row('Debris haul-away and dumpster', 0, 0, 0, 650), row('Final cleaning', 0, 0, 0, 200),
 ];
-const doc = (rows, inv, num) => {
-  const total = rows.reduce((a, r) => a + r.v, 0);
-  const dep = Math.round(total * 30 + 1e-7) / 100;
+const PROCESS = ['Arrive and protect the work area', 'Move furniture out of the room', 'Remove existing carpet / floor', 'Prepare and level the subfloor', 'Install new hardwood floor', 'Sand and finish', 'Clean up and remove debris'];
+const DETAILS = [
+ "We cover doorways, stairs, cabinets, shelving and counters with plastic sheeting and seal them off from the work area. Floor protection paper is laid along the walkway to the exit. Our sanders connect to a dust-collection vacuum and we run an air scrubber the whole time, so dust stays contained and the rest of the house stays clean.",
+ "We carefully move furniture to an area you choose, using pads and sliders so nothing gets scratched. Please remove fragile, valuable or personal items from shelves and tables before we arrive. Heavy items such as pianos, safes or aquariums need to be discussed ahead of time.",
+ "We pull up the existing carpet, padding, tack strips and old flooring and haul everything away. All staples and nails are removed from the subfloor. If we find damage, rot or moisture under the old floor, we stop, show you, and agree on any extra work before continuing.",
+ "We inspect the subfloor, screw down loose areas to stop squeaks, replace damaged sections and level low spots with patch compound. The floor is vacuumed and checked for moisture before installation, because a flat, dry base is what keeps the new floor from cupping or moving later.",
+ "We lay a moisture barrier, then install the new hardwood board by board, nailing every row and leaving expansion space along the walls. Boards are staggered for a natural look. Transitions are fitted at doorways and around stairs, and new quarter round is installed around the perimeter.",
+ "The floor is sanded to bare wood in three passes (36, 60 and 80 grit); edges are sanded separately and corners are finished by hand. After a final buff with 100 grit we apply stain if selected (color samples are provided on day one), then a sealer coat and two coats of water-based polyurethane in the sheen you choose. Light foot traffic after 24 hours; furniture can return after 72 hours.",
+ "We remove all plastic, debris and leftover materials, vacuum the work area including window sills and flat surfaces, and wipe everything down. Then we walk through the finished floor with you, answer your questions and leave care instructions so the finish lasts."
+];
+const INTRO = "This plan explains what will happen in your home and in what order. It assumes the floors under the carpet only need standard preparation; if we find anything different once the old flooring is removed, we will talk with you before doing any extra work.";
+const chunkProcess = (steps, intro) => {
+  const lines = (s, w) => Math.ceil(String(s || '').length / w);
+  const pages = []; let start = 0, used = 64 + (intro ? lines(intro, 100) * 21 + 10 : 0);
+  steps.forEach((p, i) => {
+    const h = 22 + (String(p.text || '').trim() ? 20 : 0) + lines(p.detail, 98) * 20;
+    if (used + h > 800 && i > start) { pages.push({ start, end: i }); start = i; used = 0; }
+    used += h;
+  });
+  pages.push({ start, end: steps.length });
+  return pages;
+};
+const EXTRAS = [['Debris disposal', 50], ['Carpet removal', 150], ['Cabinet protection', 40]];
+const doc = (rows, inv, num, extras = []) => {
+  const work = rows.reduce((a, r) => a + r.v, 0);
+  const ex = extras.reduce((a, x) => a + x[1], 0);
+  const total = work + ex;
+  const dep = Math.round(work * 30 + 1e-7) / 100;
   return {
-    title: inv ? 'INVOICE' : 'WORK ESTIMATE', number: (inv ? 'INV-' : 'EST-') + num, ref: inv ? 'EST-' + num : '', date: '10-05-2026', client,
+    title: inv ? 'INVOICE' : 'WORK ESTIMATE', number: (inv ? 'INV-' : 'EST-') + num, ref: inv ? 'EST-' + num : '', date: '10/05/2026', client,
     desc: 'Demolition of existing flooring area, removal of existing carpet, installation of new hardwood floors and refinishing.',
-    rows, total: money(total), hasDeposit: true,
+    rows, simple: inv, showProcess: !inv, process: PROCESS.map((text, i) => ({ text, detail: DETAILS[i] })), processIntro: INTRO,
+    extras: extras.map(([desc, v]) => ({ desc, amount: money(v) })), workTotal: money(work), extrasTotal: money(ex),
+    total: money(total), hasDeposit: true,
     depLabel: inv ? 'Deposit received (30%)' : 'Deposit required (30%)', dep: (inv ? '−' : '') + money(dep),
     balLabel: inv ? 'Balance due' : 'Balance due upon completion', balance: money(total - dep),
-    terms: inv ? 'Payment is due upon receipt. Thank you for your business.'
+    terms: inv ? 'Payment is due upon receipt of this invoice. Please make checks payable to Sosa\'s Constructions and reference the invoice number. We appreciate the opportunity to work in your home.'
       : 'This is an estimate, not a quote or contract. It covers the work described above based on the information provided and may be modified due to additional information or unforeseen conditions.',
   };
 };
 const EST = doc(BASE, false, '20261005-01');
-const INV = doc(BASE, true, '20261005-01');
-const LONGDOC = { ...doc(LONG, false, '20261005-02'), desc: 'Whole-house flooring: demolition of existing flooring, subfloor repair, installation of new hardwood floors on first floor and closets, staircase refinishing, trim and final finish.' };
+const INV = doc(BASE, true, '20261005-01', EXTRAS);
+const LONGDOC = { ...doc(LONG, false, '20261005-02'), showProcess: false, desc: 'Whole-house flooring: demolition of existing flooring, subfloor repair, installation of new hardwood floors on first floor and closets, staircase refinishing, trim and final finish.' };
 class Component extends DCLogic {
   renderVals() {
-    return { est: EST, inv: INV, long: LONGDOC, longP1: LONG.slice(0, 11), longP2: LONG.slice(11) };
+    const pp = chunkProcess(EST.process, INTRO);
+    return { balanceStyle: this.props.balanceStyle ?? 'solid', estProcPages: pp.map((p, i) => ({ ...p, pageNo: i + 2, label: 'A' + (i + 2) })), estPageCount: pp.length + 1, est: EST, inv: INV, long: LONGDOC, longP1: LONG.slice(0, 11), longP2: LONG.slice(11) };
   }
 }
 </script>

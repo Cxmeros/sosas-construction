@@ -9,89 +9,174 @@
 <x-dc>
 <helmet>
 <link rel="stylesheet" href="_ds/industry-f1167009-4538-4574-a0f0-5283778e251b/styles.css">
+<script src="./image-slot.js"></script>
 </helmet>
-<div style="width:816px;height:1056px;background:#FFFFFF;color:#1F1712;font-family:Barlow, system-ui, sans-serif;padding:48px 56px 0;box-sizing:border-box;position:relative;display:flex;flex-direction:column;gap:22px;font-size:13.5px;line-height:1.4;overflow:hidden">
+<div style="width:816px;height:1056px;background:#FFFFFF;color:#1F1712;font-family:Barlow, system-ui, sans-serif;padding:44px 56px 0;box-sizing:border-box;position:relative;display:flex;flex-direction:column;gap:{{ rootGap }};font-size:13.5px;line-height:1.4;overflow:hidden">
 
   <sc-if value="{{ isFull }}" hint-placeholder-val="{{ true }}">
-    <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:24px;padding-bottom:14px;border-bottom:3px solid #E06A1F">
-      <img src="assets/logo.png" alt="Sosa's Constructions" style="height:92px;display:block">
-      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
-        <div style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:44px;line-height:.95;color:#B5470F;letter-spacing:.02em">{{ d.title }}</div>
-        <div style="display:grid;grid-template-columns:auto auto;gap:2px 14px;font-size:13px;text-align:right">
-          <span style="font-weight:700;letter-spacing:.06em;color:#5C4A3D">NO.</span><span style="font-weight:600;font-variant-numeric:tabular-nums">{{ d.number }}</span>
-          <span style="font-weight:700;letter-spacing:.06em;color:#5C4A3D">DATE</span><span style="font-weight:600;font-variant-numeric:tabular-nums">{{ d.date }}</span>
-          <sc-if value="{{ hasRef }}" hint-placeholder-val="{{ false }}"><span style="font-weight:700;letter-spacing:.06em;color:#5C4A3D">ESTIMATE REF.</span><span style="font-weight:600;font-variant-numeric:tabular-nums">{{ d.ref }}</span></sc-if>
+    <sc-if value="{{ isStrip }}" hint-placeholder-val="{{ false }}">
+      <div style="margin:-44px -56px 0;height:22px;position:relative;-webkit-print-color-adjust:exact;print-color-adjust:exact"><image-slot id="wood-photo" shape="rect" src="assets/wood-oak.png" placeholder="Foto de madera"></image-slot></div>
+    </sc-if>
+    <sc-if value="{{ isPlain }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:24px;padding-bottom:14px;border-bottom:3px solid #9E1F1F">
+        <div style="display:flex;align-items:flex-end;gap:16px"><img src="assets/logo-ai-red.jpg" alt="Sosa's Hardwood Floors" style="height:104px;display:block"><div style="display:flex;flex-direction:column;gap:1px;font-size:12.5px;line-height:1.35;padding-bottom:2px"><strong style="font-family:'Barlow Condensed', sans-serif;font-size:19px;font-weight:700;color:#1F1712;line-height:1.1">Danilo &amp; Carlos Sosa</strong><span style="color:#5C4A3D">Sosa's Constructions</span><span style="color:#5C4A3D">29 E Providence Rd, Lansdowne, PA 19050</span><span style="font-variant-numeric:tabular-nums;color:#1F1712">435-512-4801 · 208-600-7776</span></div></div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+          <div style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:44px;line-height:.95;color:#7F1A1A;letter-spacing:.02em">{{ d.title }}</div>
+          <div style="display:grid;grid-template-columns:auto auto;gap:2px 14px;font-size:13px;text-align:right">
+            <span style="font-weight:700;letter-spacing:.06em;color:#5C4A3D">NO.</span><span style="font-weight:600;font-variant-numeric:tabular-nums">{{ d.number }}</span>
+            <span style="font-weight:700;letter-spacing:.06em;color:#5C4A3D">DATE</span><span style="font-weight:600;font-variant-numeric:tabular-nums">{{ d.date }}</span>
+            <sc-if value="{{ hasRef }}" hint-placeholder-val="{{ false }}"><span style="font-weight:700;letter-spacing:.06em;color:#5C4A3D">ESTIMATE REF.</span><span style="font-weight:600;font-variant-numeric:tabular-nums">{{ d.ref }}</span></sc-if>
+          </div>
         </div>
       </div>
+    </sc-if>
+    <sc-if value="{{ isBand }}" hint-placeholder-val="{{ false }}">
+      <div style="margin:-44px -56px 0;padding:22px 56px 18px;position:relative;display:flex;justify-content:space-between;align-items:flex-end;gap:24px;border-bottom:3px solid #9E1F1F;background:#2A1A10;-webkit-print-color-adjust:exact;print-color-adjust:exact">
+        <div style="position:absolute;inset:0"><image-slot id="wood-photo" shape="rect" src="assets/wood-oak.png" placeholder="Foto de un piso terminado por ellos"></image-slot></div>
+        <div style="position:absolute;inset:0;background:rgba(31,23,18,.68);pointer-events:none"></div>
+        <div style="position:relative;pointer-events:none;display:flex;align-items:flex-end;gap:16px"><img src="assets/logo-ai-red.jpg" alt="Sosa's Hardwood Floors" style="height:104px;display:block"><div style="display:flex;flex-direction:column;gap:1px;font-size:12.5px;line-height:1.35;padding-bottom:2px"><strong style="font-family:'Barlow Condensed', sans-serif;font-size:19px;font-weight:700;color:#FFFFFF;line-height:1.1">Danilo &amp; Carlos Sosa</strong><span style="color:#E8C58F">Sosa's Constructions</span><span style="color:#E8C58F">29 E Providence Rd, Lansdowne, PA 19050</span><span style="font-variant-numeric:tabular-nums;color:#FFFFFF">435-512-4801 · 208-600-7776</span></div></div>
+        <div style="position:relative;pointer-events:none;display:flex;flex-direction:column;align-items:flex-end;gap:8px;color:#FFFFFF">
+          <div style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:44px;line-height:.95;color:#FFFFFF;letter-spacing:.02em">{{ d.title }}</div>
+          <div style="display:grid;grid-template-columns:auto auto;gap:2px 14px;font-size:13px;text-align:right">
+            <span style="font-weight:700;letter-spacing:.06em;color:#E8C58F">NO.</span><span style="font-weight:600;font-variant-numeric:tabular-nums">{{ d.number }}</span>
+            <span style="font-weight:700;letter-spacing:.06em;color:#E8C58F">DATE</span><span style="font-weight:600;font-variant-numeric:tabular-nums">{{ d.date }}</span>
+            <sc-if value="{{ hasRef }}" hint-placeholder-val="{{ false }}"><span style="font-weight:700;letter-spacing:.06em;color:#E8C58F">ESTIMATE REF.</span><span style="font-weight:600;font-variant-numeric:tabular-nums">{{ d.ref }}</span></sc-if>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+    <sc-if value="{{ isWood }}" hint-placeholder-val="{{ false }}">
+      <div style="margin:-44px -56px 0;padding:24px 56px 16px;display:flex;justify-content:space-between;align-items:flex-end;gap:24px;border-bottom:3px solid #9E1F1F;background-color:#F1E3CF;background-image:repeating-linear-gradient(178.5deg, rgba(107,66,38,.07) 0 1px, transparent 1px 6px), repeating-linear-gradient(181deg, rgba(107,66,38,.06) 0 2px, transparent 2px 17px), repeating-linear-gradient(179deg, rgba(255,255,255,.35) 0 3px, transparent 3px 29px), linear-gradient(90deg, rgba(217,168,102,.2), rgba(255,255,255,0) 45%, rgba(217,168,102,.16))">
+        <div style="display:flex;align-items:flex-end;gap:16px"><img src="assets/logo-ai-red.jpg" alt="Sosa's Hardwood Floors" style="height:104px;display:block"><div style="display:flex;flex-direction:column;gap:1px;font-size:12.5px;line-height:1.35;padding-bottom:2px"><strong style="font-family:'Barlow Condensed', sans-serif;font-size:19px;font-weight:700;color:#1F1712;line-height:1.1">Danilo &amp; Carlos Sosa</strong><span style="color:#3A2416">Sosa's Constructions</span><span style="color:#3A2416">29 E Providence Rd, Lansdowne, PA 19050</span><span style="font-variant-numeric:tabular-nums;color:#1F1712">435-512-4801 · 208-600-7776</span></div></div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+          <div style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:44px;line-height:.95;color:#7F1A1A;letter-spacing:.02em">{{ d.title }}</div>
+          <div style="display:grid;grid-template-columns:auto auto;gap:2px 14px;font-size:13px;text-align:right">
+            <span style="font-weight:700;letter-spacing:.06em;color:#3A2416">NO.</span><span style="font-weight:600;font-variant-numeric:tabular-nums">{{ d.number }}</span>
+            <span style="font-weight:700;letter-spacing:.06em;color:#3A2416">DATE</span><span style="font-weight:600;font-variant-numeric:tabular-nums">{{ d.date }}</span>
+            <sc-if value="{{ hasRef }}" hint-placeholder-val="{{ false }}"><span style="font-weight:700;letter-spacing:.06em;color:#3A2416">ESTIMATE REF.</span><span style="font-weight:600;font-variant-numeric:tabular-nums">{{ d.ref }}</span></sc-if>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <div style="display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:2px 24px;padding:10px 14px;border:1.5px solid #1F1712">
+      <span style="grid-column:1 / -1;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:17px;letter-spacing:.08em;color:#7F1A1A;padding-bottom:2px">CUSTOMER INFORMATION</span>
+      <strong style="font-size:15px">{{ d.client.name }}</strong><span style="font-variant-numeric:tabular-nums">{{ d.client.phone }}</span>
+      <span>{{ d.client.address }}</span><span>{{ d.client.email }}</span>
     </div>
 
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
-      <div style="display:flex;flex-direction:column;gap:6px;padding:12px 14px;border:1px solid #CDBBA7">
-        <span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:14px;letter-spacing:.1em;color:#B5470F">FROM</span>
-        <strong style="font-size:15px">Danilo Sosa · Sosa's Constructions</strong>
-        <span>29 E Providence Rd<br>Lansdowne, PA 19050</span>
-        <span style="font-variant-numeric:tabular-nums">435-512-4801 · 208-600-7776</span>
-      </div>
-      <div class="blueprint" style="display:flex;flex-direction:column;gap:6px;padding:12px 14px;border:1.5px solid #1F1712"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
-        <span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:14px;letter-spacing:.1em;color:#B5470F">CUSTOMER INFORMATION</span>
-        <strong style="font-size:15px">{{ d.client.name }}</strong>
-        <span>{{ d.client.address }}</span>
-        <span style="font-variant-numeric:tabular-nums">{{ d.client.phone }} · {{ d.client.email }}</span>
-      </div>
-    </div>
-
-    <div style="display:flex;flex-direction:column;gap:6px">
-      <span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:14px;letter-spacing:.1em;color:#B5470F;border-bottom:1px solid #CDBBA7;padding-bottom:4px">JOB DESCRIPTION</span>
+    <div style="display:flex;flex-direction:column;gap:5px">
+      <span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:17px;letter-spacing:.08em;color:#7F1A1A;border-bottom:1px solid #CDBBA7;padding-bottom:4px">JOB DESCRIPTION</span>
       <p style="margin:0;font-size:14px;text-wrap:pretty">{{ d.desc }}</p>
+      <sc-if value="{{ showProcessNote }}" hint-placeholder-val="{{ false }}"><p style="margin:0;font-size:13.5px;color:#5C4A3D">Step-by-step work process on page {{ processPage }}.</p></sc-if>
     </div>
   </sc-if>
 
   <sc-if value="{{ isCompact }}" hint-placeholder-val="{{ false }}">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:10px;border-bottom:3px solid #E06A1F">
-      <img src="assets/logo.png" alt="Sosa's Constructions" style="height:48px;display:block">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:10px;border-bottom:3px solid #9E1F1F">
+      <img src="assets/logo-ai-red.jpg" alt="Sosa's Hardwood Floors" style="height:56px;display:block">
       <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
-        <span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:24px;line-height:1;color:#B5470F;letter-spacing:.02em">{{ d.title }} <span style="color:#5C4A3D;font-weight:600">(continued)</span></span>
+        <span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:24px;line-height:1;color:#7F1A1A;letter-spacing:.02em">{{ d.title }} <span style="color:#5C4A3D;font-weight:600">{{ compactTag }}</span></span>
         <span style="font-size:13px;font-weight:600;font-variant-numeric:tabular-nums">No. {{ d.number }} · {{ d.date }} · {{ d.client.name }}</span>
       </div>
     </div>
   </sc-if>
 
+  <sc-if value="{{ showTable }}" hint-placeholder-val="{{ true }}">
   <div style="display:flex;flex-direction:column">
-    <span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:14px;letter-spacing:.1em;color:#B5470F;padding-bottom:6px">SERVICES AND MATERIALS</span>
-    <div style="display:grid;grid-template-columns:minmax(0,1fr) 64px 76px 88px 104px;border-top:2px solid #1F1712;border-bottom:1px solid #1F1712;font-weight:700;font-size:11.5px;letter-spacing:.08em;color:#1F1712">
-      <span style="padding:7px 8px 7px 0">DESCRIPTION</span><span style="padding:7px 6px;text-align:right">QTY</span><span style="padding:7px 6px">UNIT</span><span style="padding:7px 6px;text-align:right">UNIT PRICE</span><span style="padding:7px 0 7px 6px;text-align:right">AMOUNT</span>
-    </div>
-    <sc-for list="{{ rows }}" as="r" hint-placeholder-count="4">
-      <div style="display:grid;grid-template-columns:minmax(0,1fr) 64px 76px 88px 104px;border-bottom:1px solid #D8CBBB;font-variant-numeric:tabular-nums;align-items:baseline">
-        <span style="padding:7px 8px 7px 0;display:flex;flex-direction:column"><span style="font-weight:500">{{ r.desc }}</span><sc-if value="{{ r.hasNote }}" hint-placeholder-val="{{ false }}"><span style="font-size:12.5px;color:#5C4A3D">{{ r.note }}</span></sc-if></span>
-        <span style="padding:7px 6px;text-align:right">{{ r.qty }}</span><span style="padding:7px 6px">{{ r.unit }}</span><span style="padding:7px 6px;text-align:right">{{ r.price }}</span><span style="padding:7px 0 7px 6px;text-align:right;font-weight:600">{{ r.amount }}</span>
+    <span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:17px;letter-spacing:.08em;color:#7F1A1A;padding-bottom:6px">SERVICES AND MATERIALS</span>
+    <sc-if value="{{ detailed }}" hint-placeholder-val="{{ true }}">
+      <div style="display:grid;grid-template-columns:minmax(0,1fr) 64px 76px 88px 104px;border-top:2px solid #1F1712;border-bottom:1px solid #1F1712;font-weight:700;font-size:11.5px;letter-spacing:.08em">
+        <span style="padding:7px 8px 7px 0">DESCRIPTION</span><span style="padding:7px 6px;text-align:right">QTY</span><span style="padding:7px 6px">UNIT</span><span style="padding:7px 6px;text-align:right">UNIT PRICE</span><span style="padding:7px 0 7px 6px;text-align:right">AMOUNT</span>
       </div>
-    </sc-for>
+      <sc-for list="{{ rows }}" as="r" hint-placeholder-count="4">
+        <div style="display:grid;grid-template-columns:minmax(0,1fr) 64px 76px 88px 104px;border-bottom:1px solid #D8CBBB;font-variant-numeric:tabular-nums;align-items:baseline">
+          <span style="padding:7px 8px 7px 0;display:flex;flex-direction:column"><span style="font-weight:500">{{ r.desc }}</span><sc-if value="{{ r.hasNote }}" hint-placeholder-val="{{ false }}"><span style="font-size:12.5px;color:#5C4A3D">{{ r.note }}</span></sc-if></span>
+          <span style="padding:7px 6px;text-align:right">{{ r.qty }}</span><span style="padding:7px 6px">{{ r.unit }}</span><span style="padding:7px 6px;text-align:right">{{ r.price }}</span><span style="padding:7px 0 7px 6px;text-align:right;font-weight:600">{{ r.amount }}</span>
+        </div>
+      </sc-for>
+    </sc-if>
+    <sc-if value="{{ simple }}" hint-placeholder-val="{{ false }}">
+      <div style="display:grid;grid-template-columns:minmax(0,1fr) 120px;border-top:2px solid #1F1712;border-bottom:1px solid #1F1712;font-weight:700;font-size:11.5px;letter-spacing:.08em">
+        <span style="padding:7px 8px 7px 0">DESCRIPTION</span><span style="padding:7px 0;text-align:right">AMOUNT</span>
+      </div>
+      <sc-for list="{{ rows }}" as="r" hint-placeholder-count="4">
+        <div style="display:grid;grid-template-columns:minmax(0,1fr) 120px;border-bottom:1px solid #D8CBBB;font-variant-numeric:tabular-nums;align-items:baseline">
+          <span style="padding:8px 8px 8px 0;display:flex;flex-direction:column"><span style="font-weight:500">{{ r.desc }}</span><sc-if value="{{ r.hasNote }}" hint-placeholder-val="{{ false }}"><span style="font-size:12.5px;color:#5C4A3D">{{ r.note }}</span></sc-if></span>
+          <span style="padding:8px 0;text-align:right;font-weight:600">{{ r.amount }}</span>
+        </div>
+      </sc-for>
+    </sc-if>
     <sc-if value="{{ isFirst }}" hint-placeholder-val="{{ false }}">
       <div style="display:flex;justify-content:space-between;padding-top:8px;font-size:12.5px;color:#5C4A3D;font-variant-numeric:tabular-nums"><span>Subtotal this page: <strong style="color:#1F1712">{{ pageSubtotal }}</strong></span><strong style="color:#1F1712">Continued on page {{ nextPage }} →</strong></div>
     </sc-if>
   </div>
 
+  </sc-if>
+
+  <sc-if value="{{ showExtras }}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex;flex-direction:column;border:1px dashed #7A6656;padding:6px 14px 2px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;padding-bottom:4px">
+        <span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:17px;letter-spacing:.08em;color:#7F1A1A">ADDITIONAL CHARGES</span>
+        <span style="font-size:12px;color:#5C4A3D">Not included in the original estimate</span>
+      </div>
+      <sc-for list="{{ d.extras }}" as="x" hint-placeholder-count="3">
+        <div style="display:grid;grid-template-columns:minmax(0,1fr) 120px;border-top:1px solid #D8CBBB;font-variant-numeric:tabular-nums">
+          <span style="padding:4px 8px 4px 0;font-weight:500">{{ x.desc }}</span><span style="padding:4px 0;text-align:right;font-weight:600">{{ x.amount }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </sc-if>
+
   <sc-if value="{{ showTotals }}" hint-placeholder-val="{{ true }}">
-    <div class="blueprint" style="align-self:flex-end;width:340px;display:flex;flex-direction:column;border:1.5px solid #1F1712;font-variant-numeric:tabular-nums"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
-      <div style="display:flex;justify-content:space-between;padding:9px 14px;font-size:15px;font-weight:700"><span>Total</span><span>{{ d.total }}</span></div>
-      <sc-if value="{{ d.hasDeposit }}" hint-placeholder-val="{{ true }}">
-        <div style="display:flex;justify-content:space-between;padding:9px 14px;border-top:1px solid #CDBBA7;font-size:14px"><span>{{ d.depLabel }}</span><span style="font-weight:600">{{ d.dep }}</span></div>
+    <div style="align-self:flex-end;width:380px;display:flex;flex-direction:column;border:1.5px solid #1F1712;font-variant-numeric:tabular-nums">
+      <sc-if value="{{ showExtras }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;justify-content:space-between;padding:4px 14px;font-size:13.5px"><span>Work</span><span>{{ d.workTotal }}</span></div>
+        <div style="display:flex;justify-content:space-between;padding:4px 14px;font-size:13.5px;border-top:1px solid #CDBBA7"><span>Additional charges</span><span>{{ d.extrasTotal }}</span></div>
       </sc-if>
-      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:11px 14px;border-top:2px solid #1F1712;background:#FCEBDF"><span style="font-weight:700;font-size:14px">{{ d.balLabel }}</span><span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:26px;line-height:1">{{ d.balance }}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:7px 14px;font-size:15px;font-weight:700;border-top:{{ totalRule }}"><span>Total</span><span>{{ d.total }}</span></div>
+      <sc-if value="{{ d.hasDeposit }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;justify-content:space-between;padding:7px 14px;border-top:1px solid #CDBBA7;font-size:14px"><span>{{ d.depLabel }}</span><span style="font-weight:600">{{ d.dep }}</span></div>
+      </sc-if>
+      <sc-if value="{{ balTint }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:11px 14px;border-top:2px solid #1F1712;background:#F6E4E1"><span style="font-weight:700;font-size:14px">{{ d.balLabel }}</span><span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:26px;line-height:1">{{ d.balance }}</span></div>
+      </sc-if>
+      <sc-if value="{{ balSolid }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:10px 14px;margin:0 -1.5px -1.5px;background:#7F1A1A;color:#FFFFFF;-webkit-print-color-adjust:exact;print-color-adjust:exact"><span style="font-weight:700;font-size:14px;letter-spacing:.02em">{{ d.balLabel }}</span><span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:28px;line-height:1">{{ d.balance }}</span></div>
+      </sc-if>
     </div>
     <div style="display:flex;flex-direction:column;gap:6px">
-      <span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:14px;letter-spacing:.1em;color:#B5470F;border-bottom:1px solid #CDBBA7;padding-bottom:4px">TERMS AND CONDITIONS</span>
+      <span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:17px;letter-spacing:.08em;color:#7F1A1A;border-bottom:1px solid #CDBBA7;padding-bottom:4px">TERMS AND CONDITIONS</span>
       <p style="margin:0;font-size:12.5px;color:#3A2416;text-wrap:pretty">{{ d.terms }}</p>
     </div>
   </sc-if>
 
-  <div style="position:absolute;left:56px;right:56px;bottom:30px;display:flex;justify-content:space-between;gap:16px;font-size:11.5px;color:#5C4A3D;border-top:1px solid #CDBBA7;padding-top:8px;font-variant-numeric:tabular-nums">
-    <span>Sosa's Constructions · Hardwood floors · Lansdowne, PA</span><span>{{ d.number }}</span><strong style="color:#1F1712">Page {{ pageNo }} of {{ pageCount }}</strong>
+  <sc-if value="{{ isProcess }}" hint-placeholder-val="{{ false }}">
+    <sc-if value="{{ processFirst }}" hint-placeholder-val="{{ true }}">
+    <div style="display:flex;flex-direction:column;gap:6px;padding-top:4px">
+      <span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:30px;line-height:1;color:#7F1A1A;letter-spacing:.02em">WORK PROCESS</span>
+      <sc-if value="{{ hasIntro }}" hint-placeholder-val="{{ true }}"><p style="margin:0;font-size:14px;line-height:1.5;color:#1F1712;text-wrap:pretty;max-width:640px">{{ d.processIntro }}</p></sc-if>
+    </div>
+    </sc-if>
+    <div style="display:flex;flex-direction:column;border-top:2px solid #1F1712">
+      <sc-for list="{{ processSteps }}" as="p" hint-placeholder-count="5">
+        <div style="display:grid;grid-template-columns:44px minmax(0,1fr);gap:0 12px;padding:10px 0;border-bottom:1px solid #D8CBBB;break-inside:avoid">
+          <span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:28px;line-height:1;color:#7F1A1A;font-variant-numeric:tabular-nums">{{ p.nn }}</span>
+          <div style="display:flex;flex-direction:column;gap:3px">
+            <sc-if value="{{ p.hasTitle }}" hint-placeholder-val="{{ true }}"><strong style="font-size:15px;line-height:1.25">{{ p.text }}</strong></sc-if>
+            <sc-if value="{{ p.hasDetail }}" hint-placeholder-val="{{ true }}"><p style="margin:0;font-size:13.5px;line-height:1.5;color:#3A2416;text-wrap:pretty;max-width:640px">{{ p.detail }}</p></sc-if>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </sc-if>
+
+  <div style="position:absolute;left:56px;right:56px;bottom:28px;display:flex;justify-content:space-between;gap:16px;font-size:11.5px;color:#5C4A3D;border-top:1px solid #CDBBA7;padding-top:8px;font-variant-numeric:tabular-nums">
+    <span>Sosa's Constructions · 435-512-4801 · 208-600-7776</span><span>{{ d.number }}</span><strong style="color:#1F1712">Page {{ pageNo }} of {{ pageCount }}</strong>
   </div>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:816,&quot;height&quot;:1056},&quot;doc&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;object&quot;},&quot;rows&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;array&quot;},&quot;part&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;single&quot;,&quot;first&quot;,&quot;last&quot;],&quot;default&quot;:&quot;single&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;pageNo&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:1,&quot;tsType&quot;:&quot;number&quot;},&quot;pageCount&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:1,&quot;tsType&quot;:&quot;number&quot;}}">
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:816,&quot;height&quot;:1056},&quot;doc&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;object&quot;},&quot;rows&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;array&quot;},&quot;part&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;single&quot;,&quot;first&quot;,&quot;last&quot;,&quot;process&quot;],&quot;default&quot;:&quot;single&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;pageNo&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:1,&quot;tsType&quot;:&quot;number&quot;},&quot;pageCount&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:1,&quot;tsType&quot;:&quot;number&quot;},&quot;balanceStyle&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;solid&quot;,&quot;tint&quot;],&quot;default&quot;:&quot;solid&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;header&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;plain&quot;,&quot;strip&quot;,&quot;band&quot;,&quot;wood&quot;],&quot;default&quot;:&quot;plain&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
 class Component extends DCLogic {
   renderVals() {
     const d = this.props.doc || { client: {} };
@@ -103,9 +188,21 @@ class Component extends DCLogic {
     });
     const sub = src.reduce((a, r) => a + (parseFloat(String(r.amount).replace(/[$,]/g, '')) || 0), 0);
     const pageNo = this.props.pageNo || 1;
+    const isProcess = part === 'process';
+    const showTotals = part !== 'first' && !isProcess;
+    const showExtras = showTotals && !!(d.extras && d.extras.length);
+    const process = (d.process || []).map(p => typeof p === 'string' ? { text: p, detail: '' } : p).filter(p => String(p.text || '').trim() || String(p.detail || '').trim()).map((p, i) => ({ n: i + 1, nn: String(i + 1).padStart(2, '0'), text: p.text, detail: p.detail || '', hasTitle: !!String(p.text || '').trim(), hasDetail: !!String(p.detail || '').trim() }));
+    const pStart = this.props.processStart || 0;
+    const pEnd = this.props.processEnd ?? process.length;
+    const hdr = this.props.header || d.header || 'plain';
+    const wood = hdr === 'wood';
     return {
-      d, rows, hasRef: !!d.ref,
-      isFull: part !== 'last', isCompact: part === 'last', showTotals: part !== 'first', isFirst: part === 'first',
+      d, rows, hasRef: !!d.ref, detailed: !d.simple, simple: !!d.simple,
+      isPlain: hdr === 'plain' || hdr === 'strip', isStrip: hdr === 'strip', isBand: hdr === 'band', isWood: wood,
+      isFull: part !== 'last' && !isProcess, isCompact: part === 'last' || isProcess, rootGap: showExtras ? '8px' : '14px', balTint: (this.props.balanceStyle || 'solid') === 'tint', balSolid: (this.props.balanceStyle || 'solid') !== 'tint', isProcess, showTable: !isProcess, processSteps: process.slice(pStart, pEnd), processFirst: pStart === 0, hasIntro: !!String(d.processIntro || '').trim(), compactTag: isProcess ? '· Work process' : '(continued)',
+      showProcessNote: showTotals && !!d.showProcess && process.length > 0, processCount: process.length, processPage: this.props.processPage || (this.props.pageCount || 1), showTotals, isFirst: part === 'first',
+      showExtras, totalRule: showExtras ? '2px solid #1F1712' : '0',
+      process,
       pageNo, pageCount: this.props.pageCount || 1, nextPage: pageNo + 1,
       pageSubtotal: '$' + sub.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
     };

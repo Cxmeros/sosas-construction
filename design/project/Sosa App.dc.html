@@ -12,22 +12,22 @@
 <link rel="stylesheet" href="_ds/industry-f1167009-4538-4574-a0f0-5283778e251b/styles.css">
 <style>
 body{margin:0;background:#E4DACD;color:#1F1712;font-family:Barlow, system-ui, sans-serif;-webkit-font-smoothing:antialiased}
-a{color:#B5470F}a:hover{color:#8F3709}
+a{color:#7F1A1A}a:hover{color:#5C1212}
 button,input,select,textarea{font-family:inherit}
-:focus-visible{outline:3px solid #B5470F;outline-offset:2px}
+:focus-visible{outline:3px solid #7F1A1A;outline-offset:2px}
 input::placeholder,textarea::placeholder{color:#8A7868}
 </style>
 </helmet>
 <div style="padding:56px;display:flex;flex-direction:column;gap:72px;min-width:1400px">
 
-<header style="display:flex;align-items:flex-end;justify-content:space-between;gap:32px;border-bottom:3px solid #E06A1F;padding-bottom:20px">
+<header style="display:flex;align-items:flex-end;justify-content:space-between;gap:32px;border-bottom:3px solid #9E1F1F;padding-bottom:20px">
   <div style="display:flex;flex-direction:column;gap:6px">
-    <div style="font-size:15px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#B5470F">Sosa's Constructions · PWA</div>
+    <div style="font-size:15px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#7F1A1A">Sosa's Constructions · PWA</div>
     <h1 style="margin:0;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:56px;line-height:1;color:#2A1A10">Estimates e Invoices</h1>
-    <p style="margin:0;font-size:17px;color:#5C4A3D;max-width:720px">Celular 375 px y escritorio 1280 px. El teléfono 1a y el escritorio 5a son interactivos y comparten datos: edita partidas, cambia el anticipo o toca “Ver PDF”.</p>
+    <p style="margin:0;font-size:17px;color:#5C4A3D;max-width:720px">Celular 375 px y escritorio 1280 px. El teléfono 1a y el escritorio 5a son interactivos y comparten datos: edita trabajos, cambia el anticipo o toca “Ver PDF”.</p>
   </div>
   <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;max-width:520px">
-    <a href="#s1" style="font-weight:600">1 Formulario</a><span>·</span><a href="#2a" style="font-weight:600">2 Partidas</a><span>·</span><a href="#3a" style="font-weight:600">3 Anticipo</a><span>·</span><a href="#4a" style="font-weight:600">4 Vista previa</a><span>·</span><a href="#s5" style="font-weight:600">5 Escritorio</a><span>·</span><a href="#s6" style="font-weight:600">6 Estados</a><span>·</span><a href="#s7" style="font-weight:600">7 Tokens</a>
+    <a href="#s1" style="font-weight:600">1 Formulario</a><span>·</span><a href="#1b" style="font-weight:600">Pasos</a><span>·</span><a href="#1c" style="font-weight:600">Cargos extra</a><span>·</span><a href="#2a" style="font-weight:600">2 Trabajos</a><span>·</span><a href="#3a" style="font-weight:600">3 Anticipo</a><span>·</span><a href="#4a" style="font-weight:600">4 Vista previa</a><span>·</span><a href="#s5" style="font-weight:600">5 Escritorio</a><span>·</span><a href="#s6" style="font-weight:600">6 Estados</a><span>·</span><a href="#s7" style="font-weight:600">7 Tokens</a>
   </div>
 </header>
 
@@ -41,20 +41,28 @@ input::placeholder,textarea::placeholder{color:#8A7868}
     <div style="display:flex;gap:8px;align-items:center"><span style="background:#2A1A10;color:#FFFFFF;font-weight:700;font-size:14px;padding:4px 8px">1a</span><span style="font-weight:600;font-size:15px">Formulario · interactivo</span></div>
     <div style="width:375px;height:812px;background:#F6F1EA;border:1px solid #1F1712;box-shadow:0 12px 32px rgba(31,23,18,.22);display:flex;flex-direction:column;overflow:hidden;position:relative">
       <sc-if value="{{ isForm }}" hint-placeholder-val="{{ true }}">
-        <div style="height:64px;flex:none;background:#FFFFFF;border-bottom:1px solid #D8CBBB;display:flex;align-items:center;justify-content:space-between;padding:0 12px 0 16px">
-          <img src="assets/logo.png" alt="Sosa's Constructions" style="height:40px;display:block">
-          <div style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:#2F6B3A"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>Borrador guardado</div>
+        <div style="height:64px;flex:none;background:#FFFFFF;border-bottom:1px solid #D8CBBB;display:flex;align-items:center;gap:10px;padding:0 4px 0 12px">
+          <img src="assets/logo-ai-red.jpg" alt="Sosa's Hardwood Floors" style="height:50px;display:block;flex:none">
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;padding-left:10px;border-left:1px solid #D8CBBB"><span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:17px;line-height:1.1;text-transform:uppercase;color:#2A1A10;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ docLabel }} <span style="color:#5C4A3D;font-weight:600">{{ numberShort }}</span></span><span style="display:flex;align-items:center;gap:4px;font-size:12.5px;font-weight:600;color:#2F6B3A"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>Guardado</span></div>
+          <button aria-label="Más opciones" aria-expanded="{{ menuOpen }}" onClick="{{ toggleMenu }}" style="flex:none;width:48px;height:48px;border:0;border-radius:2px;background:transparent;color:#2A1A10;display:grid;place-items:center;cursor:pointer" style-hover="background:#F7E7CC"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg></button>
         </div>
+        <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
+          <div onClick="{{ toggleMenu }}" style="position:absolute;inset:64px 0 0 0;background:rgba(31,23,18,.25);z-index:5"></div>
+          <div role="menu" style="position:absolute;top:60px;right:8px;width:250px;z-index:6;background:#FFFFFF;border:1px solid #CDBBA7;box-shadow:0 12px 32px rgba(31,23,18,.25);display:flex;flex-direction:column;padding:4px 0">
+            <button role="menuitem" onClick="{{ menuNew }}" style="min-height:52px;padding:0 16px;border:0;background:transparent;color:#1F1712;font-size:16px;font-weight:600;text-align:left;display:flex;align-items:center;gap:10px;cursor:pointer" style-hover="background:#F7E7CC"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>Nuevo documento</button>
+            <sc-if value="{{ isEstimate }}" hint-placeholder-val="{{ true }}"><button role="menuitem" onClick="{{ menuConvert }}" style="min-height:52px;padding:0 16px;border:0;background:transparent;color:#1F1712;font-size:16px;font-weight:600;text-align:left;display:flex;align-items:center;gap:10px;cursor:pointer;color:#7F1A1A;border-top:1px solid #E4D8CA" style-hover="background:#F6E4E1"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>Convertir en Invoice</button></sc-if>
+          </div>
+        </sc-if>
         <div style="flex:1;overflow-y:auto;padding:16px 16px 24px;display:flex;flex-direction:column;gap:20px">
 
-          <div class="blueprint" style="padding:16px;display:flex;flex-direction:column;gap:14px;border-color:#CDBBA7"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
-            <h3 style="margin:0;display:flex;gap:8px;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:22px;text-transform:uppercase;letter-spacing:.02em;color:#3A2416"><span style="color:#B5470F">01</span>Documento</h3>
+          <div style="border:1px solid #CDBBA7;padding:16px;display:flex;flex-direction:column;gap:14px;border-color:#CDBBA7">
+            <h3 style="margin:0;display:flex;gap:8px;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:22px;text-transform:uppercase;letter-spacing:.02em;color:#3A2416"><span style="color:#7F1A1A">01</span>Documento</h3>
             <div role="radiogroup" aria-label="Tipo de documento" style="display:grid;grid-template-columns:1fr 1fr;border:1.5px solid #3A2416">
               <sc-for list="{{ docSeg }}" as="o" hint-placeholder-count="2">
                 <button role="radio" aria-checked="{{ o.on }}" onClick="{{ o.onClick }}" style="min-height:52px;border:0;background:{{ o.bg }};color:{{ o.fg }};font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:20px;text-transform:uppercase;letter-spacing:.04em;cursor:pointer">{{ o.label }}</button>
               </sc-for>
             </div>
-            <div style="display:grid;grid-template-columns:1fr 1.3fr;gap:12px">
+            <div style="display:grid;grid-template-columns:1fr;gap:12px">
               <label style="display:flex;flex-direction:column;gap:6px;font-size:15px;font-weight:600;color:#3A2416">Número
                 <input value="{{ numberFull }}" readOnly style="height:48px;padding:0 12px;border:1.5px solid #7A6656;border-radius:2px;background:#EFE7DC;font-size:17px;color:#1F1712;width:100%;box-sizing:border-box;font-variant-numeric:tabular-nums">
               </label>
@@ -64,8 +72,8 @@ input::placeholder,textarea::placeholder{color:#8A7868}
             </div>
           </div>
 
-          <div class="blueprint" style="padding:16px;display:flex;flex-direction:column;gap:14px;border-color:#CDBBA7"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
-            <h3 style="margin:0;display:flex;gap:8px;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:22px;text-transform:uppercase;letter-spacing:.02em;color:#3A2416"><span style="color:#B5470F">02</span>Cliente</h3>
+          <div style="border:1px solid #CDBBA7;padding:16px;display:flex;flex-direction:column;gap:14px;border-color:#CDBBA7">
+            <h3 style="margin:0;display:flex;gap:8px;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:22px;text-transform:uppercase;letter-spacing:.02em;color:#3A2416"><span style="color:#7F1A1A">02</span>Cliente</h3>
             <label style="display:flex;flex-direction:column;gap:6px;font-size:15px;font-weight:600;color:#3A2416">Nombre
               <input value="{{ client.name }}" onChange="{{ onName }}" autoComplete="name" style="height:48px;padding:0 12px;border:1.5px solid #7A6656;border-radius:2px;background:#FFFFFF;font-size:17px;color:#1F1712;width:100%;box-sizing:border-box">
             </label>
@@ -80,88 +88,143 @@ input::placeholder,textarea::placeholder{color:#8A7868}
             </label>
           </div>
 
-          <div class="blueprint" style="padding:16px;display:flex;flex-direction:column;gap:14px;border-color:#CDBBA7"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
-            <h3 style="margin:0;display:flex;gap:8px;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:22px;text-transform:uppercase;letter-spacing:.02em;color:#3A2416"><span style="color:#B5470F">03</span>Trabajo</h3>
+          <div style="border:1px solid #CDBBA7;padding:16px;display:flex;flex-direction:column;gap:14px;border-color:#CDBBA7">
+            <h3 style="margin:0;display:flex;gap:8px;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:22px;text-transform:uppercase;letter-spacing:.02em;color:#3A2416"><span style="color:#7F1A1A">03</span>Trabajo</h3>
             <label style="display:flex;flex-direction:column;gap:6px;font-size:15px;font-weight:600;color:#3A2416">Descripción del trabajo
               <textarea rows="4" value="{{ desc }}" onChange="{{ onDesc }}" style="padding:10px 12px;border:1.5px solid #7A6656;border-radius:2px;background:#FFFFFF;font-size:17px;line-height:1.4;color:#1F1712;width:100%;box-sizing:border-box;resize:vertical"></textarea>
             </label>
           </div>
 
           <div style="display:flex;flex-direction:column;gap:12px">
-            <h3 style="margin:0;display:flex;gap:8px;align-items:baseline;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:22px;text-transform:uppercase;letter-spacing:.02em;color:#3A2416"><span style="color:#B5470F">04</span>Partidas<span style="margin-left:auto;font-family:Barlow, sans-serif;font-size:15px;font-weight:600;text-transform:none;letter-spacing:0;color:#5C4A3D">{{ itemCount }}</span></h3>
-            <sc-for list="{{ items }}" as="it" hint-placeholder-count="4">
-              <div class="blueprint" style="background:#FFFFFF;border-color:#CDBBA7;display:flex;flex-direction:column"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+            <h3 style="margin:0;display:flex;gap:8px;align-items:baseline;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:22px;text-transform:uppercase;letter-spacing:.02em;color:#3A2416"><span style="color:#7F1A1A">04</span>Trabajos<span style="margin-left:auto;font-family:Barlow, sans-serif;font-size:15px;font-weight:600;text-transform:none;letter-spacing:0;color:#5C4A3D">{{ itemCount }}</span></h3>
+            <sc-for list="{{ items }}" as="it" hint-placeholder-count="3">
+              <div style="border:1px solid #CDBBA7;background:#FFFFFF;display:flex;flex-direction:column">
                 <div style="display:flex;align-items:center;gap:4px;padding:0 0 0 12px;border-bottom:1px solid #E4D8CA;background:#F6F1EA">
-                  <span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:20px;color:#B5470F;flex:1">#{{ it.n }}</span>
-                  <button aria-label="Subir" onClick="{{ it.onUp }}" disabled="{{ it.isFirst }}" style="width:48px;height:48px;border:0;background:transparent;color:#3A2416;display:grid;place-items:center;cursor:pointer"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"></path></svg></button>
-                  <button aria-label="Bajar" onClick="{{ it.onDown }}" disabled="{{ it.isLast }}" style="width:48px;height:48px;border:0;background:transparent;color:#3A2416;display:grid;place-items:center;cursor:pointer"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"></path></svg></button>
-                  <button aria-label="Eliminar partida" onClick="{{ it.onDel }}" style="width:48px;height:48px;border:0;border-left:1px solid #E4D8CA;background:transparent;color:#B3261E;display:grid;place-items:center;cursor:pointer"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg></button>
+                  <span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:20px;color:#7F1A1A;flex:1">#{{ it.n }}</span>
+                  <button aria-label="Subir" onClick="{{ it.onUp }}" disabled="{{ it.isFirst }}" style="width:48px;height:48px;border:0;background:transparent;color:#3A2416;display:grid;place-items:center;cursor:pointer" style-hover="background:#F7E7CC"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"></path></svg></button><button aria-label="Bajar" onClick="{{ it.onDown }}" disabled="{{ it.isLast }}" style="width:48px;height:48px;border:0;background:transparent;color:#3A2416;display:grid;place-items:center;cursor:pointer" style-hover="background:#F7E7CC"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"></path></svg></button>
+                  <button aria-label="Quitar" title="Quitar" onClick="{{ it.onDel }}" style="flex:none;width:48px;height:48px;border:0;border-radius:2px;background:transparent;color:#B3261E;display:grid;place-items:center;cursor:pointer" style-hover="background:#FBE9E7" style-active="background:#F3D2CD"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg></button>
                 </div>
                 <div style="padding:12px;display:flex;flex-direction:column;gap:12px">
-                  <label style="display:flex;flex-direction:column;gap:6px;font-size:15px;font-weight:600;color:#3A2416">Descripción
-                    <textarea rows="2" value="{{ it.desc }}" onChange="{{ it.onDesc }}" style="padding:10px 12px;border:1.5px solid #7A6656;border-radius:2px;background:#FFFFFF;font-size:17px;line-height:1.35;color:#1F1712;width:100%;box-sizing:border-box;resize:vertical"></textarea>
-                  </label>
-                  <label style="display:flex;flex-direction:column;gap:6px;font-size:15px;font-weight:600;color:#3A2416">Unidad
-                    <select value="{{ it.unit }}" onChange="{{ it.onUnit }}" style="height:48px;padding:0 10px;border:1.5px solid #7A6656;border-radius:2px;background:#FFFFFF;font-size:17px;color:#1F1712;width:100%;box-sizing:border-box">
+                  <label style="display:flex;flex-direction:column;gap:6px;font-size:15px;font-weight:600;color:#3A2416">Descripción<textarea rows="2" value="{{ it.desc }}" onChange="{{ it.onDesc }}" style="padding:10px 12px;border:1.5px solid #7A6656;border-radius:2px;background:#FFFFFF;font-family:Barlow, sans-serif;font-size:17px;font-weight:400;line-height:1.35;color:#1F1712;width:100%;box-sizing:border-box;resize:vertical"></textarea></label>
+                  <label style="display:flex;flex-direction:column;gap:6px;font-size:15px;font-weight:600;color:#3A2416">Unidad<select value="{{ it.unit }}" onChange="{{ it.onUnit }}" style="height:48px;padding:0 12px;border:1.5px solid #7A6656;border-radius:2px;background:#FFFFFF;font-size:17px;color:#1F1712;width:100%;box-sizing:border-box;padding:0 10px;font-weight:400">
                       <option value="sqft">sq ft</option><option value="lft">linear ft</option><option value="steps">steps</option><option value="each">each</option><option value="hours">hours</option><option value="lump">lump sum</option><option value="other">other</option>
-                    </select>
-                  </label>
+                    </select></label>
                   <sc-if value="{{ it.isOther }}" hint-placeholder-val="{{ false }}">
-                    <label style="display:flex;flex-direction:column;gap:6px;font-size:15px;font-weight:600;color:#3A2416">Escribe la unidad
-                      <input value="{{ it.other }}" onChange="{{ it.onOther }}" placeholder="ej. rooms" style="height:48px;padding:0 12px;border:1.5px solid #7A6656;border-radius:2px;background:#FFFFFF;font-size:17px;color:#1F1712;width:100%;box-sizing:border-box">
-                    </label>
+                    <label style="display:flex;flex-direction:column;gap:6px;font-size:15px;font-weight:600;color:#3A2416">Escribe la unidad<input value="{{ it.other }}" onChange="{{ it.onOther }}" placeholder="ej. rooms" style="height:48px;padding:0 12px;border:1.5px solid #7A6656;border-radius:2px;background:#FFFFFF;font-size:17px;color:#1F1712;width:100%;box-sizing:border-box;font-weight:400"></label>
                   </sc-if>
                   <sc-if value="{{ it.notLump }}" hint-placeholder-val="{{ true }}">
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-                      <label style="display:flex;flex-direction:column;gap:6px;font-size:15px;font-weight:600;color:#3A2416">Cantidad
-                        <input inputMode="decimal" value="{{ it.qty }}" onChange="{{ it.onQty }}" style="height:48px;padding:0 12px;border:1.5px solid #7A6656;border-radius:2px;background:#FFFFFF;font-size:17px;color:#1F1712;width:100%;box-sizing:border-box;text-align:right;font-variant-numeric:tabular-nums">
-                      </label>
-                      <label style="display:flex;flex-direction:column;gap:6px;font-size:15px;font-weight:600;color:#3A2416">Precio $
-                        <input inputMode="decimal" value="{{ it.price }}" onChange="{{ it.onPrice }}" style="height:48px;padding:0 12px;border:1.5px solid #7A6656;border-radius:2px;background:#FFFFFF;font-size:17px;color:#1F1712;width:100%;box-sizing:border-box;text-align:right;font-variant-numeric:tabular-nums">
-                      </label>
+                    <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px">
+                      <label style="display:flex;flex-direction:column;gap:6px;font-size:15px;font-weight:600;color:#3A2416">Cantidad<input inputMode="decimal" value="{{ it.qty }}" onChange="{{ it.onQty }}" style="height:48px;padding:0 12px;border:1.5px solid #7A6656;border-radius:2px;background:#FFFFFF;font-size:17px;color:#1F1712;width:100%;box-sizing:border-box;font-weight:400;text-align:right;font-variant-numeric:tabular-nums"></label>
+                      <label style="display:flex;flex-direction:column;gap:6px;font-size:15px;font-weight:600;color:#3A2416">Precio por {{ it.unitLabel }}<span style="display:flex;align-items:center;height:48px;border:1.5px solid #7A6656;border-radius:2px;background:#FFFFFF;box-sizing:border-box;width:100%"><span style="flex:none;font-size:17px;font-weight:600;color:#5C4A3D;padding-left:12px">$</span><input inputMode="decimal" value="{{ it.price }}" onChange="{{ it.onPrice }}" style="height:48px;padding:0 12px;border:1.5px solid #7A6656;border-radius:2px;background:#FFFFFF;font-size:17px;color:#1F1712;width:100%;box-sizing:border-box;font-weight:400;text-align:right;font-variant-numeric:tabular-nums;flex:1;min-width:0;width:0;height:100%;border:0;background:transparent;padding-left:4px"></span></label>
                     </div>
                     <div style="display:flex;justify-content:space-between;align-items:baseline;border-top:1px dashed #CDBBA7;padding-top:10px"><span style="font-size:15px;font-weight:600;color:#5C4A3D">Monto</span><span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:24px;font-variant-numeric:tabular-nums">{{ it.amountStr }}</span></div>
                   </sc-if>
                   <sc-if value="{{ it.isLump }}" hint-placeholder-val="{{ false }}">
-                    <label style="display:flex;flex-direction:column;gap:6px;font-size:15px;font-weight:600;color:#3A2416">Monto total $
-                      <input inputMode="decimal" value="{{ it.amount }}" onChange="{{ it.onAmount }}" style="height:48px;padding:0 12px;border:1.5px solid #7A6656;border-radius:2px;background:#FFFFFF;font-size:19px;font-weight:600;color:#1F1712;width:100%;box-sizing:border-box;text-align:right;font-variant-numeric:tabular-nums">
-                    </label>
+                    <label style="display:flex;flex-direction:column;gap:6px;font-size:15px;font-weight:600;color:#3A2416">Monto total<span style="display:flex;align-items:center;height:48px;border:1.5px solid #7A6656;border-radius:2px;background:#FFFFFF;box-sizing:border-box;width:100%"><span style="flex:none;font-size:17px;font-weight:600;color:#5C4A3D;padding-left:12px">$</span><input inputMode="decimal" value="{{ it.amount }}" onChange="{{ it.onAmount }}" style="height:48px;padding:0 12px;border:1.5px solid #7A6656;border-radius:2px;background:#FFFFFF;font-size:17px;color:#1F1712;width:100%;box-sizing:border-box;font-size:19px;font-weight:600;text-align:right;font-variant-numeric:tabular-nums;flex:1;min-width:0;width:0;height:100%;border:0;background:transparent;padding-left:4px"></span></label>
                   </sc-if>
                 </div>
               </div>
             </sc-for>
             <sc-if value="{{ noItems }}" hint-placeholder-val="{{ false }}">
-              <div style="border:1.5px dashed #7A6656;padding:20px 16px;text-align:center;color:#5C4A3D;font-size:16px">Aún no hay partidas.</div>
+              <div style="border:1.5px dashed #7A6656;padding:20px 16px;text-align:center;color:#5C4A3D;font-size:16px">Aún no hay trabajos.</div>
             </sc-if>
-            <button onClick="{{ addItem }}" style="min-height:52px;border:1.5px solid #3A2416;border-radius:2px;background:#FFFFFF;color:#3A2416;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:20px;text-transform:uppercase;letter-spacing:.04em;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer" style-hover="background:#F7E7CC"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>Agregar partida</button>
+            <button onClick="{{ addItem }}" style="min-height:52px;border:1.5px solid #3A2416;border-radius:2px;background:#FFFFFF;color:#3A2416;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:20px;text-transform:uppercase;letter-spacing:.04em;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer" style-hover="background:#F7E7CC"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>Agregar trabajo</button>
           </div>
 
-          <div class="blueprint" style="padding:16px;display:flex;flex-direction:column;gap:14px;border-color:#CDBBA7"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
-            <h3 style="margin:0;display:flex;gap:8px;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:22px;text-transform:uppercase;letter-spacing:.02em;color:#3A2416"><span style="color:#B5470F">05</span>{{ depTitle }}</h3>
+          <sc-if value="{{ isInvoice }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:16px;display:flex;flex-direction:column;gap:12px;border:1px solid #CDBBA7">
+            <div style="display:flex;align-items:center;gap:8px"><h3 style="margin:0;flex:1;display:flex;gap:8px;align-items:baseline;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:22px;text-transform:uppercase;letter-spacing:.02em;color:#3A2416"><span style="color:#7F1A1A">05</span>Cargos extra<sc-if value="{{ extrasOn }}" hint-placeholder-val="{{ true }}"><span style="margin-left:auto;font-family:Barlow, sans-serif;font-size:17px;font-weight:700;text-transform:none;letter-spacing:0;color:#1F1712;font-variant-numeric:tabular-nums">{{ extrasTotalStr }}</span></sc-if></h3><button role="switch" aria-checked="{{ extrasOn }}" aria-label="Incluir cargos extra en el PDF" onClick="{{ toggleExtras }}" style="flex:none;min-width:64px;height:48px;border:0;background:transparent;padding:0;display:flex;align-items:center;justify-content:flex-end;cursor:pointer"><span style="width:52px;height:30px;border-radius:2px;background:{{ exSwBg }};position:relative;display:block;transition:background .15s"><span style="position:absolute;top:3px;left:{{ exSwKnob }};width:24px;height:24px;border-radius:1px;background:#FFFFFF;transition:left .15s"></span></span></button></div>
+            <sc-if value="{{ extrasOff }}" hint-placeholder-val="{{ false }}"><span style="font-size:15px;color:#5C4A3D;text-wrap:pretty;margin-top:-6px">No sale en el invoice. Actívalo si hubo trabajo extra.</span></sc-if>
+            <sc-if value="{{ extrasOn }}" hint-placeholder-val="{{ true }}">
+            <sc-for list="{{ extras }}" as="x" hint-placeholder-count="3">
+              <div style="display:flex;flex-direction:column;gap:12px;padding:12px;background:#FFFFFF;border:1px solid #CDBBA7">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+                  <span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:18px;text-transform:uppercase;letter-spacing:.04em;color:#7F1A1A">Cargo {{ x.n }}</span>
+                  <button aria-label="Quitar" title="Quitar" onClick="{{ x.onDel }}" style="flex:none;width:48px;height:48px;border:0;border-radius:2px;background:transparent;color:#B3261E;display:grid;place-items:center;cursor:pointer" style-hover="background:#FBE9E7" style-active="background:#F3D2CD"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg></button>
+                </div>
+                <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600;color:#3A2416">Descripción<input value="{{ x.desc }}" onChange="{{ x.onDesc }}" placeholder="ej. Debris disposal" enterKeyHint="next" style="height:52px;padding:0 12px;border:1.5px solid #7A6656;border-radius:2px;background:#FFFFFF;font-size:17px;color:#1F1712;box-sizing:border-box;width:100%"></label>
+                <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600;color:#3A2416">Monto<span style="width:170px;display:flex;align-items:center;height:52px;border:1.5px solid #7A6656;border-radius:2px;background:#FFFFFF;box-sizing:border-box"><span style="padding:0 4px 0 12px;font-size:18px;font-weight:600;color:#5C4A3D">$</span><input inputMode="decimal" value="{{ x.amount }}" onChange="{{ x.onAmount }}" placeholder="0.00" enterKeyHint="done" style="flex:1;min-width:0;height:100%;padding:0 12px 0 0;border:0;outline-offset:2px;background:transparent;font-size:18px;font-weight:600;color:#1F1712;font-variant-numeric:tabular-nums"></span></label>
+              </div>
+            </sc-for>
+            <sc-if value="{{ noExtras }}" hint-placeholder-val="{{ false }}"><div style="border:1.5px dashed #7A6656;padding:16px;text-align:center;color:#5C4A3D;font-size:15px">Sin cargos extra · no aparece en el PDF.</div></sc-if>
+            <button onClick="{{ addExtra }}" style="min-height:52px;border:1.5px solid #3A2416;border-radius:2px;background:#FFFFFF;color:#3A2416;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:18px;text-transform:uppercase;letter-spacing:.04em;display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;font-size:20px" style-hover="background:#F7E7CC"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>Agregar cargo</button>
+            </sc-if>
+          </div>
+          </sc-if>
+
+          <div style="border:1px solid #CDBBA7;padding:16px;display:flex;flex-direction:column;gap:14px;border-color:#CDBBA7">
+            <h3 style="margin:0;display:flex;gap:8px;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:22px;text-transform:uppercase;letter-spacing:.02em;color:#3A2416"><span style="color:#7F1A1A">{{ secDep }}</span>{{ depTitle }}</h3>
             <div role="radiogroup" aria-label="Anticipo" style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px">
               <sc-for list="{{ depOpts }}" as="o" hint-placeholder-count="5">
                 <button role="radio" aria-checked="{{ o.on }}" onClick="{{ o.onClick }}" style="grid-column:span {{ o.span }};min-height:48px;border:1.5px solid #3A2416;border-radius:2px;background:{{ o.bg }};color:{{ o.fg }};font-size:16px;font-weight:600;cursor:pointer">{{ o.label }}</button>
               </sc-for>
             </div>
             <sc-if value="{{ depIsPct }}" hint-placeholder-val="{{ false }}">
-              <label style="display:flex;flex-direction:column;gap:6px;font-size:15px;font-weight:600;color:#3A2416">Porcentaje %
-                <input inputMode="decimal" value="{{ depPct }}" onChange="{{ onDepPct }}" style="height:48px;padding:0 12px;border:1.5px solid #7A6656;border-radius:2px;background:#FFFFFF;font-size:17px;color:#1F1712;width:100%;box-sizing:border-box;text-align:right">
+              <label style="display:flex;flex-direction:column;gap:6px;font-size:15px;font-weight:600;color:#3A2416">Porcentaje<span style="display:flex;align-items:center;height:48px;border:1.5px solid #7A6656;border-radius:2px;background:#FFFFFF;box-sizing:border-box;width:100%"><input inputMode="decimal" value="{{ depPct }}" onChange="{{ onDepPct }}" style="height:48px;padding:0 12px;border:1.5px solid #7A6656;border-radius:2px;background:#FFFFFF;font-size:17px;color:#1F1712;width:100%;box-sizing:border-box;text-align:right;flex:1;min-width:0;width:0;height:100%;border:0;background:transparent;padding-right:4px"><span style="flex:none;font-size:17px;font-weight:600;color:#5C4A3D;padding-right:12px">%</span></span>
               </label>
             </sc-if>
             <sc-if value="{{ depIsFixed }}" hint-placeholder-val="{{ false }}">
-              <label style="display:flex;flex-direction:column;gap:6px;font-size:15px;font-weight:600;color:#3A2416">Monto del anticipo $
-                <input inputMode="decimal" value="{{ depFixed }}" onChange="{{ onDepFixed }}" style="height:48px;padding:0 12px;border:1.5px solid #7A6656;border-radius:2px;background:#FFFFFF;font-size:17px;color:#1F1712;width:100%;box-sizing:border-box;text-align:right">
+              <label style="display:flex;flex-direction:column;gap:6px;font-size:15px;font-weight:600;color:#3A2416">Monto del anticipo<span style="display:flex;align-items:center;height:48px;border:1.5px solid #7A6656;border-radius:2px;background:#FFFFFF;box-sizing:border-box;width:100%"><span style="flex:none;font-size:17px;font-weight:600;color:#5C4A3D;padding-left:12px">$</span><input inputMode="decimal" value="{{ depFixed }}" onChange="{{ onDepFixed }}" style="height:48px;padding:0 12px;border:1.5px solid #7A6656;border-radius:2px;background:#FFFFFF;font-size:17px;color:#1F1712;width:100%;box-sizing:border-box;text-align:right;flex:1;min-width:0;width:0;height:100%;border:0;background:transparent;padding-left:4px"></span>
               </label>
             </sc-if>
             <div style="display:flex;flex-direction:column;border-top:1px solid #CDBBA7;font-variant-numeric:tabular-nums">
               <div style="display:flex;justify-content:space-between;padding:10px 0;font-size:16px"><span>Total</span><span style="font-weight:600">{{ totalStr }}</span></div>
               <div style="display:flex;justify-content:space-between;padding:10px 0;font-size:16px;border-top:1px dashed #CDBBA7"><span>{{ depLabel }}</span><span style="font-weight:600">{{ depStr }}</span></div>
-              <div style="display:flex;justify-content:space-between;align-items:baseline;padding:10px 12px;background:#2A1A10;color:#FFFFFF"><span style="font-weight:600">{{ balLabel }}</span><span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:24px">{{ balStr }}</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:baseline;padding:10px 12px;background:#7F1A1A;color:#FFFFFF"><span style="font-weight:600">{{ balLabel }}</span><span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:24px">{{ balStr }}</span></div>
             </div>
           </div>
 
-          <div class="blueprint" style="padding:16px;display:flex;flex-direction:column;gap:14px;border-color:#CDBBA7"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
-            <h3 style="margin:0;display:flex;gap:8px;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:22px;text-transform:uppercase;letter-spacing:.02em;color:#3A2416"><span style="color:#B5470F">06</span>Términos</h3>
+          <sc-if value="{{ isEstimate }}" hint-placeholder-val="{{ true }}">
+          <div style="padding:16px;display:flex;flex-direction:column;gap:14px;border:1px solid #CDBBA7">
+            <div style="display:flex;align-items:center;gap:8px"><h3 style="margin:0;display:flex;gap:8px;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:22px;text-transform:uppercase;letter-spacing:.02em;color:#3A2416;flex:1"><span style="color:#7F1A1A">06</span>Pasos del proceso</h3><button role="switch" aria-checked="{{ showProcess }}" aria-label="Incluir pasos en el PDF" onClick="{{ toggleProcess }}" style="flex:none;min-width:64px;height:48px;border:0;background:transparent;padding:0;display:flex;align-items:center;justify-content:flex-end;cursor:pointer"><span style="width:52px;height:30px;border-radius:2px;background:{{ swBg }};position:relative;display:block;transition:background .15s"><span style="position:absolute;top:3px;left:{{ swKnob }};width:24px;height:24px;border-radius:1px;background:#FFFFFF;transition:left .15s"></span></span></button></div>
+            <sc-if value="{{ processOff }}" hint-placeholder-val="{{ false }}"><span style="font-size:15px;color:#5C4A3D;text-wrap:pretty;margin-top:-8px">{{ processHint }}</span></sc-if>
+            <sc-if value="{{ showProcess }}" hint-placeholder-val="{{ true }}">
+              <label style="display:flex;flex-direction:column;gap:6px;font-size:15px;font-weight:600;color:#3A2416">Nota inicial para el cliente (opcional)<textarea rows="4" value="{{ processIntro }}" onChange="{{ onProcessIntro }}" placeholder="ej. Supuestos del trabajo, qué pasa si encontramos daños…" style="padding:8px 10px;border:1.5px solid #7A6656;border-radius:2px;background:#FFFFFF;font-family:Barlow, sans-serif;font-size:15px;font-weight:400;line-height:1.4;color:#1F1712;box-sizing:border-box;width:100%;resize:vertical"></textarea></label>
+              <div role="radiogroup" aria-label="Modo de la lista" style="display:grid;grid-template-columns:1fr 1fr;border:1.5px solid #3A2416">
+                <sc-for list="{{ pModes }}" as="o" hint-placeholder-count="2"><button role="radio" aria-checked="{{ o.on }}" onClick="{{ o.onClick }}" style="min-height:48px;border:0;background:{{ o.bg }};color:{{ o.fg }};font-size:16px;font-weight:600;cursor:pointer">{{ o.label }}</button></sc-for>
+              </div>
+              <div style="display:flex;flex-direction:column">
+                <sc-for list="{{ steps }}" as="p" hint-placeholder-count="7">
+                  <div style="border-bottom:1px dashed #CDBBA7">
+                    <sc-if value="{{ p.isCollapsed }}" hint-placeholder-val="{{ true }}">
+                      <button onClick="{{ p.onOpen }}" aria-label="Editar paso {{ p.n }}" style="width:100%;min-height:64px;display:flex;gap:10px;align-items:flex-start;padding:12px 0;background:transparent;border:0;text-align:left;cursor:pointer;color:#1F1712;font-family:Barlow, sans-serif" style-hover="background:#F7E7CC">
+                        <span style="flex:none;width:24px;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:20px;line-height:1.1;color:#7F1A1A;font-variant-numeric:tabular-nums">{{ p.n }}</span>
+                        <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px"><strong style="font-size:16px;line-height:1.25">{{ p.titleShown }}</strong><span style="font-size:14px;line-height:1.4;color:#5C4A3D;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">{{ p.preview }}</span></span>
+                        <span style="flex:none;align-self:center;display:flex;align-items:center;gap:5px;min-height:40px;padding:0 10px;border:1.5px solid #3A2416;border-radius:2px;background:#FFFFFF;color:#3A2416;font-size:15px;font-weight:600"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg>Editar</span>
+                      </button>
+                    </sc-if>
+                    <sc-if value="{{ p.isOpen }}" hint-placeholder-val="{{ false }}">
+                      <div style="display:flex;flex-direction:column;gap:12px;margin:8px -8px;padding:12px;background:#FFFFFF;border:1.5px solid #3A2416">
+                        <div style="display:flex;align-items:center;justify-content:space-between"><span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:20px;text-transform:uppercase;color:#7F1A1A">Paso {{ p.n }} de {{ p.total }}</span><button onClick="{{ p.onClose }}" aria-label="Cerrar" style="width:48px;height:48px;margin:-8px -8px -8px 0;border:0;background:transparent;color:#3A2416;display:grid;place-items:center;cursor:pointer" style-hover="background:#F7E7CC"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"></path></svg></button></div>
+                        <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600;color:#3A2416">Título del paso<input value="{{ p.text }}" onChange="{{ p.onText }}" placeholder="ej. Install baseboards" enterKeyHint="next" style="height:52px;padding:0 12px;border:1.5px solid #7A6656;border-radius:2px;background:#FFFFFF;font-size:17px;font-weight:600;color:#1F1712;box-sizing:border-box;width:100%"></label>
+                        <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600;color:#3A2416">Explicación para el cliente<textarea rows="9" value="{{ p.detail }}" onChange="{{ p.onDetail }}" placeholder="Qué harán, con qué materiales y qué debe saber el cliente (opcional)" style="padding:10px 12px;border:1.5px solid #7A6656;border-radius:2px;background:#FFFFFF;font-family:Barlow, sans-serif;font-size:16px;font-weight:400;line-height:1.5;color:#1F1712;box-sizing:border-box;width:100%;resize:vertical"></textarea></label>
+                        <div style="display:grid;grid-template-columns:auto 1fr;gap:8px">
+                          <button aria-label="Quitar" title="Quitar" onClick="{{ p.onDel }}" style="flex:none;width:52px;height:52px;border:0;border-radius:2px;background:transparent;color:#B3261E;display:grid;place-items:center;cursor:pointer" style-hover="background:#FBE9E7" style-active="background:#F3D2CD"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg></button>
+                          <button onClick="{{ p.onNext }}" style="min-height:52px;border:0;border-radius:2px;background:#7F1A1A;color:#FFFFFF;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:19px;text-transform:uppercase;letter-spacing:.04em;cursor:pointer" style-hover="background:#5C1212">{{ p.nextLabel }}</button>
+                        </div>
+                      </div>
+                    </sc-if>
+                    <sc-if value="{{ p.orderMode }}" hint-placeholder-val="{{ false }}">
+                      <div style="display:flex;align-items:flex-start;gap:6px;min-height:60px;padding:6px 0">
+                      <span style="flex:none;width:24px;line-height:48px;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:20px;color:#7F1A1A;font-variant-numeric:tabular-nums">{{ p.n }}</span>
+                      <span style="flex:1;min-width:0;font-size:16px;line-height:1.3;padding:6px 0;text-wrap:pretty">{{ p.text }}</span>
+                      <button aria-label="Subir paso" onClick="{{ p.onUp }}" disabled="{{ p.isFirst }}" style="flex:none;width:48px;height:48px;border:0;background:transparent;color:#3A2416;display:grid;place-items:center;cursor:pointer" style-hover="background:#F7E7CC"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"></path></svg></button><button aria-label="Bajar paso" onClick="{{ p.onDown }}" disabled="{{ p.isLast }}" style="flex:none;width:48px;height:48px;border:0;background:transparent;color:#3A2416;display:grid;place-items:center;cursor:pointer" style-hover="background:#F7E7CC"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"></path></svg></button>
+                    </div>
+                    </sc-if>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                <button onClick="{{ addStep }}" style="min-height:52px;border:1.5px solid #3A2416;border-radius:2px;background:#FFFFFF;color:#3A2416;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:18px;text-transform:uppercase;letter-spacing:.04em;display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer" style-hover="background:#F7E7CC"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>Agregar paso</button>
+                <button onClick="{{ resetSteps }}" style="min-height:52px;border:1.5px solid #7A6656;border-radius:2px;background:transparent;color:#3A2416;font-size:15px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer" style-hover="background:#F7E7CC"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>Restaurar plantilla</button>
+              </div>
+              <span style="font-size:14px;color:#5C4A3D;text-wrap:pretty">Escribe en inglés: así lo lee el cliente. Los cambios son solo para este estimate; la plantilla base no cambia.</span>
+            </sc-if>
+          </div>
+          </sc-if>
+
+          <div style="border:1px solid #CDBBA7;padding:16px;display:flex;flex-direction:column;gap:14px;border-color:#CDBBA7">
+            <h3 style="margin:0;display:flex;gap:8px;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:22px;text-transform:uppercase;letter-spacing:.02em;color:#3A2416"><span style="color:#7F1A1A">07</span>Términos</h3>
             <textarea rows="5" value="{{ terms }}" onChange="{{ onTerms }}" aria-label="Términos y condiciones" style="padding:10px 12px;border:1.5px solid #7A6656;border-radius:2px;background:#FFFFFF;font-size:16px;line-height:1.4;color:#1F1712;width:100%;box-sizing:border-box;resize:vertical"></textarea>
             <div style="font-size:14px;color:#5C4A3D">Este texto sale en inglés en el PDF.</div>
           </div>
@@ -170,17 +233,17 @@ input::placeholder,textarea::placeholder{color:#8A7868}
         <sc-if value="{{ hasUndo }}" hint-placeholder-val="{{ false }}">
           <div role="status" style="position:absolute;left:12px;right:12px;bottom:92px;background:#1F1712;color:#FFFFFF;display:flex;align-items:center;justify-content:space-between;padding:0 4px 0 16px;box-shadow:0 12px 32px rgba(31,23,18,.3)">
             <span style="font-size:16px">{{ undoLabel }}</span>
-            <button onClick="{{ doUndo }}" style="min-height:48px;padding:0 14px;border:0;background:transparent;color:#EE7A30;font-weight:700;font-size:16px;text-transform:uppercase;letter-spacing:.04em;display:flex;align-items:center;gap:6px;cursor:pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>Deshacer</button>
+            <button onClick="{{ doUndo }}" style="min-height:48px;padding:0 14px;border:0;background:transparent;color:#E8C58F;font-weight:700;font-size:16px;text-transform:uppercase;letter-spacing:.04em;display:flex;align-items:center;gap:6px;cursor:pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>Deshacer</button>
           </div>
         </sc-if>
 
-        <div style="flex:none;background:#2A1A10;border-top:3px solid #E06A1F;padding:10px 12px 14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px">
+        <div style="flex:none;background:#2A1A10;border-top:3px solid #9E1F1F;padding:10px 12px 14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px">
           <div style="display:flex;flex-direction:column;font-variant-numeric:tabular-nums" aria-live="polite">
             <span style="font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#E8C58F">Total</span>
             <span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:32px;line-height:1;color:#FFFFFF">{{ totalStr }}</span>
             <span style="font-size:13px;color:#E8C58F">{{ barSub }}</span>
           </div>
-          <button onClick="{{ goPreview }}" style="min-height:56px;padding:0 20px;border:0;border-radius:2px;background:#EE7A30;color:#1F1712;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:22px;text-transform:uppercase;letter-spacing:.04em;display:flex;align-items:center;gap:8px;cursor:pointer" style-hover="background:#F49456"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path><path d="M14 2v4a2 2 0 0 0 2 2h4"></path></svg>Ver PDF</button>
+          <button onClick="{{ goPreview }}" style="min-height:56px;padding:0 20px;border:0;border-radius:2px;background:#A51C30;color:#FFFFFF;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:22px;text-transform:uppercase;letter-spacing:.04em;display:flex;align-items:center;gap:8px;cursor:pointer" style-hover="background:#7F1A1A"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path><path d="M14 2v4a2 2 0 0 0 2 2h4"></path></svg>Ver PDF</button>
         </div>
       </sc-if>
 
@@ -197,64 +260,167 @@ input::placeholder,textarea::placeholder{color:#8A7868}
           </div>
           <div style="text-align:center;color:#E8C58F;font-size:13px;padding-top:8px">Página 1 de 1 · pellizca para ampliar</div>
         </div>
-        <div style="flex:none;background:#2A1A10;padding:12px;display:flex;flex-direction:column;gap:10px;border-top:3px solid #E06A1F">
-          <button style="min-height:56px;border:0;border-radius:2px;background:#EE7A30;color:#1F1712;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:22px;text-transform:uppercase;letter-spacing:.04em;display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><path d="m8.59 13.51 6.83 3.98"></path><path d="m15.41 6.51-6.82 3.98"></path></svg>Compartir</button>
+        <div style="flex:none;background:#2A1A10;padding:12px;display:flex;flex-direction:column;gap:10px;border-top:3px solid #9E1F1F">
+          <button style="min-height:56px;border:0;border-radius:2px;background:#A51C30;color:#FFFFFF;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:22px;text-transform:uppercase;letter-spacing:.04em;display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><path d="m8.59 13.51 6.83 3.98"></path><path d="m15.41 6.51-6.82 3.98"></path></svg>Compartir</button>
           <div style="display:flex;gap:8px">
-            <button style="flex:1;min-height:64px;border:1.5px solid #E8C58F;border-radius:2px;background:transparent;color:#FFFFFF;font-size:14px;font-weight:600;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><path d="m7 10 5 5 5-5"></path><path d="M12 15V3"></path></svg>Descargar</button>
+            <button style="flex:1;min-width:0;min-height:72px;padding:10px 8px;border:1.5px solid #E8C58F;border-radius:2px;background:#4A3426;color:#FFFFFF;font-size:14px;font-weight:600;line-height:1.2;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><path d="m7 10 5 5 5-5"></path><path d="M12 15V3"></path></svg>Descargar</button>
             <sc-if value="{{ isEstimate }}" hint-placeholder-val="{{ true }}">
-              <button onClick="{{ convert }}" style="flex:1.3;min-height:64px;border:1.5px solid #E8C58F;border-radius:2px;background:transparent;color:#FFFFFF;font-size:14px;font-weight:600;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m16 3 4 4-4 4"></path><path d="M20 7H4"></path><path d="m8 21-4-4 4-4"></path><path d="M4 17h16"></path></svg>Convertir en Invoice</button>
+              <button onClick="{{ convert }}" style="flex:1.3;min-width:0;min-height:72px;padding:10px 8px;border:1.5px solid #E8C58F;border-radius:2px;background:#4A3426;color:#FFFFFF;font-size:14px;font-weight:600;line-height:1.2;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m16 3 4 4-4 4"></path><path d="M20 7H4"></path><path d="m8 21-4-4 4-4"></path><path d="M4 17h16"></path></svg>Convertir en Invoice</button>
             </sc-if>
-            <button onClick="{{ newDoc }}" style="flex:1;min-height:64px;border:1.5px solid #E8C58F;border-radius:2px;background:transparent;color:#FFFFFF;font-size:14px;font-weight:600;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path><path d="M9 15h6"></path><path d="M12 18v-6"></path></svg>Nuevo documento</button>
+            <button onClick="{{ newDoc }}" style="flex:1;min-width:0;min-height:72px;padding:10px 8px;border:1.5px solid #E8C58F;border-radius:2px;background:#4A3426;color:#FFFFFF;font-size:14px;font-weight:600;line-height:1.2;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path><path d="M9 15h6"></path><path d="M12 18v-6"></path></svg>Nuevo documento</button>
           </div>
         </div>
       </sc-if>
     </div>
   </div>
 
+  <div id="1b" style="display:flex;flex-direction:column;gap:12px">
+    <div style="display:flex;gap:8px;align-items:center"><span style="background:#2A1A10;color:#FFFFFF;font-weight:700;font-size:14px;padding:4px 8px">1b</span><span style="font-weight:600;font-size:15px">Nuevo · Pasos del proceso (estimate) · en vivo</span></div>
+    <div style="width:375px;height:812px;background:#F6F1EA;border:1px solid #1F1712;box-shadow:0 12px 32px rgba(31,23,18,.22);display:flex;flex-direction:column;overflow:hidden">
+      <div style="height:64px;flex:none;background:#FFFFFF;border-bottom:1px solid #D8CBBB;display:flex;align-items:center;gap:10px;padding:0 4px 0 12px">
+          <img src="assets/logo-ai-red.jpg" alt="Sosa's Hardwood Floors" style="height:50px;display:block;flex:none">
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;padding-left:10px;border-left:1px solid #D8CBBB"><span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:17px;line-height:1.1;text-transform:uppercase;color:#2A1A10;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Estimate <span style="color:#5C4A3D;font-weight:600">#20261005-01</span></span><span style="display:flex;align-items:center;gap:4px;font-size:12.5px;font-weight:600;color:#2F6B3A"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>Guardado</span></div>
+          <button aria-label="Más opciones" style="flex:none;width:48px;height:48px;border:0;border-radius:2px;background:transparent;color:#2A1A10;display:grid;place-items:center;cursor:pointer" style-hover="background:#F7E7CC"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg></button>
+        </div>
+      <div style="flex:1;overflow-y:auto;padding:16px 16px 24px;display:flex;flex-direction:column;gap:20px">
+          <div style="padding:16px;display:flex;flex-direction:column;gap:14px;border:1px solid #CDBBA7">
+            <div style="display:flex;align-items:center;gap:8px"><h3 style="margin:0;display:flex;gap:8px;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:22px;text-transform:uppercase;letter-spacing:.02em;color:#3A2416;flex:1"><span style="color:#7F1A1A">06</span>Pasos del proceso</h3><button role="switch" aria-checked="{{ showProcess }}" aria-label="Incluir pasos en el PDF" onClick="{{ toggleProcess }}" style="flex:none;min-width:64px;height:48px;border:0;background:transparent;padding:0;display:flex;align-items:center;justify-content:flex-end;cursor:pointer"><span style="width:52px;height:30px;border-radius:2px;background:{{ swBg }};position:relative;display:block;transition:background .15s"><span style="position:absolute;top:3px;left:{{ swKnob }};width:24px;height:24px;border-radius:1px;background:#FFFFFF;transition:left .15s"></span></span></button></div>
+            <sc-if value="{{ processOff }}" hint-placeholder-val="{{ false }}"><span style="font-size:15px;color:#5C4A3D;text-wrap:pretty;margin-top:-8px">{{ processHint }}</span></sc-if>
+            <sc-if value="{{ showProcess }}" hint-placeholder-val="{{ true }}">
+              <label style="display:flex;flex-direction:column;gap:6px;font-size:15px;font-weight:600;color:#3A2416">Nota inicial para el cliente (opcional)<textarea rows="4" value="{{ processIntro }}" onChange="{{ onProcessIntro }}" placeholder="ej. Supuestos del trabajo, qué pasa si encontramos daños…" style="padding:8px 10px;border:1.5px solid #7A6656;border-radius:2px;background:#FFFFFF;font-family:Barlow, sans-serif;font-size:15px;font-weight:400;line-height:1.4;color:#1F1712;box-sizing:border-box;width:100%;resize:vertical"></textarea></label>
+              <div role="radiogroup" aria-label="Modo de la lista" style="display:grid;grid-template-columns:1fr 1fr;border:1.5px solid #3A2416">
+                <sc-for list="{{ pModes }}" as="o" hint-placeholder-count="2"><button role="radio" aria-checked="{{ o.on }}" onClick="{{ o.onClick }}" style="min-height:48px;border:0;background:{{ o.bg }};color:{{ o.fg }};font-size:16px;font-weight:600;cursor:pointer">{{ o.label }}</button></sc-for>
+              </div>
+              <div style="display:flex;flex-direction:column">
+                <sc-for list="{{ steps }}" as="p" hint-placeholder-count="7">
+                  <div style="border-bottom:1px dashed #CDBBA7">
+                    <sc-if value="{{ p.isCollapsed }}" hint-placeholder-val="{{ true }}">
+                      <button onClick="{{ p.onOpen }}" aria-label="Editar paso {{ p.n }}" style="width:100%;min-height:64px;display:flex;gap:10px;align-items:flex-start;padding:12px 0;background:transparent;border:0;text-align:left;cursor:pointer;color:#1F1712;font-family:Barlow, sans-serif" style-hover="background:#F7E7CC">
+                        <span style="flex:none;width:24px;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:20px;line-height:1.1;color:#7F1A1A;font-variant-numeric:tabular-nums">{{ p.n }}</span>
+                        <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px"><strong style="font-size:16px;line-height:1.25">{{ p.titleShown }}</strong><span style="font-size:14px;line-height:1.4;color:#5C4A3D;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">{{ p.preview }}</span></span>
+                        <span style="flex:none;align-self:center;display:flex;align-items:center;gap:5px;min-height:40px;padding:0 10px;border:1.5px solid #3A2416;border-radius:2px;background:#FFFFFF;color:#3A2416;font-size:15px;font-weight:600"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg>Editar</span>
+                      </button>
+                    </sc-if>
+                    <sc-if value="{{ p.isOpen }}" hint-placeholder-val="{{ false }}">
+                      <div style="display:flex;flex-direction:column;gap:12px;margin:8px -8px;padding:12px;background:#FFFFFF;border:1.5px solid #3A2416">
+                        <div style="display:flex;align-items:center;justify-content:space-between"><span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:20px;text-transform:uppercase;color:#7F1A1A">Paso {{ p.n }} de {{ p.total }}</span><button onClick="{{ p.onClose }}" aria-label="Cerrar" style="width:48px;height:48px;margin:-8px -8px -8px 0;border:0;background:transparent;color:#3A2416;display:grid;place-items:center;cursor:pointer" style-hover="background:#F7E7CC"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"></path></svg></button></div>
+                        <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600;color:#3A2416">Título del paso<input value="{{ p.text }}" onChange="{{ p.onText }}" placeholder="ej. Install baseboards" enterKeyHint="next" style="height:52px;padding:0 12px;border:1.5px solid #7A6656;border-radius:2px;background:#FFFFFF;font-size:17px;font-weight:600;color:#1F1712;box-sizing:border-box;width:100%"></label>
+                        <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600;color:#3A2416">Explicación para el cliente<textarea rows="9" value="{{ p.detail }}" onChange="{{ p.onDetail }}" placeholder="Qué harán, con qué materiales y qué debe saber el cliente (opcional)" style="padding:10px 12px;border:1.5px solid #7A6656;border-radius:2px;background:#FFFFFF;font-family:Barlow, sans-serif;font-size:16px;font-weight:400;line-height:1.5;color:#1F1712;box-sizing:border-box;width:100%;resize:vertical"></textarea></label>
+                        <div style="display:grid;grid-template-columns:auto 1fr;gap:8px">
+                          <button aria-label="Quitar" title="Quitar" onClick="{{ p.onDel }}" style="flex:none;width:52px;height:52px;border:0;border-radius:2px;background:transparent;color:#B3261E;display:grid;place-items:center;cursor:pointer" style-hover="background:#FBE9E7" style-active="background:#F3D2CD"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg></button>
+                          <button onClick="{{ p.onNext }}" style="min-height:52px;border:0;border-radius:2px;background:#7F1A1A;color:#FFFFFF;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:19px;text-transform:uppercase;letter-spacing:.04em;cursor:pointer" style-hover="background:#5C1212">{{ p.nextLabel }}</button>
+                        </div>
+                      </div>
+                    </sc-if>
+                    <sc-if value="{{ p.orderMode }}" hint-placeholder-val="{{ false }}">
+                      <div style="display:flex;align-items:flex-start;gap:6px;min-height:60px;padding:6px 0">
+                      <span style="flex:none;width:24px;line-height:48px;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:20px;color:#7F1A1A;font-variant-numeric:tabular-nums">{{ p.n }}</span>
+                      <span style="flex:1;min-width:0;font-size:16px;line-height:1.3;padding:6px 0;text-wrap:pretty">{{ p.text }}</span>
+                      <button aria-label="Subir paso" onClick="{{ p.onUp }}" disabled="{{ p.isFirst }}" style="flex:none;width:48px;height:48px;border:0;background:transparent;color:#3A2416;display:grid;place-items:center;cursor:pointer" style-hover="background:#F7E7CC"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"></path></svg></button><button aria-label="Bajar paso" onClick="{{ p.onDown }}" disabled="{{ p.isLast }}" style="flex:none;width:48px;height:48px;border:0;background:transparent;color:#3A2416;display:grid;place-items:center;cursor:pointer" style-hover="background:#F7E7CC"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"></path></svg></button>
+                    </div>
+                    </sc-if>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                <button onClick="{{ addStep }}" style="min-height:52px;border:1.5px solid #3A2416;border-radius:2px;background:#FFFFFF;color:#3A2416;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:18px;text-transform:uppercase;letter-spacing:.04em;display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer" style-hover="background:#F7E7CC"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>Agregar paso</button>
+                <button onClick="{{ resetSteps }}" style="min-height:52px;border:1.5px solid #7A6656;border-radius:2px;background:transparent;color:#3A2416;font-size:15px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer" style-hover="background:#F7E7CC"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>Restaurar plantilla</button>
+              </div>
+              <span style="font-size:14px;color:#5C4A3D;text-wrap:pretty">Escribe en inglés: así lo lee el cliente. Los cambios son solo para este estimate; la plantilla base no cambia.</span>
+            </sc-if>
+          </div>
+      </div>
+      <div style="flex:none;background:#2A1A10;border-top:3px solid #9E1F1F;padding:10px 12px 14px 16px;display:flex;align-items:center;justify-content:space-between"><div style="display:flex;flex-direction:column"><span style="font-size:13px;font-weight:600;letter-spacing:.08em;color:#E8C58F">TOTAL</span><span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:32px;line-height:1;color:#FFFFFF;font-variant-numeric:tabular-nums">{{ totalStr }}</span></div><span style="min-height:56px;padding:0 20px;background:#A51C30;color:#FFFFFF;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:22px;letter-spacing:.04em;display:flex;align-items:center">VER PDF</span></div>
+    </div>
+    <p style="margin:0;max-width:375px;font-size:14px;color:#5C4A3D;text-wrap:pretty">Mismo estado que 1a. Interruptor apagado = no sale en el PDF. “Ordenar” cambia la lista a flechas ↑ ↓ grandes para el dedo; quitar un paso muestra “Deshacer” en 1a.</p>
+  </div>
+
+  <div id="1c" style="display:flex;flex-direction:column;gap:12px">
+    <div style="display:flex;gap:8px;align-items:center"><span style="background:#2A1A10;color:#FFFFFF;font-weight:700;font-size:14px;padding:4px 8px">1c</span><span style="font-weight:600;font-size:15px">Nuevo · Cargos extra (invoice) · en vivo</span></div>
+    <div style="width:375px;height:812px;background:#F6F1EA;border:1px solid #1F1712;box-shadow:0 12px 32px rgba(31,23,18,.22);display:flex;flex-direction:column;overflow:hidden">
+      <div style="height:64px;flex:none;background:#FFFFFF;border-bottom:1px solid #D8CBBB;display:flex;align-items:center;gap:10px;padding:0 4px 0 12px">
+          <img src="assets/logo-ai-red.jpg" alt="Sosa's Hardwood Floors" style="height:50px;display:block;flex:none">
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;padding-left:10px;border-left:1px solid #D8CBBB"><span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:17px;line-height:1.1;text-transform:uppercase;color:#2A1A10;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Invoice <span style="color:#5C4A3D;font-weight:600">#20261005-01</span></span><span style="display:flex;align-items:center;gap:4px;font-size:12.5px;font-weight:600;color:#2F6B3A"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>Guardado</span></div>
+          <button aria-label="Más opciones" style="flex:none;width:48px;height:48px;border:0;border-radius:2px;background:transparent;color:#2A1A10;display:grid;place-items:center;cursor:pointer" style-hover="background:#F7E7CC"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg></button>
+        </div>
+      <div style="flex:1;overflow-y:auto;padding:16px 16px 24px;display:flex;flex-direction:column;gap:20px">
+          <div style="padding:16px;display:flex;flex-direction:column;gap:12px;border:1px solid #CDBBA7">
+            <div style="display:flex;align-items:center;gap:8px"><h3 style="margin:0;flex:1;display:flex;gap:8px;align-items:baseline;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:22px;text-transform:uppercase;letter-spacing:.02em;color:#3A2416"><span style="color:#7F1A1A">05</span>Cargos extra<sc-if value="{{ extrasOn }}" hint-placeholder-val="{{ true }}"><span style="margin-left:auto;font-family:Barlow, sans-serif;font-size:17px;font-weight:700;text-transform:none;letter-spacing:0;color:#1F1712;font-variant-numeric:tabular-nums">{{ extrasTotalStr }}</span></sc-if></h3><button role="switch" aria-checked="{{ extrasOn }}" aria-label="Incluir cargos extra en el PDF" onClick="{{ toggleExtras }}" style="flex:none;min-width:64px;height:48px;border:0;background:transparent;padding:0;display:flex;align-items:center;justify-content:flex-end;cursor:pointer"><span style="width:52px;height:30px;border-radius:2px;background:{{ exSwBg }};position:relative;display:block;transition:background .15s"><span style="position:absolute;top:3px;left:{{ exSwKnob }};width:24px;height:24px;border-radius:1px;background:#FFFFFF;transition:left .15s"></span></span></button></div>
+            <sc-if value="{{ extrasOff }}" hint-placeholder-val="{{ false }}"><span style="font-size:15px;color:#5C4A3D;text-wrap:pretty;margin-top:-6px">No sale en el invoice. Actívalo si hubo trabajo extra.</span></sc-if>
+            <sc-if value="{{ extrasOn }}" hint-placeholder-val="{{ true }}">
+            <sc-for list="{{ extras }}" as="x" hint-placeholder-count="3">
+              <div style="display:flex;flex-direction:column;gap:12px;padding:12px;background:#FFFFFF;border:1px solid #CDBBA7">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+                  <span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:18px;text-transform:uppercase;letter-spacing:.04em;color:#7F1A1A">Cargo {{ x.n }}</span>
+                  <button aria-label="Quitar" title="Quitar" onClick="{{ x.onDel }}" style="flex:none;width:48px;height:48px;border:0;border-radius:2px;background:transparent;color:#B3261E;display:grid;place-items:center;cursor:pointer" style-hover="background:#FBE9E7" style-active="background:#F3D2CD"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg></button>
+                </div>
+                <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600;color:#3A2416">Descripción<input value="{{ x.desc }}" onChange="{{ x.onDesc }}" placeholder="ej. Debris disposal" enterKeyHint="next" style="height:52px;padding:0 12px;border:1.5px solid #7A6656;border-radius:2px;background:#FFFFFF;font-size:17px;color:#1F1712;box-sizing:border-box;width:100%"></label>
+                <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600;color:#3A2416">Monto<span style="width:170px;display:flex;align-items:center;height:52px;border:1.5px solid #7A6656;border-radius:2px;background:#FFFFFF;box-sizing:border-box"><span style="padding:0 4px 0 12px;font-size:18px;font-weight:600;color:#5C4A3D">$</span><input inputMode="decimal" value="{{ x.amount }}" onChange="{{ x.onAmount }}" placeholder="0.00" enterKeyHint="done" style="flex:1;min-width:0;height:100%;padding:0 12px 0 0;border:0;outline-offset:2px;background:transparent;font-size:18px;font-weight:600;color:#1F1712;font-variant-numeric:tabular-nums"></span></label>
+              </div>
+            </sc-for>
+            <sc-if value="{{ noExtras }}" hint-placeholder-val="{{ false }}"><div style="border:1.5px dashed #7A6656;padding:16px;text-align:center;color:#5C4A3D;font-size:15px">Sin cargos extra · no aparece en el PDF.</div></sc-if>
+            <button onClick="{{ addExtra }}" style="min-height:52px;border:1.5px solid #3A2416;border-radius:2px;background:#FFFFFF;color:#3A2416;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:18px;text-transform:uppercase;letter-spacing:.04em;display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;font-size:20px" style-hover="background:#F7E7CC"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>Agregar cargo</button>
+            </sc-if>
+          </div>
+      </div>
+      <div style="flex:none;background:#2A1A10;border-top:3px solid #9E1F1F;padding:10px 12px 14px 16px;display:flex;align-items:center;justify-content:space-between"><div style="display:flex;flex-direction:column"><span style="font-size:13px;font-weight:600;letter-spacing:.08em;color:#E8C58F">TOTAL</span><span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:32px;line-height:1;color:#FFFFFF;font-variant-numeric:tabular-nums">{{ totalStr }}</span></div><span style="min-height:56px;padding:0 20px;background:#A51C30;color:#FFFFFF;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:22px;letter-spacing:.04em;display:flex;align-items:center">VER PDF</span></div>
+    </div>
+    <p style="margin:0;max-width:375px;font-size:14px;color:#5C4A3D;text-wrap:pretty">Mismo estado que 1a. Cambia 1a a Invoice para verlos sumados al total y en el PDF.</p>
+  </div>
+
   <!-- 2a items detail -->
   <div id="2a" style="display:flex;flex-direction:column;gap:12px">
-    <div style="display:flex;gap:8px;align-items:center"><span style="background:#2A1A10;color:#FFFFFF;font-weight:700;font-size:14px;padding:4px 8px">2a</span><span style="font-weight:600;font-size:15px">Partidas · lump sum, other y deshacer</span></div>
+    <div style="display:flex;gap:8px;align-items:center"><span style="background:#2A1A10;color:#FFFFFF;font-weight:700;font-size:14px;padding:4px 8px">2a</span><span style="font-weight:600;font-size:15px">Trabajos · lump sum, other y deshacer</span></div>
     <div style="width:375px;height:812px;background:#F6F1EA;border:1px solid #1F1712;box-shadow:0 12px 32px rgba(31,23,18,.22);display:flex;flex-direction:column;overflow:hidden;position:relative">
-      <div style="height:64px;flex:none;background:#FFFFFF;border-bottom:1px solid #D8CBBB;display:flex;align-items:center;padding:0 16px"><img src="assets/logo.png" alt="Sosa's Constructions" style="height:40px;display:block"></div>
-      <div style="flex:1;overflow:hidden;padding:16px;display:flex;flex-direction:column;gap:12px">
-        <h3 style="margin:0;display:flex;gap:8px;align-items:baseline;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:22px;text-transform:uppercase;letter-spacing:.02em;color:#3A2416"><span style="color:#B5470F">04</span>Partidas<span style="margin-left:auto;font-family:Barlow, sans-serif;font-size:15px;font-weight:600;text-transform:none;letter-spacing:0;color:#5C4A3D">3 partidas</span></h3>
-        <div class="blueprint" style="background:#FFFFFF;border-color:#CDBBA7;display:flex;flex-direction:column"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
-          <div style="display:flex;align-items:center;padding-left:12px;border-bottom:1px solid #E4D8CA;background:#F6F1EA;height:48px"><span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:20px;color:#B5470F;flex:1">#3</span><span style="font-size:14px;color:#5C4A3D;padding-right:12px">Lump sum: solo monto</span></div>
-          <div style="padding:12px;display:flex;flex-direction:column;gap:12px">
-            <div style="padding:10px 12px;border:1.5px solid #7A6656;background:#FFFFFF;font-size:17px;line-height:1.35">Refinish steps and handrails (15 steps, 10 sticks)</div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-              <label style="display:flex;flex-direction:column;gap:6px;font-size:15px;font-weight:600;color:#3A2416">Unidad<div style="height:48px;display:flex;align-items:center;padding:0 10px;border:1.5px solid #7A6656;background:#FFFFFF;font-size:17px;font-weight:400">lump sum</div></label>
-              <label style="display:flex;flex-direction:column;gap:6px;font-size:15px;font-weight:600;color:#3A2416">Monto total $<div style="height:48px;display:flex;align-items:center;justify-content:flex-end;padding:0 12px;border:1.5px solid #1F1712;outline:3px solid #B5470F;outline-offset:1px;background:#FFFFFF;font-size:19px">3,000.00</div></label>
-            </div>
-          </div>
+      <div style="height:64px;flex:none;background:#FFFFFF;border-bottom:1px solid #D8CBBB;display:flex;align-items:center;gap:10px;padding:0 4px 0 12px">
+          <img src="assets/logo-ai-red.jpg" alt="Sosa's Hardwood Floors" style="height:50px;display:block;flex:none">
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;padding-left:10px;border-left:1px solid #D8CBBB"><span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:17px;line-height:1.1;text-transform:uppercase;color:#2A1A10;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Estimate <span style="color:#5C4A3D;font-weight:600">#20261005-01</span></span><span style="display:flex;align-items:center;gap:4px;font-size:12.5px;font-weight:600;color:#2F6B3A"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>Guardado</span></div>
+          <button aria-label="Más opciones" style="flex:none;width:48px;height:48px;border:0;border-radius:2px;background:transparent;color:#2A1A10;display:grid;place-items:center;cursor:pointer" style-hover="background:#F7E7CC"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg></button>
         </div>
-        <div class="blueprint" style="background:#FFFFFF;border-color:#CDBBA7;display:flex;flex-direction:column"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
-          <div style="display:flex;align-items:center;padding-left:12px;border-bottom:1px solid #E4D8CA;background:#F6F1EA;height:48px"><span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:20px;color:#B5470F;flex:1">#4</span><span style="font-size:14px;color:#5C4A3D;padding-right:12px">Other: escribe la unidad</span></div>
-          <div style="padding:12px;display:flex;flex-direction:column;gap:12px">
-            <div style="padding:10px 12px;border:1.5px solid #7A6656;background:#FFFFFF;font-size:17px">Furniture moving</div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-              <label style="display:flex;flex-direction:column;gap:6px;font-size:15px;font-weight:600;color:#3A2416">Unidad<div style="height:48px;display:flex;align-items:center;padding:0 10px;border:1.5px solid #7A6656;background:#FFFFFF;font-size:17px;font-weight:400">other</div></label>
-              <label style="display:flex;flex-direction:column;gap:6px;font-size:15px;font-weight:600;color:#3A2416">¿Cuál?<div style="height:48px;display:flex;align-items:center;padding:0 12px;border:1.5px solid #7A6656;background:#FFFFFF;font-size:17px;font-weight:400">rooms</div></label>
-              <label style="display:flex;flex-direction:column;gap:6px;font-size:15px;font-weight:600;color:#3A2416">Cantidad<div style="height:48px;display:flex;align-items:center;justify-content:flex-end;padding:0 12px;border:1.5px solid #7A6656;background:#FFFFFF;font-size:17px;font-weight:400">3</div></label>
-              <label style="display:flex;flex-direction:column;gap:6px;font-size:15px;font-weight:600;color:#3A2416">Precio $<div style="height:48px;display:flex;align-items:center;justify-content:flex-end;padding:0 12px;border:1.5px solid #7A6656;background:#FFFFFF;font-size:17px;font-weight:400">75.00</div></label>
-            </div>
-            <div style="display:flex;justify-content:space-between;align-items:baseline;border-top:1px dashed #CDBBA7;padding-top:10px"><span style="font-size:15px;font-weight:600;color:#5C4A3D">Monto</span><span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:24px">$225.00</span></div>
-          </div>
-        </div>
-        <div style="border:2px solid #B5470F;background:#FCEBDF;display:flex;align-items:center;gap:10px;padding:0 12px;height:56px;box-shadow:0 12px 32px rgba(31,23,18,.22);transform:rotate(-1deg)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3A2416" stroke-width="1.5" stroke-linecap="round"><circle cx="9" cy="5" r="1"></circle><circle cx="9" cy="12" r="1"></circle><circle cx="9" cy="19" r="1"></circle><circle cx="15" cy="5" r="1"></circle><circle cx="15" cy="12" r="1"></circle><circle cx="15" cy="19" r="1"></circle></svg><span style="font-weight:600">#1 Removed carpet…</span><span style="margin-left:auto;font-size:14px;color:#5C4A3D">Moviendo</span></div>
+      <div style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px">
+        <h3 style="margin:0;display:flex;gap:8px;align-items:baseline;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:22px;text-transform:uppercase;letter-spacing:.02em;color:#3A2416"><span style="color:#7F1A1A">04</span>Trabajos</h3>
+        <sc-for list="{{ demoItems }}" as="it" hint-placeholder-count="3">
+              <div style="border:1px solid #CDBBA7;background:#FFFFFF;display:flex;flex-direction:column">
+                <div style="display:flex;align-items:center;gap:4px;padding:0 0 0 12px;border-bottom:1px solid #E4D8CA;background:#F6F1EA">
+                  <span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:20px;color:#7F1A1A;flex:1">#{{ it.n }}</span>
+                  <button aria-label="Subir" onClick="{{ it.onUp }}" disabled="{{ it.isFirst }}" style="width:48px;height:48px;border:0;background:transparent;color:#3A2416;display:grid;place-items:center;cursor:pointer" style-hover="background:#F7E7CC"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"></path></svg></button><button aria-label="Bajar" onClick="{{ it.onDown }}" disabled="{{ it.isLast }}" style="width:48px;height:48px;border:0;background:transparent;color:#3A2416;display:grid;place-items:center;cursor:pointer" style-hover="background:#F7E7CC"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"></path></svg></button>
+                  <button aria-label="Quitar" title="Quitar" onClick="{{ it.onDel }}" style="flex:none;width:48px;height:48px;border:0;border-radius:2px;background:transparent;color:#B3261E;display:grid;place-items:center;cursor:pointer" style-hover="background:#FBE9E7" style-active="background:#F3D2CD"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg></button>
+                </div>
+                <div style="padding:12px;display:flex;flex-direction:column;gap:12px">
+                  <label style="display:flex;flex-direction:column;gap:6px;font-size:15px;font-weight:600;color:#3A2416">Descripción<textarea rows="2" value="{{ it.desc }}" onChange="{{ it.onDesc }}" style="padding:10px 12px;border:1.5px solid #7A6656;border-radius:2px;background:#FFFFFF;font-family:Barlow, sans-serif;font-size:17px;font-weight:400;line-height:1.35;color:#1F1712;width:100%;box-sizing:border-box;resize:vertical"></textarea></label>
+                  <label style="display:flex;flex-direction:column;gap:6px;font-size:15px;font-weight:600;color:#3A2416">Unidad<select value="{{ it.unit }}" onChange="{{ it.onUnit }}" style="height:48px;padding:0 12px;border:1.5px solid #7A6656;border-radius:2px;background:#FFFFFF;font-size:17px;color:#1F1712;width:100%;box-sizing:border-box;padding:0 10px;font-weight:400">
+                      <option value="sqft">sq ft</option><option value="lft">linear ft</option><option value="steps">steps</option><option value="each">each</option><option value="hours">hours</option><option value="lump">lump sum</option><option value="other">other</option>
+                    </select></label>
+                  <sc-if value="{{ it.isOther }}" hint-placeholder-val="{{ false }}">
+                    <label style="display:flex;flex-direction:column;gap:6px;font-size:15px;font-weight:600;color:#3A2416">Escribe la unidad<input value="{{ it.other }}" onChange="{{ it.onOther }}" placeholder="ej. rooms" style="height:48px;padding:0 12px;border:1.5px solid #7A6656;border-radius:2px;background:#FFFFFF;font-size:17px;color:#1F1712;width:100%;box-sizing:border-box;font-weight:400"></label>
+                  </sc-if>
+                  <sc-if value="{{ it.notLump }}" hint-placeholder-val="{{ true }}">
+                    <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px">
+                      <label style="display:flex;flex-direction:column;gap:6px;font-size:15px;font-weight:600;color:#3A2416">Cantidad<input inputMode="decimal" value="{{ it.qty }}" onChange="{{ it.onQty }}" style="height:48px;padding:0 12px;border:1.5px solid #7A6656;border-radius:2px;background:#FFFFFF;font-size:17px;color:#1F1712;width:100%;box-sizing:border-box;font-weight:400;text-align:right;font-variant-numeric:tabular-nums"></label>
+                      <label style="display:flex;flex-direction:column;gap:6px;font-size:15px;font-weight:600;color:#3A2416">Precio por {{ it.unitLabel }}<span style="display:flex;align-items:center;height:48px;border:1.5px solid #7A6656;border-radius:2px;background:#FFFFFF;box-sizing:border-box;width:100%"><span style="flex:none;font-size:17px;font-weight:600;color:#5C4A3D;padding-left:12px">$</span><input inputMode="decimal" value="{{ it.price }}" onChange="{{ it.onPrice }}" style="height:48px;padding:0 12px;border:1.5px solid #7A6656;border-radius:2px;background:#FFFFFF;font-size:17px;color:#1F1712;width:100%;box-sizing:border-box;font-weight:400;text-align:right;font-variant-numeric:tabular-nums;flex:1;min-width:0;width:0;height:100%;border:0;background:transparent;padding-left:4px"></span></label>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;align-items:baseline;border-top:1px dashed #CDBBA7;padding-top:10px"><span style="font-size:15px;font-weight:600;color:#5C4A3D">Monto</span><span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:24px;font-variant-numeric:tabular-nums">{{ it.amountStr }}</span></div>
+                  </sc-if>
+                  <sc-if value="{{ it.isLump }}" hint-placeholder-val="{{ false }}">
+                    <label style="display:flex;flex-direction:column;gap:6px;font-size:15px;font-weight:600;color:#3A2416">Monto total<span style="display:flex;align-items:center;height:48px;border:1.5px solid #7A6656;border-radius:2px;background:#FFFFFF;box-sizing:border-box;width:100%"><span style="flex:none;font-size:17px;font-weight:600;color:#5C4A3D;padding-left:12px">$</span><input inputMode="decimal" value="{{ it.amount }}" onChange="{{ it.onAmount }}" style="height:48px;padding:0 12px;border:1.5px solid #7A6656;border-radius:2px;background:#FFFFFF;font-size:17px;color:#1F1712;width:100%;box-sizing:border-box;font-size:19px;font-weight:600;text-align:right;font-variant-numeric:tabular-nums;flex:1;min-width:0;width:0;height:100%;border:0;background:transparent;padding-left:4px"></span></label>
+                  </sc-if>
+                </div>
+              </div>
+            </sc-for>
+        <div style="border:2px solid #7F1A1A;background:#F6E4E1;display:flex;align-items:center;gap:10px;padding:0 12px;height:56px;box-shadow:0 12px 32px rgba(31,23,18,.22);transform:rotate(-1deg)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3A2416" stroke-width="1.5" stroke-linecap="round"><circle cx="9" cy="5" r="1"></circle><circle cx="9" cy="12" r="1"></circle><circle cx="9" cy="19" r="1"></circle><circle cx="15" cy="5" r="1"></circle><circle cx="15" cy="12" r="1"></circle><circle cx="15" cy="19" r="1"></circle></svg><span style="font-weight:600">#1 Removed carpet…</span><span style="margin-left:auto;font-size:14px;color:#5C4A3D">Moviendo</span></div>
       </div>
-      <div role="status" style="position:absolute;left:12px;right:12px;bottom:92px;background:#1F1712;color:#FFFFFF;display:flex;align-items:center;justify-content:space-between;padding:0 4px 0 16px;box-shadow:0 12px 32px rgba(31,23,18,.3)"><span style="font-size:16px">Partida #2 eliminada</span><span style="min-height:48px;padding:0 14px;color:#EE7A30;font-weight:700;font-size:16px;text-transform:uppercase;letter-spacing:.04em;display:flex;align-items:center">Deshacer</span></div>
-      <div style="flex:none;background:#2A1A10;border-top:3px solid #E06A1F;padding:10px 12px 14px 16px;display:flex;align-items:center;justify-content:space-between"><div style="display:flex;flex-direction:column"><span style="font-size:13px;font-weight:600;letter-spacing:.08em;color:#E8C58F">TOTAL</span><span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:32px;line-height:1;color:#FFFFFF">$6,394.25</span></div><span style="min-height:56px;padding:0 20px;background:#EE7A30;color:#1F1712;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:22px;letter-spacing:.04em;display:flex;align-items:center">VER PDF</span></div>
+      <div role="status" style="position:absolute;left:12px;right:12px;bottom:92px;background:#1F1712;color:#FFFFFF;display:flex;align-items:center;justify-content:space-between;padding:0 4px 0 16px;box-shadow:0 12px 32px rgba(31,23,18,.3)"><span style="font-size:16px">Trabajo #2 eliminado</span><span style="min-height:48px;padding:0 14px;color:#E8C58F;font-weight:700;font-size:16px;text-transform:uppercase;letter-spacing:.04em;display:flex;align-items:center">Deshacer</span></div>
+      <div style="flex:none;background:#2A1A10;border-top:3px solid #9E1F1F;padding:10px 12px 14px 16px;display:flex;align-items:center;justify-content:space-between"><div style="display:flex;flex-direction:column"><span style="font-size:13px;font-weight:600;letter-spacing:.08em;color:#E8C58F">TOTAL</span><span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:32px;line-height:1;color:#FFFFFF">$6,394.25</span></div><span style="min-height:56px;padding:0 20px;background:#A51C30;color:#FFFFFF;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:22px;letter-spacing:.04em;display:flex;align-items:center">VER PDF</span></div>
     </div>
-    <p style="margin:0;max-width:375px;font-size:14px;color:#5C4A3D;text-wrap:pretty">Reordenar: flechas ↑ ↓ en cada bloque (accesible) o mantener presionado el número y arrastrar. Eliminar es inmediato y el aviso “Deshacer” dura 6 s.</p>
+    <p style="margin:0;max-width:375px;font-size:14px;color:#5C4A3D;text-wrap:pretty">En vivo. Unidad con un toque (sin menú desplegable). Lump sum pide solo el monto; “other” pide el nombre de la unidad. La cuenta “cantidad × precio” queda a la vista para revisarla antes de mandar. “Quitar” se puede deshacer durante 6 s.</p>
   </div>
 
   <!-- 3a deposit invoice -->
   <div id="3a" style="display:flex;flex-direction:column;gap:12px">
     <div style="display:flex;gap:8px;align-items:center"><span style="background:#2A1A10;color:#FFFFFF;font-weight:700;font-size:14px;padding:4px 8px">3a</span><span style="font-weight:600;font-size:15px">Anticipo · Estimate vs Invoice</span></div>
     <div style="width:375px;display:flex;flex-direction:column;gap:16px">
-      <div class="blueprint" style="padding:16px;display:flex;flex-direction:column;gap:14px;border-color:#CDBBA7;background:#F6F1EA"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
-        <div style="display:flex;justify-content:space-between;align-items:center"><h3 style="margin:0;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:22px;text-transform:uppercase;color:#3A2416"><span style="color:#B5470F">05 </span>Anticipo</h3><span style="font-size:13px;font-weight:700;padding:3px 8px;border:1px solid #3A2416">ESTIMATE</span></div>
+      <div style="border:1px solid #CDBBA7;padding:16px;display:flex;flex-direction:column;gap:14px;border-color:#CDBBA7;background:#F6F1EA">
+        <div style="display:flex;justify-content:space-between;align-items:center"><h3 style="margin:0;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:22px;text-transform:uppercase;color:#3A2416"><span style="color:#7F1A1A">05 </span>Anticipo</h3><span style="font-size:13px;font-weight:700;padding:3px 8px;border:1px solid #3A2416">ESTIMATE</span></div>
         <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px">
           <span style="grid-column:span 2;min-height:48px;display:grid;place-items:center;border:1.5px solid #3A2416;background:#FFFFFF;font-weight:600">20 %</span>
           <span style="grid-column:span 2;min-height:48px;display:grid;place-items:center;border:1.5px solid #3A2416;background:#3A2416;color:#FFFFFF;font-weight:600">30 %</span>
@@ -265,11 +431,11 @@ input::placeholder,textarea::placeholder{color:#8A7868}
         <div style="display:flex;flex-direction:column;border-top:1px solid #CDBBA7;font-variant-numeric:tabular-nums">
           <div style="display:flex;justify-content:space-between;padding:10px 0"><span>Total</span><strong>$18,356.75</strong></div>
           <div style="display:flex;justify-content:space-between;padding:10px 0;border-top:1px dashed #CDBBA7"><span>Anticipo (30 %)</span><strong>$5,507.03</strong></div>
-          <div style="display:flex;justify-content:space-between;align-items:baseline;padding:10px 12px;background:#2A1A10;color:#FFFFFF"><span style="font-weight:600">Saldo</span><span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:24px">$12,849.72</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:baseline;padding:10px 12px;background:#7F1A1A;color:#FFFFFF"><span style="font-weight:600">Saldo</span><span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:24px">$12,849.72</span></div>
         </div>
       </div>
-      <div class="blueprint" style="padding:16px;display:flex;flex-direction:column;gap:14px;border-color:#CDBBA7;background:#F6F1EA"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
-        <div style="display:flex;justify-content:space-between;align-items:center"><h3 style="margin:0;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:22px;text-transform:uppercase;color:#3A2416"><span style="color:#B5470F">05 </span>Anticipo recibido</h3><span style="font-size:13px;font-weight:700;padding:3px 8px;background:#B5470F;color:#FFFFFF">INVOICE</span></div>
+      <div style="border:1px solid #CDBBA7;padding:16px;display:flex;flex-direction:column;gap:14px;border-color:#CDBBA7;background:#F6F1EA">
+        <div style="display:flex;justify-content:space-between;align-items:center"><h3 style="margin:0;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:22px;text-transform:uppercase;color:#3A2416"><span style="color:#7F1A1A">05 </span>Anticipo recibido</h3><span style="font-size:13px;font-weight:700;padding:3px 8px;background:#7F1A1A;color:#FFFFFF">INVOICE</span></div>
         <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px">
           <span style="grid-column:span 2;min-height:48px;display:grid;place-items:center;border:1.5px solid #3A2416;background:#FFFFFF;font-weight:600">20 %</span>
           <span style="grid-column:span 2;min-height:48px;display:grid;place-items:center;border:1.5px solid #3A2416;background:#FFFFFF;font-weight:600">30 %</span>
@@ -277,14 +443,14 @@ input::placeholder,textarea::placeholder{color:#8A7868}
           <span style="grid-column:span 3;min-height:48px;display:grid;place-items:center;border:1.5px solid #3A2416;background:#FFFFFF;font-weight:600">Monto fijo</span>
           <span style="grid-column:span 3;min-height:48px;display:grid;place-items:center;border:1.5px solid #3A2416;background:#FFFFFF;font-weight:600">Sin anticipo</span>
         </div>
-        <label style="display:flex;flex-direction:column;gap:6px;font-size:15px;font-weight:600;color:#3A2416">Porcentaje %<div style="height:48px;display:flex;align-items:center;justify-content:flex-end;padding:0 12px;border:1.5px solid #7A6656;background:#FFFFFF;font-size:17px;font-weight:400">25</div></label>
+        <label style="display:flex;flex-direction:column;gap:6px;font-size:15px;font-weight:600;color:#3A2416">Porcentaje<div style="height:48px;display:flex;align-items:center;justify-content:flex-end;padding:0 12px;border:1.5px solid #7A6656;background:#FFFFFF;font-size:17px;font-weight:400">25<span style="flex:none;font-size:17px;font-weight:600;color:#5C4A3D;margin-left:6px">%</span></div></label>
         <div style="display:flex;flex-direction:column;border-top:1px solid #CDBBA7;font-variant-numeric:tabular-nums">
           <div style="display:flex;justify-content:space-between;padding:10px 0"><span>Total</span><strong>$18,356.75</strong></div>
           <div style="display:flex;justify-content:space-between;padding:10px 0;border-top:1px dashed #CDBBA7"><span>Anticipo recibido (25 %)</span><strong>−$4,589.19</strong></div>
-          <div style="display:flex;justify-content:space-between;align-items:baseline;padding:10px 12px;background:#B5470F;color:#FFFFFF"><span style="font-weight:600">Saldo a pagar</span><span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:24px">$13,767.56</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:baseline;padding:10px 12px;background:#7F1A1A;color:#FFFFFF"><span style="font-weight:600">Saldo a pagar</span><span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:24px">$13,767.56</span></div>
         </div>
       </div>
-      <p style="margin:0;font-size:14px;color:#5C4A3D;text-wrap:pretty">En Invoice el saldo se pinta en naranja: es lo que el cliente debe pagar. “Sin anticipo” oculta la fila y el saldo = total.</p>
+      <p style="margin:0;font-size:14px;color:#5C4A3D;text-wrap:pretty">En Invoice el saldo se pinta en rojo: es lo que el cliente debe pagar. “Sin anticipo” oculta la fila y el saldo = total.</p>
     </div>
   </div>
 
@@ -297,9 +463,9 @@ input::placeholder,textarea::placeholder{color:#8A7868}
         <div style="width:351px;height:454px;overflow:hidden;box-shadow:0 3px 10px rgba(0,0,0,.35)"><div style="transform:scale(0.43);transform-origin:0 0;width:816px"><dc-import name="Sosa PDF" doc="{{ pdfEstimate }}" hint-size="816px,1056px"></dc-import></div></div>
         <div style="text-align:center;color:#E8C58F;font-size:13px;padding-top:8px">Página 1 de 1 · pellizca para ampliar</div>
       </div>
-      <div style="flex:none;padding:12px;display:flex;flex-direction:column;gap:10px;border-top:3px solid #E06A1F">
-        <span style="min-height:56px;background:#EE7A30;color:#1F1712;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:22px;letter-spacing:.04em;display:flex;align-items:center;justify-content:center">COMPARTIR</span>
-        <div style="display:flex;gap:8px"><span style="flex:1;min-height:64px;border:1.5px solid #E8C58F;color:#FFFFFF;font-size:14px;font-weight:600;display:grid;place-items:center">Descargar</span><span style="flex:1.3;min-height:64px;border:1.5px solid #E8C58F;color:#FFFFFF;font-size:14px;font-weight:600;display:grid;place-items:center">Convertir en Invoice</span><span style="flex:1;min-height:64px;border:1.5px solid #E8C58F;color:#FFFFFF;font-size:14px;font-weight:600;display:grid;place-items:center;text-align:center">Nuevo documento</span></div>
+      <div style="flex:none;padding:12px;display:flex;flex-direction:column;gap:10px;border-top:3px solid #9E1F1F">
+        <span style="min-height:56px;background:#A51C30;color:#FFFFFF;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:22px;letter-spacing:.04em;display:flex;align-items:center;justify-content:center">COMPARTIR</span>
+        <div style="display:flex;gap:8px"><span style="flex:1;min-width:0;min-height:72px;padding:10px 8px;border:1.5px solid #E8C58F;background:#4A3426;color:#FFFFFF;font-size:14px;font-weight:600;line-height:1.2;text-align:center;display:grid;place-items:center">Descargar</span><span style="flex:1.3;min-width:0;min-height:72px;padding:10px 8px;border:1.5px solid #E8C58F;background:#4A3426;color:#FFFFFF;font-size:14px;font-weight:600;line-height:1.2;text-align:center;display:grid;place-items:center">Convertir en Invoice</span><span style="flex:1;min-width:0;min-height:72px;padding:10px 8px;border:1.5px solid #E8C58F;background:#4A3426;color:#FFFFFF;font-size:14px;font-weight:600;line-height:1.2;text-align:center;display:grid;place-items:center;text-align:center">Nuevo documento</span></div>
       </div>
     </div>
   </div>
@@ -311,10 +477,10 @@ input::placeholder,textarea::placeholder{color:#8A7868}
         <div style="width:351px;height:454px;overflow:hidden"><div style="transform:scale(0.43);transform-origin:0 0;width:816px"><dc-import name="Sosa PDF" doc="{{ pdfInvoice }}" hint-size="816px,1056px"></dc-import></div></div>
       </div>
       <div style="position:absolute;inset:0;background:rgba(20,12,8,.55)"></div>
-      <div style="position:absolute;left:0;right:0;bottom:0;background:#FFFFFF;border-top:3px solid #E06A1F;padding:16px;display:flex;flex-direction:column;gap:10px">
+      <div style="position:absolute;left:0;right:0;bottom:0;background:#FFFFFF;border-top:3px solid #9E1F1F;padding:16px;display:flex;flex-direction:column;gap:10px">
         <div style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:22px;text-transform:uppercase;color:#3A2416">Enviar a Margaret Kelly</div>
         <span style="min-height:56px;border:1.5px solid #3A2416;display:flex;align-items:center;gap:12px;padding:0 16px;font-size:17px;font-weight:600"><span style="width:12px;height:12px;background:#2F6B3A"></span>WhatsApp · (610) 555-0142</span>
-        <span style="min-height:56px;border:1.5px solid #3A2416;display:flex;align-items:center;gap:12px;padding:0 16px;font-size:17px;font-weight:600"><span style="width:12px;height:12px;background:#B5470F"></span>Correo · mkelly.home@gmail.com</span>
+        <span style="min-height:56px;border:1.5px solid #3A2416;display:flex;align-items:center;gap:12px;padding:0 16px;font-size:17px;font-weight:600"><span style="width:12px;height:12px;background:#7F1A1A"></span>Correo · mkelly.home@gmail.com</span>
         <span style="min-height:56px;border:1.5px solid #CDBBA7;display:flex;align-items:center;padding:0 16px;font-size:17px;color:#5C4A3D">Más opciones del teléfono…</span>
         <span style="min-height:48px;display:grid;place-items:center;font-weight:600;color:#3A2416">Cancelar</span>
       </div>
@@ -331,16 +497,17 @@ input::placeholder,textarea::placeholder{color:#8A7868}
     <div style="display:flex;gap:8px;align-items:center"><span style="background:#2A1A10;color:#FFFFFF;font-weight:700;font-size:14px;padding:4px 8px">5a</span><span style="font-weight:600;font-size:15px">Formulario + PDF en vivo · interactivo (arrastra filas para reordenar)</span></div>
     <div style="width:1280px;height:860px;background:#F6F1EA;border:1px solid #1F1712;box-shadow:0 12px 32px rgba(31,23,18,.22);display:flex;flex-direction:column;overflow:hidden">
       <div style="height:72px;flex:none;background:#FFFFFF;border-bottom:1px solid #D8CBBB;display:flex;align-items:center;gap:20px;padding:0 24px">
-        <img src="assets/logo.png" alt="Sosa's Constructions" style="height:48px;display:block">
+        <img src="assets/logo-ai-red.jpg" alt="Sosa's Hardwood Floors" style="height:62px;display:block">
         <div style="width:1px;height:36px;background:#D8CBBB"></div>
         <div style="display:flex;flex-direction:column"><span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:22px;color:#2A1A10;text-transform:uppercase">{{ docLabel }} {{ numberFull }}</span><span style="font-size:13px;font-weight:600;color:#2F6B3A">✓ Borrador guardado</span></div>
+        <sc-if value="{{ isEstimate }}" hint-placeholder-val="{{ true }}"><button onClick="{{ convert }}" style="min-height:48px;padding:0 16px;border:1.5px solid #7F1A1A;border-radius:2px;background:#F6E4E1;color:#7F1A1A;font-size:16px;font-weight:700;display:flex;align-items:center;gap:8px;cursor:pointer" style-hover="background:#EFD3CE"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>Convertir en Invoice</button></sc-if>
         <div style="flex:1"></div>
-        <button style="min-height:48px;padding:0 18px;border:1.5px solid #3A2416;border-radius:2px;background:#FFFFFF;color:#3A2416;font-size:16px;font-weight:600;cursor:pointer" style-hover="background:#F7E7CC">Nuevo documento</button>
-        <sc-if value="{{ isEstimate }}" hint-placeholder-val="{{ true }}"><button onClick="{{ convert }}" style="min-height:48px;padding:0 18px;border:1.5px solid #3A2416;border-radius:2px;background:#FFFFFF;color:#3A2416;font-size:16px;font-weight:600;cursor:pointer" style-hover="background:#F7E7CC">Convertir en Invoice</button></sc-if>
-        <button style="min-height:48px;padding:0 18px;border:1.5px solid #3A2416;border-radius:2px;background:#FFFFFF;color:#3A2416;font-size:16px;font-weight:600;cursor:pointer" style-hover="background:#F7E7CC">Descargar PDF</button>
-        <button class="blueprint" style="min-height:48px;padding:0 22px;border:0;border-radius:0;background:#B5470F;color:#FFFFFF;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:20px;text-transform:uppercase;letter-spacing:.04em;cursor:pointer" style-hover="background:#8F3709"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>Compartir</button>
+        <button style="min-height:48px;padding:0 12px;border:0;border-radius:2px;background:transparent;color:#3A2416;font-size:15px;font-weight:600;display:flex;align-items:center;gap:6px;cursor:pointer" style-hover="background:#F7E7CC"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>Nuevo documento</button>
+        <div style="width:1px;height:36px;background:#D8CBBB"></div>
+        <button style="min-height:48px;padding:0 16px;border:1.5px solid #3A2416;border-radius:2px;background:#FFFFFF;color:#3A2416;font-size:16px;font-weight:600;display:flex;align-items:center;gap:8px;cursor:pointer" style-hover="background:#F7E7CC"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><path d="m7 10 5 5 5-5"></path><path d="M12 15V3"></path></svg>Descargar PDF</button>
+        <button style="min-height:48px;padding:0 22px;border:0;border-radius:2px;background:#7F1A1A;color:#FFFFFF;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:20px;text-transform:uppercase;letter-spacing:.04em;display:flex;align-items:center;gap:8px;cursor:pointer" style-hover="background:#5C1212"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><path d="m8.6 13.5 6.8 4"></path><path d="m15.4 6.5-6.8 4"></path></svg>Compartir</button>
       </div>
-      <div style="flex:1;display:grid;grid-template-columns:minmax(0,1fr) 540px;min-height:0">
+      <div style="flex:1;display:grid;grid-template-columns:minmax(0,1fr) 420px;min-height:0">
         <div style="overflow-y:auto;padding:24px 32px 32px;display:flex;flex-direction:column;gap:24px">
           <div style="display:grid;grid-template-columns:280px 1fr 1fr;gap:16px;align-items:end">
             <div role="radiogroup" aria-label="Tipo de documento" style="display:grid;grid-template-columns:1fr 1fr;border:1.5px solid #3A2416">
@@ -350,7 +517,7 @@ input::placeholder,textarea::placeholder{color:#8A7868}
             <label style="display:flex;flex-direction:column;gap:6px;font-size:15px;font-weight:600;color:#3A2416">Fecha<input type="date" value="{{ date }}" onChange="{{ onDate }}" style="height:48px;padding:0 10px;border:1.5px solid #7A6656;border-radius:2px;background:#FFFFFF;font-size:17px;color:#1F1712;box-sizing:border-box"></label>
           </div>
           <div style="display:flex;flex-direction:column;gap:12px">
-            <h3 style="margin:0;display:flex;gap:8px;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:22px;text-transform:uppercase;letter-spacing:.02em;color:#3A2416"><span style="color:#B5470F">02</span>Cliente</h3>
+            <h3 style="margin:0;display:flex;gap:8px;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:22px;text-transform:uppercase;letter-spacing:.02em;color:#3A2416"><span style="color:#7F1A1A">02</span>Cliente</h3>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 16px">
               <label style="display:flex;flex-direction:column;gap:6px;font-size:15px;font-weight:600;color:#3A2416">Nombre<input value="{{ client.name }}" onChange="{{ onName }}" style="height:48px;padding:0 12px;border:1.5px solid #7A6656;border-radius:2px;background:#FFFFFF;font-size:17px;color:#1F1712;box-sizing:border-box"></label>
               <label style="display:flex;flex-direction:column;gap:6px;font-size:15px;font-weight:600;color:#3A2416">Dirección<input value="{{ client.address }}" onChange="{{ onAddress }}" style="height:48px;padding:0 12px;border:1.5px solid #7A6656;border-radius:2px;background:#FFFFFF;font-size:17px;color:#1F1712;box-sizing:border-box"></label>
@@ -358,57 +525,83 @@ input::placeholder,textarea::placeholder{color:#8A7868}
               <label style="display:flex;flex-direction:column;gap:6px;font-size:15px;font-weight:600;color:#3A2416">Email<input type="email" value="{{ client.email }}" onChange="{{ onEmail }}" style="height:48px;padding:0 12px;border:1.5px solid #7A6656;border-radius:2px;background:#FFFFFF;font-size:17px;color:#1F1712;box-sizing:border-box"></label>
             </div>
           </div>
-          <label style="display:flex;flex-direction:column;gap:8px;font-size:15px;font-weight:600;color:#3A2416"><span style="display:flex;gap:8px;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:22px;text-transform:uppercase;letter-spacing:.02em"><span style="color:#B5470F">03</span>Descripción del trabajo</span>
+          <label style="display:flex;flex-direction:column;gap:8px;font-size:15px;font-weight:600;color:#3A2416"><span style="display:flex;gap:8px;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:22px;text-transform:uppercase;letter-spacing:.02em"><span style="color:#7F1A1A">03</span>Descripción del trabajo</span>
             <textarea rows="3" value="{{ desc }}" onChange="{{ onDesc }}" style="padding:10px 12px;border:1.5px solid #7A6656;border-radius:2px;background:#FFFFFF;font-size:17px;line-height:1.4;color:#1F1712;resize:vertical;font-weight:400"></textarea>
           </label>
           <div style="display:flex;flex-direction:column;gap:12px">
-            <h3 style="margin:0;display:flex;gap:8px;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:22px;text-transform:uppercase;letter-spacing:.02em;color:#3A2416"><span style="color:#B5470F">04</span>Partidas</h3>
-            <div class="blueprint" style="background:#FFFFFF;border-color:#CDBBA7"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
-              <div style="display:grid;grid-template-columns:36px minmax(0,1fr) 84px 124px 96px 108px 48px;gap:8px;padding:0 8px;height:40px;align-items:center;background:#2A1A10;color:#FFFFFF;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase">
-                <span></span><span>Descripción</span><span style="text-align:right">Cant.</span><span>Unidad</span><span style="text-align:right">Precio</span><span style="text-align:right">Monto</span><span></span>
+            <h3 style="margin:0;display:flex;gap:8px;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:22px;text-transform:uppercase;letter-spacing:.02em;color:#3A2416"><span style="color:#7F1A1A">04</span>Trabajos</h3>
+            <div style="border:1px solid #CDBBA7;background:#FFFFFF;border-color:#CDBBA7">
+              <div style="display:grid;grid-template-columns:24px minmax(0,1fr) 88px 116px 108px 104px 48px;gap:8px;padding:0 12px;height:40px;align-items:center;background:#2A1A10;color:#FFFFFF;font-family:Barlow, sans-serif;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase">
+                <span></span><span style="padding-left:10px">Descripción</span><span style="text-align:center">Cant.</span><span style="text-align:center">Unidad</span><span style="text-align:center">Precio</span><span style="text-align:right">Monto</span><span></span>
               </div>
               <sc-for list="{{ items }}" as="it" hint-placeholder-count="4">
-                <div draggable="true" onDragStart="{{ it.onDragStart }}" onDragOver="{{ it.onDragOver }}" onDrop="{{ it.onDrop }}" style="display:grid;grid-template-columns:36px minmax(0,1fr) 84px 124px 96px 108px 48px;gap:8px;padding:8px;align-items:center;border-bottom:1px solid #E4D8CA" style-hover="background:#FBF6EF">
-                  <span title="Arrastra para reordenar" style="height:48px;display:grid;place-items:center;color:#7A6656;cursor:grab"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="5" r="1"></circle><circle cx="9" cy="12" r="1"></circle><circle cx="9" cy="19" r="1"></circle><circle cx="15" cy="5" r="1"></circle><circle cx="15" cy="12" r="1"></circle><circle cx="15" cy="19" r="1"></circle></svg></span>
-                  <input value="{{ it.desc }}" onChange="{{ it.onDesc }}" aria-label="Descripción" style="height:48px;padding:0 10px;border:1.5px solid #7A6656;border-radius:2px;background:#FFFFFF;font-size:16px;color:#1F1712;min-width:0">
-                  <input inputMode="decimal" value="{{ it.qtyCell }}" onChange="{{ it.onQty }}" disabled="{{ it.isLump }}" aria-label="Cantidad" style="height:48px;padding:0 10px;border:1.5px solid #7A6656;border-radius:2px;background:{{ it.cellBg }};font-size:16px;color:#1F1712;text-align:right;min-width:0">
-                  <select value="{{ it.unit }}" onChange="{{ it.onUnit }}" aria-label="Unidad" style="height:48px;padding:0 6px;border:1.5px solid #7A6656;border-radius:2px;background:#FFFFFF;font-size:16px;color:#1F1712;min-width:0">
+                <div draggable="true" onDragStart="{{ it.onDragStart }}" onDragOver="{{ it.onDragOver }}" onDrop="{{ it.onDrop }}" style="display:grid;grid-template-columns:24px minmax(0,1fr) 88px 116px 108px 104px 48px;gap:8px;padding:8px 12px;align-items:start;border-bottom:1px solid #E4D8CA" style-hover="background:#FBF6EF">
+                  <span title="Arrastra para reordenar" style="height:44px;display:grid;place-items:center;color:#7A6656;cursor:grab"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="5" r="1"></circle><circle cx="9" cy="12" r="1"></circle><circle cx="9" cy="19" r="1"></circle><circle cx="15" cy="5" r="1"></circle><circle cx="15" cy="12" r="1"></circle><circle cx="15" cy="19" r="1"></circle></svg></span>
+                  <textarea rows="1" value="{{ it.desc }}" onChange="{{ it.onDesc }}" aria-label="Descripción del trabajo {{ it.n }}" style="min-height:48px;field-sizing:content;padding:12px 10px;border:1.5px solid #7A6656;border-radius:2px;box-sizing:border-box;font-family:Barlow, sans-serif;font-size:16px;line-height:1.3;color:#1F1712;min-width:0;width:100%;background:#FFFFFF;resize:none"></textarea>
+                  <input inputMode="decimal" value="{{ it.qtyCell }}" onChange="{{ it.onQty }}" disabled="{{ it.isLump }}" aria-label="Cantidad" placeholder="0" style="height:48px;border:1.5px solid #7A6656;border-radius:2px;box-sizing:border-box;font-size:17px;color:#1F1712;min-width:0;width:100%;padding:0 8px;background:{{ it.cellBg }};text-align:right;font-variant-numeric:tabular-nums">
+                  <select value="{{ it.unit }}" onChange="{{ it.onUnit }}" aria-label="Unidad" style="height:48px;border:1.5px solid #7A6656;border-radius:2px;box-sizing:border-box;font-size:17px;color:#1F1712;min-width:0;width:100%;padding:0 6px;background:#FFFFFF">
                     <option value="sqft">sq ft</option><option value="lft">linear ft</option><option value="steps">steps</option><option value="each">each</option><option value="hours">hours</option><option value="lump">lump sum</option><option value="other">other</option>
                   </select>
-                  <input inputMode="decimal" value="{{ it.priceCell }}" onChange="{{ it.onPrice }}" disabled="{{ it.isLump }}" aria-label="Precio" style="height:48px;padding:0 10px;border:1.5px solid #7A6656;border-radius:2px;background:{{ it.cellBg }};font-size:16px;color:#1F1712;text-align:right;min-width:0">
-                  <sc-if value="{{ it.isLump }}" hint-placeholder-val="{{ false }}"><input inputMode="decimal" value="{{ it.amount }}" onChange="{{ it.onAmount }}" aria-label="Monto" style="height:48px;padding:0 10px;border:1.5px solid #1F1712;border-radius:2px;background:#FFFFFF;font-size:16px;font-weight:600;color:#1F1712;text-align:right;min-width:0"></sc-if>
-                  <sc-if value="{{ it.notLump }}" hint-placeholder-val="{{ true }}"><span style="text-align:right;font-weight:700;font-size:17px;font-variant-numeric:tabular-nums">{{ it.amountStr }}</span></sc-if>
-                  <button aria-label="Eliminar partida" onClick="{{ it.onDel }}" style="width:48px;height:48px;border:0;background:transparent;color:#B3261E;display:grid;place-items:center;cursor:pointer" style-hover="background:#FBE9E7"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg></button>
+                  <input inputMode="decimal" value="{{ it.priceCell }}" onChange="{{ it.onPrice }}" disabled="{{ it.isLump }}" aria-label="Precio" placeholder="0.00" style="height:48px;border:1.5px solid #7A6656;border-radius:2px;box-sizing:border-box;font-size:17px;color:#1F1712;min-width:0;width:100%;padding:0 8px;background:{{ it.cellBg }};text-align:right;font-variant-numeric:tabular-nums">
+                  <sc-if value="{{ it.notLump }}" hint-placeholder-val="{{ true }}"><span style="line-height:48px;text-align:right;font-weight:700;font-size:16px;font-variant-numeric:tabular-nums">{{ it.amountStr }}</span></sc-if>
+                  <sc-if value="{{ it.isLump }}" hint-placeholder-val="{{ false }}"><input inputMode="decimal" value="{{ it.amount }}" onChange="{{ it.onAmount }}" aria-label="Monto" style="height:48px;border:1.5px solid #7A6656;border-radius:2px;box-sizing:border-box;font-size:17px;color:#1F1712;min-width:0;width:100%;padding:0 8px;border-color:#1F1712;background:#FFFFFF;font-weight:700;text-align:right;font-variant-numeric:tabular-nums"></sc-if>
+                  <button aria-label="Quitar" title="Quitar" onClick="{{ it.onDel }}" style="flex:none;width:48px;height:48px;border:0;border-radius:2px;background:transparent;color:#B3261E;display:grid;place-items:center;cursor:pointer" style-hover="background:#FBE9E7" style-active="background:#F3D2CD"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg></button>
+                  <sc-if value="{{ it.isOther }}" hint-placeholder-val="{{ false }}"><span></span><span></span><span></span><input value="{{ it.other }}" onChange="{{ it.onOther }}" aria-label="¿Qué unidad?" placeholder="¿qué unidad?" style="height:48px;border:1.5px solid #7A6656;border-radius:2px;box-sizing:border-box;font-size:17px;color:#1F1712;min-width:0;width:100%;padding:0 8px;background:#FFFFFF"></sc-if>
                 </div>
               </sc-for>
               <div style="display:flex;justify-content:space-between;align-items:center;padding:8px">
-                <button onClick="{{ addItem }}" style="min-height:48px;padding:0 16px;border:1.5px solid #3A2416;border-radius:2px;background:#FFFFFF;color:#3A2416;font-size:16px;font-weight:600;cursor:pointer" style-hover="background:#F7E7CC">+ Agregar partida</button>
-                <sc-if value="{{ hasUndo }}" hint-placeholder-val="{{ false }}"><span style="display:flex;align-items:center;gap:4px;background:#1F1712;color:#FFFFFF;padding-left:14px">{{ undoLabel }}<button onClick="{{ doUndo }}" style="min-height:48px;padding:0 14px;border:0;background:transparent;color:#EE7A30;font-weight:700;cursor:pointer">DESHACER</button></span></sc-if>
-                <span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:26px;font-variant-numeric:tabular-nums">Total {{ totalStr }}</span>
+                <button onClick="{{ addItem }}" style="min-height:48px;padding:0 16px;border:1.5px solid #3A2416;border-radius:2px;background:#FFFFFF;color:#3A2416;font-size:16px;font-weight:600;cursor:pointer" style-hover="background:#F7E7CC">+ Agregar trabajo</button>
+                <sc-if value="{{ hasUndo }}" hint-placeholder-val="{{ false }}"><span style="display:flex;align-items:center;gap:4px;background:#1F1712;color:#FFFFFF;padding-left:14px">{{ undoLabel }}<button onClick="{{ doUndo }}" style="min-height:48px;padding:0 14px;border:0;background:transparent;color:#E8C58F;font-weight:700;cursor:pointer">DESHACER</button></span></sc-if>
+                <span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:26px;font-variant-numeric:tabular-nums">Subtotal {{ workStr }}</span>
               </div>
             </div>
           </div>
+          <sc-if value="{{ isInvoice }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div style="display:flex;align-items:center;gap:8px"><h3 style="margin:0;flex:1;display:flex;gap:8px;align-items:baseline;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:22px;text-transform:uppercase;letter-spacing:.02em;color:#3A2416"><span style="color:#7F1A1A">05</span>Cargos extra<sc-if value="{{ extrasOn }}" hint-placeholder-val="{{ true }}"><span style="margin-left:auto;font-family:Barlow, sans-serif;font-size:17px;font-weight:700;text-transform:none;letter-spacing:0;color:#1F1712;font-variant-numeric:tabular-nums">{{ extrasTotalStr }}</span></sc-if></h3><button role="switch" aria-checked="{{ extrasOn }}" aria-label="Incluir cargos extra en el PDF" onClick="{{ toggleExtras }}" style="flex:none;min-width:64px;height:48px;border:0;background:transparent;padding:0;display:flex;align-items:center;justify-content:flex-end;cursor:pointer"><span style="width:52px;height:30px;border-radius:2px;background:{{ exSwBg }};position:relative;display:block;transition:background .15s"><span style="position:absolute;top:3px;left:{{ exSwKnob }};width:24px;height:24px;border-radius:1px;background:#FFFFFF;transition:left .15s"></span></span></button></div>
+            <sc-if value="{{ extrasOff }}" hint-placeholder-val="{{ false }}"><span style="font-size:15px;color:#5C4A3D;text-wrap:pretty;margin-top:-6px">No sale en el invoice.</span></sc-if>
+            <sc-if value="{{ extrasOn }}" hint-placeholder-val="{{ true }}">
+            <div style="background:#FFFFFF;border:1px solid #CDBBA7">
+              <sc-for list="{{ extras }}" as="x" hint-placeholder-count="3"><div style="display:grid;grid-template-columns:minmax(0,1fr) 160px 48px;gap:8px;padding:8px;border-bottom:1px solid #E4D8CA;align-items:center"><input value="{{ x.desc }}" onChange="{{ x.onDesc }}" aria-label="Descripción del cargo" placeholder="ej. Debris disposal" style="height:48px;padding:0 10px;border:1.5px solid #7A6656;border-radius:2px;background:#FFFFFF;font-size:16px;color:#1F1712;box-sizing:border-box;min-width:0"><input inputMode="decimal" value="{{ x.amount }}" onChange="{{ x.onAmount }}" aria-label="Monto" placeholder="0.00" style="height:48px;padding:0 10px;border:1.5px solid #7A6656;border-radius:2px;background:#FFFFFF;font-size:16px;color:#1F1712;box-sizing:border-box;min-width:0;text-align:right;font-weight:600"><button aria-label="Quitar" title="Quitar" onClick="{{ x.onDel }}" style="flex:none;width:48px;height:48px;border:0;border-radius:2px;background:transparent;color:#B3261E;display:grid;place-items:center;cursor:pointer" style-hover="background:#FBE9E7" style-active="background:#F3D2CD"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg></button></div></sc-for>
+              <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:8px"><button onClick="{{ addExtra }}" style="min-height:48px;padding:0 16px;border:1.5px solid #3A2416;border-radius:2px;background:#FFFFFF;color:#3A2416;font-size:16px;font-weight:600;cursor:pointer" style-hover="background:#F7E7CC">+ Agregar cargo</button></div>
+            </div>
+            </sc-if>
+          </div>
+          </sc-if>
+          <sc-if value="{{ isEstimate }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div style="display:flex;align-items:center;gap:12px"><h3 style="margin:0;display:flex;gap:8px;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:22px;text-transform:uppercase;letter-spacing:.02em;color:#3A2416;flex:1"><span style="color:#7F1A1A">06</span>Pasos del proceso</h3><span style="font-size:15px;font-weight:600;color:#3A2416">Incluir en el PDF</span><button role="switch" aria-checked="{{ showProcess }}" aria-label="Incluir pasos en el PDF" onClick="{{ toggleProcess }}" style="flex:none;min-width:64px;height:48px;border:0;background:transparent;padding:0;display:flex;align-items:center;justify-content:flex-end;cursor:pointer"><span style="width:52px;height:30px;border-radius:2px;background:{{ swBg }};position:relative;display:block;transition:background .15s"><span style="position:absolute;top:3px;left:{{ swKnob }};width:24px;height:24px;border-radius:1px;background:#FFFFFF;transition:left .15s"></span></span></button></div>
+            <sc-if value="{{ showProcess }}" hint-placeholder-val="{{ true }}">
+              <label style="display:flex;flex-direction:column;gap:6px;font-size:15px;font-weight:600;color:#3A2416">Nota inicial para el cliente (opcional)<textarea rows="2" value="{{ processIntro }}" onChange="{{ onProcessIntro }}" placeholder="ej. Supuestos del trabajo, qué pasa si encontramos daños…" style="padding:8px 10px;border:1.5px solid #7A6656;border-radius:2px;background:#FFFFFF;font-family:Barlow, sans-serif;font-size:15px;font-weight:400;line-height:1.4;color:#1F1712;box-sizing:border-box;width:100%;resize:vertical"></textarea></label>
+              <div style="background:#FFFFFF;border:1px solid #CDBBA7">
+                <sc-for list="{{ steps }}" as="p" hint-placeholder-count="7"><div style="display:grid;grid-template-columns:32px minmax(0,1fr) 48px 48px 48px;gap:4px;padding:8px;border-bottom:1px solid #E4D8CA;align-items:start"><span style="line-height:48px;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:20px;color:#7F1A1A;text-align:center">{{ p.n }}</span><div style="display:flex;flex-direction:column;gap:6px;min-width:0"><input value="{{ p.text }}" onChange="{{ p.onText }}" placeholder="Título del paso" aria-label="Texto del paso {{ p.n }}" style="height:48px;padding:0 10px;border:1.5px solid #7A6656;border-radius:2px;background:#FFFFFF;font-size:16px;color:#1F1712;box-sizing:border-box;min-width:0"><textarea rows="2" value="{{ p.detail }}" onChange="{{ p.onDetail }}" aria-label="Explicación del paso {{ p.n }}" placeholder="Explica qué harán en este paso (opcional)" style="padding:8px 10px;border:1.5px solid #7A6656;border-radius:2px;background:#FFFFFF;font-family:Barlow, sans-serif;font-size:15px;line-height:1.4;color:#1F1712;box-sizing:border-box;min-width:0;width:100%;resize:vertical"></textarea></div><button aria-label="Subir paso" onClick="{{ p.onUp }}" disabled="{{ p.isFirst }}" style="flex:none;width:48px;height:48px;border:0;background:transparent;color:#3A2416;display:grid;place-items:center;cursor:pointer" style-hover="background:#F7E7CC"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"></path></svg></button><button aria-label="Bajar paso" onClick="{{ p.onDown }}" disabled="{{ p.isLast }}" style="flex:none;width:48px;height:48px;border:0;background:transparent;color:#3A2416;display:grid;place-items:center;cursor:pointer" style-hover="background:#F7E7CC"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"></path></svg></button><button aria-label="Quitar" title="Quitar" onClick="{{ p.onDel }}" style="flex:none;width:48px;height:48px;border:0;border-radius:2px;background:transparent;color:#B3261E;display:grid;place-items:center;cursor:pointer" style-hover="background:#FBE9E7" style-active="background:#F3D2CD"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg></button></div></sc-for>
+                <div style="display:flex;gap:8px;align-items:center;padding:8px"><button onClick="{{ addStep }}" style="min-height:48px;padding:0 16px;border:1.5px solid #3A2416;border-radius:2px;background:#FFFFFF;color:#3A2416;font-size:16px;font-weight:600;cursor:pointer" style-hover="background:#F7E7CC">+ Agregar paso</button><button onClick="{{ resetSteps }}" style="min-height:48px;padding:0 16px;border:1.5px solid #7A6656;border-radius:2px;background:transparent;color:#3A2416;font-size:16px;font-weight:600;cursor:pointer" style-hover="background:#F7E7CC">Restaurar plantilla</button><span style="font-size:14px;color:#5C4A3D;margin-left:auto">Solo cambia este estimate.</span></div>
+              </div>
+            </sc-if>
+          </div>
+          </sc-if>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
             <div style="display:flex;flex-direction:column;gap:12px">
-              <h3 style="margin:0;display:flex;gap:8px;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:22px;text-transform:uppercase;letter-spacing:.02em;color:#3A2416"><span style="color:#B5470F">05</span>{{ depTitle }}</h3>
+              <h3 style="margin:0;display:flex;gap:8px;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:22px;text-transform:uppercase;letter-spacing:.02em;color:#3A2416"><span style="color:#7F1A1A">{{ secDep }}</span>{{ depTitle }}</h3>
               <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px">
                 <sc-for list="{{ depOpts }}" as="o" hint-placeholder-count="5"><button role="radio" aria-checked="{{ o.on }}" onClick="{{ o.onClick }}" style="grid-column:span {{ o.span }};min-height:48px;border:1.5px solid #3A2416;border-radius:2px;background:{{ o.bg }};color:{{ o.fg }};font-size:15px;font-weight:600;cursor:pointer">{{ o.label }}</button></sc-for>
               </div>
-              <sc-if value="{{ depIsPct }}" hint-placeholder-val="{{ false }}"><input inputMode="decimal" value="{{ depPct }}" onChange="{{ onDepPct }}" aria-label="Porcentaje" style="height:48px;padding:0 12px;border:1.5px solid #7A6656;border-radius:2px;background:#FFFFFF;font-size:17px;text-align:right"></sc-if>
-              <sc-if value="{{ depIsFixed }}" hint-placeholder-val="{{ false }}"><input inputMode="decimal" value="{{ depFixed }}" onChange="{{ onDepFixed }}" aria-label="Monto fijo" style="height:48px;padding:0 12px;border:1.5px solid #7A6656;border-radius:2px;background:#FFFFFF;font-size:17px;text-align:right"></sc-if>
+              <sc-if value="{{ depIsPct }}" hint-placeholder-val="{{ false }}"><span style="display:flex;align-items:center;height:48px;border:1.5px solid #7A6656;border-radius:2px;background:#FFFFFF;box-sizing:border-box;width:100%"><input inputMode="decimal" value="{{ depPct }}" onChange="{{ onDepPct }}" aria-label="Porcentaje" style="height:48px;padding:0 12px;border:1.5px solid #7A6656;border-radius:2px;background:#FFFFFF;font-size:17px;text-align:right;flex:1;min-width:0;width:0;height:100%;border:0;background:transparent;padding-right:4px"><span style="flex:none;font-size:17px;font-weight:600;color:#5C4A3D;padding-right:12px">%</span></span></sc-if>
+              <sc-if value="{{ depIsFixed }}" hint-placeholder-val="{{ false }}"><span style="display:flex;align-items:center;height:48px;border:1.5px solid #7A6656;border-radius:2px;background:#FFFFFF;box-sizing:border-box;width:100%"><span style="flex:none;font-size:17px;font-weight:600;color:#5C4A3D;padding-left:12px">$</span><input inputMode="decimal" value="{{ depFixed }}" onChange="{{ onDepFixed }}" aria-label="Monto fijo" style="height:48px;padding:0 12px;border:1.5px solid #7A6656;border-radius:2px;background:#FFFFFF;font-size:17px;text-align:right;flex:1;min-width:0;width:0;height:100%;border:0;background:transparent;padding-left:4px"></span></sc-if>
               <div style="display:flex;flex-direction:column;font-variant-numeric:tabular-nums">
                 <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed #CDBBA7"><span>{{ depLabel }}</span><strong>{{ depStr }}</strong></div>
-                <div style="display:flex;justify-content:space-between;align-items:baseline;padding:8px 12px;background:#2A1A10;color:#FFFFFF"><span style="font-weight:600">{{ balLabel }}</span><span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:22px">{{ balStr }}</span></div>
+                <div style="display:flex;justify-content:space-between;align-items:baseline;padding:8px 12px;background:#7F1A1A;color:#FFFFFF"><span style="font-weight:600">{{ balLabel }}</span><span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:22px">{{ balStr }}</span></div>
               </div>
             </div>
-            <label style="display:flex;flex-direction:column;gap:12px;font-size:15px;font-weight:600;color:#3A2416"><span style="display:flex;gap:8px;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:22px;text-transform:uppercase;letter-spacing:.02em"><span style="color:#B5470F">06</span>Términos</span>
+            <label style="display:flex;flex-direction:column;gap:12px;font-size:15px;font-weight:600;color:#3A2416"><span style="display:flex;gap:8px;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:22px;text-transform:uppercase;letter-spacing:.02em"><span style="color:#7F1A1A">07</span>Términos</span>
               <textarea rows="6" value="{{ terms }}" onChange="{{ onTerms }}" style="padding:10px 12px;border:1.5px solid #7A6656;border-radius:2px;background:#FFFFFF;font-size:15px;line-height:1.4;color:#1F1712;resize:vertical;font-weight:400"></textarea>
             </label>
           </div>
         </div>
         <div style="background:#4A3426;overflow-y:auto;padding:24px;display:flex;flex-direction:column;align-items:center;gap:10px">
-          <div style="align-self:stretch;display:flex;justify-content:space-between;color:#E8C58F;font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase"><span>Vista previa en vivo</span><span>Carta · 1 de 1</span></div>
-          <div style="width:490px;height:634px;overflow:hidden;flex:none;box-shadow:0 12px 32px rgba(0,0,0,.4)"><div style="transform:scale(0.6);transform-origin:0 0;width:816px"><dc-import name="Sosa PDF" doc="{{ pdfDoc }}" hint-size="816px,1056px"></dc-import></div></div>
+          <div style="align-self:stretch;display:flex;justify-content:space-between;color:#E8C58F;font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase"><span>Vista previa en vivo</span><span>{{ previewPages }}</span></div>
+          <div style="width:375px;height:485px;overflow:hidden;flex:none;box-shadow:0 12px 32px rgba(0,0,0,.4)"><div style="transform:scale(0.46);transform-origin:0 0;width:816px"><dc-import name="Sosa PDF" doc="{{ pdfDoc }}" page-count="{{ pdfPages }}" process-page="{{ 2 }}" hint-size="816px,1056px"></dc-import></div></div>
+          <sc-for list="{{ procPages }}" as="pg" hint-placeholder-count="0"><div style="width:375px;height:485px;overflow:hidden;flex:none;box-shadow:0 12px 32px rgba(0,0,0,.4)"><div style="transform:scale(0.46);transform-origin:0 0;width:816px"><dc-import name="Sosa PDF" doc="{{ pdfDoc }}" part="process" process-start="{{ pg.start }}" process-end="{{ pg.end }}" page-no="{{ pg.pageNo }}" page-count="{{ pdfPages }}" hint-size="816px,1056px"></dc-import></div></div></sc-for>
         </div>
       </div>
     </div>
@@ -423,51 +616,63 @@ input::placeholder,textarea::placeholder{color:#8A7868}
   <div id="6a" style="display:flex;flex-direction:column;gap:12px">
     <div style="display:flex;gap:8px;align-items:center"><span style="background:#2A1A10;color:#FFFFFF;font-weight:700;font-size:14px;padding:4px 8px">6a</span><span style="font-weight:600;font-size:15px">Formulario vacío</span></div>
     <div style="width:375px;height:812px;background:#F6F1EA;border:1px solid #1F1712;box-shadow:0 12px 32px rgba(31,23,18,.22);display:flex;flex-direction:column;overflow:hidden">
-      <div style="height:64px;flex:none;background:#FFFFFF;border-bottom:1px solid #D8CBBB;display:flex;align-items:center;padding:0 16px"><img src="assets/logo.png" alt="Sosa's Constructions" style="height:40px;display:block"></div>
+      <div style="height:64px;flex:none;background:#FFFFFF;border-bottom:1px solid #D8CBBB;display:flex;align-items:center;gap:10px;padding:0 4px 0 12px">
+          <img src="assets/logo-ai-red.jpg" alt="Sosa's Hardwood Floors" style="height:50px;display:block;flex:none">
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;padding-left:10px;border-left:1px solid #D8CBBB"><span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:17px;line-height:1.1;text-transform:uppercase;color:#2A1A10;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Estimate <span style="color:#5C4A3D;font-weight:600">#20261005-02</span></span><span style="display:flex;align-items:center;gap:4px;font-size:12.5px;font-weight:600;color:#2F6B3A"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>Guardado</span></div>
+          <button aria-label="Más opciones" style="flex:none;width:48px;height:48px;border:0;border-radius:2px;background:transparent;color:#2A1A10;display:grid;place-items:center;cursor:pointer" style-hover="background:#F7E7CC"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg></button>
+        </div>
       <div style="flex:1;overflow:hidden;padding:16px;display:flex;flex-direction:column;gap:20px">
         <div style="display:flex;flex-direction:column;gap:4px"><span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:28px;color:#2A1A10;text-transform:uppercase">Nuevo documento</span><span style="font-size:16px;color:#5C4A3D">Elige el tipo y empieza por el cliente.</span></div>
         <div style="display:grid;grid-template-columns:1fr 1fr;border:1.5px solid #3A2416"><span style="min-height:52px;display:grid;place-items:center;background:#3A2416;color:#FFFFFF;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:20px">ESTIMATE</span><span style="min-height:52px;display:grid;place-items:center;background:#FFFFFF;color:#3A2416;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:20px">INVOICE</span></div>
         <label style="display:flex;flex-direction:column;gap:6px;font-size:15px;font-weight:600;color:#3A2416">Nombre del cliente<input placeholder="ej. Margaret Kelly" style="height:48px;padding:0 12px;border:1.5px solid #7A6656;border-radius:2px;background:#FFFFFF;font-size:17px;box-sizing:border-box"></label>
         <label style="display:flex;flex-direction:column;gap:6px;font-size:15px;font-weight:600;color:#3A2416">Teléfono<input inputMode="tel" placeholder="(610) 555-0000" style="height:48px;padding:0 12px;border:1.5px solid #7A6656;border-radius:2px;background:#FFFFFF;font-size:17px;box-sizing:border-box"></label>
         <div style="display:flex;flex-direction:column;gap:12px">
-          <h3 style="margin:0;display:flex;gap:8px;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:22px;text-transform:uppercase;color:#3A2416"><span style="color:#B5470F">04</span>Partidas</h3>
-          <div style="border:1.5px dashed #7A6656;padding:24px 16px;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center"><span style="font-size:17px;font-weight:600">Aún no hay partidas</span><span style="font-size:15px;color:#5C4A3D">Agrega lo que vas a cobrar: piso, escaleras, material.</span>
-            <span style="min-height:52px;align-self:stretch;background:#B5470F;color:#FFFFFF;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:20px;letter-spacing:.04em;display:flex;align-items:center;justify-content:center">+ AGREGAR PRIMERA PARTIDA</span></div>
+          <h3 style="margin:0;display:flex;gap:8px;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:22px;text-transform:uppercase;color:#3A2416"><span style="color:#7F1A1A">04</span>Trabajos</h3>
+          <div style="border:1.5px dashed #7A6656;padding:24px 16px;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center"><span style="font-size:17px;font-weight:600">Aún no hay trabajos</span><span style="font-size:15px;color:#5C4A3D">Agrega lo que vas a cobrar: piso, escaleras, material.</span>
+            <span style="min-height:52px;align-self:stretch;background:#7F1A1A;color:#FFFFFF;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:20px;letter-spacing:.04em;display:flex;align-items:center;justify-content:center">+ AGREGAR PRIMERA PARTIDA</span></div>
         </div>
       </div>
-      <div style="flex:none;background:#2A1A10;border-top:3px solid #E06A1F;padding:10px 12px 14px 16px;display:flex;align-items:center;justify-content:space-between"><div style="display:flex;flex-direction:column"><span style="font-size:13px;font-weight:600;letter-spacing:.08em;color:#E8C58F">TOTAL</span><span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:32px;line-height:1;color:#FFFFFF">$0.00</span></div><span style="min-height:56px;padding:0 20px;background:#EE7A30;color:#1F1712;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:22px;letter-spacing:.04em;display:flex;align-items:center">VER PDF</span></div>
+      <div style="flex:none;background:#2A1A10;border-top:3px solid #9E1F1F;padding:10px 12px 14px 16px;display:flex;align-items:center;justify-content:space-between"><div style="display:flex;flex-direction:column"><span style="font-size:13px;font-weight:600;letter-spacing:.08em;color:#E8C58F">TOTAL</span><span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:32px;line-height:1;color:#FFFFFF">$0.00</span></div><span style="min-height:56px;padding:0 20px;background:#A51C30;color:#FFFFFF;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:22px;letter-spacing:.04em;display:flex;align-items:center">VER PDF</span></div>
     </div>
   </div>
 
   <div id="6b" style="display:flex;flex-direction:column;gap:12px">
     <div style="display:flex;gap:8px;align-items:center"><span style="background:#2A1A10;color:#FFFFFF;font-weight:700;font-size:14px;padding:4px 8px">6b</span><span style="font-weight:600;font-size:15px">Errores de validación (al tocar Ver PDF)</span></div>
     <div style="width:375px;height:812px;background:#F6F1EA;border:1px solid #1F1712;box-shadow:0 12px 32px rgba(31,23,18,.22);display:flex;flex-direction:column;overflow:hidden">
-      <div style="height:64px;flex:none;background:#FFFFFF;border-bottom:1px solid #D8CBBB;display:flex;align-items:center;padding:0 16px"><img src="assets/logo.png" alt="Sosa's Constructions" style="height:40px;display:block"></div>
+      <div style="height:64px;flex:none;background:#FFFFFF;border-bottom:1px solid #D8CBBB;display:flex;align-items:center;gap:10px;padding:0 4px 0 12px">
+          <img src="assets/logo-ai-red.jpg" alt="Sosa's Hardwood Floors" style="height:50px;display:block;flex:none">
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;padding-left:10px;border-left:1px solid #D8CBBB"><span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:17px;line-height:1.1;text-transform:uppercase;color:#2A1A10;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Estimate <span style="color:#5C4A3D;font-weight:600">#20261005-02</span></span><span style="display:flex;align-items:center;gap:4px;font-size:12.5px;font-weight:600;color:#2F6B3A"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>Sin enviar</span></div>
+          <button aria-label="Más opciones" style="flex:none;width:48px;height:48px;border:0;border-radius:2px;background:transparent;color:#2A1A10;display:grid;place-items:center;cursor:pointer" style-hover="background:#F7E7CC"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg></button>
+        </div>
       <div style="flex:1;overflow:hidden;padding:16px;display:flex;flex-direction:column;gap:16px">
         <div role="alert" style="border:2px solid #B3261E;background:#FBE9E7;padding:12px;display:flex;gap:10px;color:#7A1A14"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" style="flex:none"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v4"></path><path d="M12 16h.01"></path></svg><div style="display:flex;flex-direction:column;gap:4px"><strong style="font-size:16px">Faltan 3 datos para crear el PDF</strong><span style="font-size:15px">Revisa los campos marcados.</span></div></div>
         <label style="display:flex;flex-direction:column;gap:6px;font-size:15px;font-weight:600;color:#7A1A14">Nombre del cliente<input aria-invalid="true" style="height:48px;padding:0 12px;border:2px solid #B3261E;border-radius:2px;background:#FFFFFF;font-size:17px;box-sizing:border-box"><span style="display:flex;gap:6px;align-items:center;font-size:14px;font-weight:600;color:#B3261E">● Escribe el nombre del cliente.</span></label>
         <label style="display:flex;flex-direction:column;gap:6px;font-size:15px;font-weight:600;color:#7A1A14">Teléfono<input aria-invalid="true" defaultValue="610 555" style="height:48px;padding:0 12px;border:2px solid #B3261E;border-radius:2px;background:#FFFFFF;font-size:17px;box-sizing:border-box"><span style="font-size:14px;font-weight:600;color:#B3261E">● Faltan dígitos: usa 10 números.</span></label>
         <label style="display:flex;flex-direction:column;gap:6px;font-size:15px;font-weight:600;color:#3A2416">Email<input defaultValue="mkelly.home@gmail.com" style="height:48px;padding:0 12px;border:1.5px solid #7A6656;border-radius:2px;background:#FFFFFF;font-size:17px;box-sizing:border-box"></label>
-        <div class="blueprint" style="background:#FFFFFF;border:2px solid #B3261E"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+        <div style="border:1px solid #CDBBA7;background:#FFFFFF;border:2px solid #B3261E">
           <div style="height:48px;display:flex;align-items:center;padding:0 12px;background:#FBE9E7;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:20px;color:#B3261E">#2 · Install and refinish</div>
           <div style="padding:12px;display:grid;grid-template-columns:1fr 1fr;gap:12px">
             <label style="display:flex;flex-direction:column;gap:6px;font-size:15px;font-weight:600;color:#3A2416">Cantidad<div style="height:48px;display:flex;align-items:center;justify-content:flex-end;padding:0 12px;border:1.5px solid #7A6656;font-size:17px;font-weight:400">1625</div></label>
-            <label style="display:flex;flex-direction:column;gap:6px;font-size:15px;font-weight:600;color:#7A1A14">Precio $<div style="height:48px;border:2px solid #B3261E;outline:3px solid #B5470F;outline-offset:1px"></div></label>
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:15px;font-weight:600;color:#7A1A14">Precio<div style="height:48px;border:2px solid #B3261E;outline:3px solid #7F1A1A;outline-offset:1px"><span style="flex:none;font-size:17px;font-weight:600;color:#5C4A3D;margin-right:auto">$</span></div></label>
             <span style="grid-column:1 / -1;font-size:14px;font-weight:600;color:#B3261E">● Falta el precio por sq ft.</span>
           </div>
         </div>
       </div>
-      <div style="flex:none;background:#2A1A10;border-top:3px solid #E06A1F;padding:10px 12px 14px 16px;display:flex;align-items:center;justify-content:space-between"><div style="display:flex;flex-direction:column"><span style="font-size:13px;font-weight:600;letter-spacing:.08em;color:#E8C58F">TOTAL</span><span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:32px;line-height:1;color:#FFFFFF">$6,169.25</span></div><span style="min-height:56px;padding:0 20px;background:#EE7A30;color:#1F1712;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:22px;letter-spacing:.04em;display:flex;align-items:center">VER PDF</span></div>
+      <div style="flex:none;background:#2A1A10;border-top:3px solid #9E1F1F;padding:10px 12px 14px 16px;display:flex;align-items:center;justify-content:space-between"><div style="display:flex;flex-direction:column"><span style="font-size:13px;font-weight:600;letter-spacing:.08em;color:#E8C58F">TOTAL</span><span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:32px;line-height:1;color:#FFFFFF">$6,169.25</span></div><span style="min-height:56px;padding:0 20px;background:#A51C30;color:#FFFFFF;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:22px;letter-spacing:.04em;display:flex;align-items:center">VER PDF</span></div>
     </div>
   </div>
 
   <div id="6c" style="display:flex;flex-direction:column;gap:12px">
     <div style="display:flex;gap:8px;align-items:center"><span style="background:#2A1A10;color:#FFFFFF;font-weight:700;font-size:14px;padding:4px 8px">6c</span><span style="font-weight:600;font-size:15px">Borrador recuperado</span></div>
     <div style="width:375px;height:812px;background:#F6F1EA;border:1px solid #1F1712;box-shadow:0 12px 32px rgba(31,23,18,.22);display:flex;flex-direction:column;overflow:hidden">
-      <div style="height:64px;flex:none;background:#FFFFFF;border-bottom:1px solid #D8CBBB;display:flex;align-items:center;padding:0 16px"><img src="assets/logo.png" alt="Sosa's Constructions" style="height:40px;display:block"></div>
+      <div style="height:64px;flex:none;background:#FFFFFF;border-bottom:1px solid #D8CBBB;display:flex;align-items:center;gap:10px;padding:0 4px 0 12px">
+          <img src="assets/logo-ai-red.jpg" alt="Sosa's Hardwood Floors" style="height:50px;display:block;flex:none">
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;padding-left:10px;border-left:1px solid #D8CBBB"><span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:17px;line-height:1.1;text-transform:uppercase;color:#2A1A10;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Estimate <span style="color:#5C4A3D;font-weight:600">#20261005-02</span></span><span style="display:flex;align-items:center;gap:4px;font-size:12.5px;font-weight:600;color:#2F6B3A"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>Recuperado</span></div>
+          <button aria-label="Más opciones" style="flex:none;width:48px;height:48px;border:0;border-radius:2px;background:transparent;color:#2A1A10;display:grid;place-items:center;cursor:pointer" style-hover="background:#F7E7CC"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg></button>
+        </div>
       <div role="status" style="flex:none;background:#F7E7CC;border-bottom:2px solid #C9962E;padding:14px 16px;display:flex;flex-direction:column;gap:12px">
         <div style="display:flex;gap:10px;color:#3A2416"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg><div style="display:flex;flex-direction:column;gap:2px"><strong style="font-size:16px">Recuperamos tu borrador</strong><span style="font-size:15px">Estimate EST-20261005-01 · Margaret Kelly · ayer, 6:15 p.m.</span></div></div>
-        <div style="display:grid;grid-template-columns:1.2fr 1fr;gap:8px"><span style="min-height:48px;background:#B5470F;color:#FFFFFF;font-weight:700;font-size:16px;display:grid;place-items:center">Seguir editando</span><span style="min-height:48px;border:1.5px solid #3A2416;color:#3A2416;font-weight:600;font-size:16px;display:grid;place-items:center">Descartar</span></div>
+        <div style="display:grid;grid-template-columns:1.2fr 1fr;gap:8px"><span style="min-height:48px;background:#7F1A1A;color:#FFFFFF;font-weight:700;font-size:16px;display:grid;place-items:center">Seguir editando</span><span style="min-height:48px;border:1.5px solid #3A2416;color:#3A2416;font-weight:600;font-size:16px;display:grid;place-items:center">Descartar</span></div>
       </div>
       <div style="flex:1;overflow:hidden;padding:16px;display:flex;flex-direction:column;gap:14px;opacity:.55">
         <div style="display:grid;grid-template-columns:1fr 1fr;border:1.5px solid #3A2416"><span style="min-height:52px;display:grid;place-items:center;background:#3A2416;color:#FFFFFF;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:20px">ESTIMATE</span><span style="min-height:52px;display:grid;place-items:center;background:#FFFFFF;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:20px">INVOICE</span></div>
@@ -476,7 +681,7 @@ input::placeholder,textarea::placeholder{color:#8A7868}
         <div style="height:120px;border:1.5px solid #CDBBA7;background:#FFFFFF"></div>
         <div style="height:120px;border:1.5px solid #CDBBA7;background:#FFFFFF"></div>
       </div>
-      <div style="flex:none;background:#2A1A10;border-top:3px solid #E06A1F;padding:10px 12px 14px 16px;display:flex;align-items:center;justify-content:space-between"><div style="display:flex;flex-direction:column"><span style="font-size:13px;font-weight:600;letter-spacing:.08em;color:#E8C58F">TOTAL</span><span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:32px;line-height:1;color:#FFFFFF">$18,356.75</span></div><span style="min-height:56px;padding:0 20px;background:#EE7A30;color:#1F1712;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:22px;letter-spacing:.04em;display:flex;align-items:center">VER PDF</span></div>
+      <div style="flex:none;background:#2A1A10;border-top:3px solid #9E1F1F;padding:10px 12px 14px 16px;display:flex;align-items:center;justify-content:space-between"><div style="display:flex;flex-direction:column"><span style="font-size:13px;font-weight:600;letter-spacing:.08em;color:#E8C58F">TOTAL</span><span style="font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:32px;line-height:1;color:#FFFFFF">$18,356.75</span></div><span style="min-height:56px;padding:0 20px;background:#A51C30;color:#FFFFFF;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:22px;letter-spacing:.04em;display:flex;align-items:center">VER PDF</span></div>
     </div>
     <p style="margin:0;max-width:375px;font-size:14px;color:#5C4A3D;text-wrap:pretty">Se guarda solo en el teléfono cada 2 s. Al abrir con un borrador pendiente aparece este aviso; “Descartar” pide confirmación.</p>
   </div>
@@ -488,32 +693,32 @@ input::placeholder,textarea::placeholder{color:#8A7868}
   <h2 style="margin:0;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:34px;color:#2A1A10;text-transform:uppercase;letter-spacing:.02em">7 · Tokens para desarrollo</h2>
   <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px">
     <sc-for list="{{ swatches }}" as="c" hint-placeholder-count="16">
-      <div class="blueprint" style="background:#FFFFFF;border-color:#CDBBA7;display:flex;flex-direction:column"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+      <div style="border:1px solid #CDBBA7;background:#FFFFFF;border-color:#CDBBA7;display:flex;flex-direction:column">
         <div style="height:72px;background:{{ c.hex }};border-bottom:1px solid #CDBBA7"></div>
         <div style="padding:10px 12px;display:flex;flex-direction:column;gap:2px"><code style="font-size:14px;font-weight:700;color:#1F1712">{{ c.name }}</code><span style="font-size:14px;font-variant-numeric:tabular-nums">{{ c.hex }}</span><span style="font-size:13px;color:#5C4A3D">{{ c.use }}</span></div>
       </div>
     </sc-for>
   </div>
   <div style="display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:24px;align-items:start">
-    <div class="blueprint" style="padding:20px;border-color:#CDBBA7;display:flex;flex-direction:column;gap:12px"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+    <div style="border:1px solid #CDBBA7;padding:20px;border-color:#CDBBA7;display:flex;flex-direction:column;gap:12px">
       <h3 style="margin:0;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:22px;text-transform:uppercase;color:#3A2416">Tipografía</h3>
       <p style="margin:0;font-size:15px;color:#3A2416;text-wrap:pretty"><strong>Barlow Condensed</strong> 600/700 para títulos, botones y montos. <strong>Barlow</strong> 400/500/600 para texto y campos. Ambas SIL OFL: empaquetar .woff2 en <code>/fonts</code> con <code>@font-face</code> y <code>font-display: swap</code>. Montos con <code>font-variant-numeric: tabular-nums</code>.</p>
       <sc-for list="{{ typeScale }}" as="t" hint-placeholder-count="7">
         <div style="display:grid;grid-template-columns:120px 1fr;gap:12px;align-items:baseline;border-top:1px dashed #CDBBA7;padding-top:8px"><code style="font-size:13px;color:#5C4A3D">{{ t.name }} · {{ t.spec }}</code><span style="font-family:{{ t.family }};font-size:{{ t.size }};font-weight:{{ t.weight }};line-height:1.15;color:#1F1712">{{ t.sample }}</span></div>
       </sc-for>
     </div>
-    <div class="blueprint" style="padding:20px;border-color:#CDBBA7;display:flex;flex-direction:column;gap:10px"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+    <div style="border:1px solid #CDBBA7;padding:20px;border-color:#CDBBA7;display:flex;flex-direction:column;gap:10px">
       <h3 style="margin:0;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:22px;text-transform:uppercase;color:#3A2416">Espaciado</h3>
       <sc-for list="{{ spaces }}" as="s" hint-placeholder-count="8">
-        <div style="display:flex;align-items:center;gap:12px"><code style="width:96px;font-size:13px">{{ s.name }}</code><span style="width:{{ s.px }};height:16px;background:#B5470F"></span><span style="font-size:14px">{{ s.px }}</span></div>
+        <div style="display:flex;align-items:center;gap:12px"><code style="width:96px;font-size:13px">{{ s.name }}</code><span style="width:{{ s.px }};height:16px;background:#7F1A1A"></span><span style="font-size:14px">{{ s.px }}</span></div>
       </sc-for>
       <div style="font-size:14px;color:#5C4A3D;border-top:1px dashed #CDBBA7;padding-top:8px">Táctil mínimo: 48 px · campos 48 px · CTA 56 px.</div>
     </div>
-    <div class="blueprint" style="padding:20px;border-color:#CDBBA7;display:flex;flex-direction:column;gap:12px"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+    <div style="border:1px solid #CDBBA7;padding:20px;border-color:#CDBBA7;display:flex;flex-direction:column;gap:12px">
       <h3 style="margin:0;font-family:'Barlow Condensed', sans-serif;font-weight:700;font-size:22px;text-transform:uppercase;color:#3A2416">Radios y bordes</h3>
       <div style="display:flex;gap:16px"><div style="display:flex;flex-direction:column;gap:6px;align-items:center"><span style="width:64px;height:64px;border:2px solid #3A2416"></span><code style="font-size:13px">radius-0 · 0</code></div><div style="display:flex;flex-direction:column;gap:6px;align-items:center"><span style="width:64px;height:64px;border:2px solid #3A2416;border-radius:2px"></span><code style="font-size:13px">radius-1 · 2px</code></div><div style="display:flex;flex-direction:column;gap:6px;align-items:center"><span style="width:64px;height:64px;border:2px solid #3A2416;border-radius:4px"></span><code style="font-size:13px">radius-2 · 4px</code></div></div>
-      <p style="margin:0;font-size:14px;color:#3A2416;text-wrap:pretty">0 en tarjetas y marcos (con marcas “+” en esquinas), 2px en campos y botones. Borde de campo 1.5px <code>#7A6656</code>; error 2px <code>#B3261E</code>. Foco: <code>outline 3px solid #B5470F, offset 2px</code>.</p>
-      <p style="margin:0;font-size:14px;color:#3A2416;text-wrap:pretty">Contraste: blanco sobre <code>#B5470F</code> 5.4:1 · tinta sobre <code>#EE7A30</code> 6.6:1 · <code>#E8C58F</code> sobre <code>#2A1A10</code> 10:1. El naranja <code>#E06A1F</code> es solo decorativo (líneas), nunca fondo de texto pequeño. El logo va siempre sobre blanco.</p>
+      <p style="margin:0;font-size:14px;color:#3A2416;text-wrap:pretty">0 en tarjetas y marcos (borde fino, sin marcas en esquinas), 2px en campos y botones. Borde de campo 1.5px <code>#7A6656</code>; error 2px <code>#B3261E</code>. Foco: <code>outline 3px solid #7F1A1A, offset 2px</code>.</p>
+      <p style="margin:0;font-size:14px;color:#3A2416;text-wrap:pretty">Contraste: blanco sobre <code>#7F1A1A</code> 10:1 · blanco sobre <code>#9E1F1F</code> 7.9:1 · <code>#E8C58F</code> sobre <code>#2A1A10</code> 10:1. El error <code>#B3261E</code> siempre va con ícono y texto para no confundirse con el rojo de marca. El logo va siempre sobre blanco.</p>
     </div>
   </div>
 </section>
@@ -524,7 +729,33 @@ const money = n => (n < 0 ? '−$' : '$') + Math.abs(n).toLocaleString('en-US', 
 const num = v => { const n = parseFloat(String(v ?? '').replace(/,/g, '')); return isFinite(n) ? n : 0; };
 const UNIT = { sqft: 'sq ft', lft: 'linear ft', steps: 'steps', each: 'each', hours: 'hours', lump: 'lump sum', other: 'other' };
 let uid = 100;
+const PROCESS_TEMPLATE = ["Arrive and protect the work area","Move furniture out of the room","Remove existing carpet / floor","Prepare and level the subfloor","Install new hardwood floor","Sand and finish","Clean up and remove debris"];
+const PROCESS_DETAILS = [
+ "We cover doorways, stairs, cabinets, shelving and counters with plastic sheeting and seal them off from the work area. Floor protection paper is laid along the walkway to the exit. Our sanders connect to a dust-collection vacuum and we run an air scrubber the whole time, so dust stays contained and the rest of the house stays clean.",
+ "We carefully move furniture to an area you choose, using pads and sliders so nothing gets scratched. Please remove fragile, valuable or personal items from shelves and tables before we arrive. Heavy items such as pianos, safes or aquariums need to be discussed ahead of time.",
+ "We pull up the existing carpet, padding, tack strips and old flooring and haul everything away. All staples and nails are removed from the subfloor. If we find damage, rot or moisture under the old floor, we stop, show you, and agree on any extra work before continuing.",
+ "We inspect the subfloor, screw down loose areas to stop squeaks, replace damaged sections and level low spots with patch compound. The floor is vacuumed and checked for moisture before installation, because a flat, dry base is what keeps the new floor from cupping or moving later.",
+ "We lay a moisture barrier, then install the new hardwood board by board, nailing every row and leaving expansion space along the walls. Boards are staggered for a natural look. Transitions are fitted at doorways and around stairs, and new quarter round is installed around the perimeter.",
+ "The floor is sanded to bare wood in three passes (36, 60 and 80 grit); edges are sanded separately and corners are finished by hand. After a final buff with 100 grit we apply stain if selected (color samples are provided on day one), then a sealer coat and two coats of water-based polyurethane in the sheen you choose. Light foot traffic after 24 hours; furniture can return after 72 hours.",
+ "We remove all plastic, debris and leftover materials, vacuum the work area including window sills and flat surfaces, and wipe everything down. Then we walk through the finished floor with you, answer your questions and leave care instructions so the finish lasts."
+];
+const PROCESS_INTRO = "This plan explains what will happen in your home and in what order. It assumes the floors under the carpet only need standard preparation; if we find anything different once the old flooring is removed, we will talk with you before doing any extra work.";
+const chunkProcess = (steps, intro) => {
+  const lines = (s, w) => Math.ceil(String(s || '').length / w);
+  const pages = []; let start = 0, used = 64 + (intro ? lines(intro, 100) * 21 + 10 : 0);
+  steps.forEach((p, i) => {
+    const h = 22 + (String(p.text || '').trim() ? 20 : 0) + lines(p.detail, 98) * 20;
+    if (used + h > 800 && i > start) { pages.push({ start, end: i }); start = i; used = 0; }
+    used += h;
+  });
+  pages.push({ start, end: steps.length });
+  return pages;
+};
+const PROC = () => PROCESS_TEMPLATE.map((text, i) => ({ id: uid++, text, detail: PROCESS_DETAILS[i] || '' }));
+const QUICK = ['Debris disposal', 'Carpet removal', 'Cabinet protection', 'Furniture moving'];
 const SAMPLE = () => ({
+  showProcess: true, process: PROC(), pMode: 'edit', processIntro: PROCESS_INTRO,
+  extras: [{ id: 51, desc: 'Debris disposal', amount: '50.00' }, { id: 52, desc: 'Carpet removal', amount: '150.00' }, { id: 53, desc: 'Cabinet protection', amount: '40.00' }],
   docType: 'estimate', number: '01', date: '2026-10-05',
   client: { name: 'Margaret Kelly', address: '412 Owen Ave, Lansdowne, PA 19050', phone: '(610) 555-0142', email: 'mkelly.home@gmail.com' },
   desc: 'Demolition of existing flooring area, removal of existing carpet, installation of new hardwood floors and refinishing.',
@@ -540,22 +771,27 @@ const SAMPLE = () => ({
 const amt = i => i.unit === 'lump' ? num(i.amount) : Math.round(num(i.qty) * num(i.price) * 100) / 100;
 function calc(s) {
   const inv = s.docType === 'invoice';
-  const total = s.items.reduce((a, i) => a + amt(i), 0);
+  const work = s.items.reduce((a, i) => a + amt(i), 0);
+  const extrasTotal = inv && s.showExtras !== false ? s.extras.reduce((a, x) => a + num(x.amount), 0) : 0;
+  const total = work + extrasTotal;
   const pct = s.dep === '20' ? 20 : s.dep === '30' ? 30 : s.dep === 'pct' ? num(s.depPct) : null;
-  const dep = s.dep === 'none' ? 0 : pct != null ? Math.round(total * pct + 1e-7) / 100 : Math.min(num(s.depFixed), total);
+  const dep = s.dep === 'none' ? 0 : pct != null ? Math.round(work * pct + 1e-7) / 100 : Math.min(num(s.depFixed), total);
   const tag = pct != null ? ` (${pct} %)` : '';
   const pdfTag = pct != null ? ` (${pct}%)` : '';
   const [y, m, d] = (s.date || '').split('-');
   const ymd = (y || '') + (m || '') + (d || '');
   const numFull = (inv ? 'INV-' : 'EST-') + ymd + '-' + s.number;
   return {
-    inv, total, dep, bal: total - dep, hasDep: s.dep !== 'none',
+    inv, total, work, extrasTotal, dep, bal: total - dep, hasDep: s.dep !== 'none',
     depLabel: (inv ? 'Anticipo recibido' : 'Anticipo') + tag,
     balLabel: inv ? 'Saldo a pagar' : 'Saldo',
     numberFull: numFull,
     pdf: {
-      title: inv ? 'INVOICE' : 'WORK ESTIMATE', number: numFull, ref: inv ? 'EST-' + ymd + '-' + s.number : '', date: d ? `${m}-${d}-${y}` : '',
+      title: inv ? 'INVOICE' : 'WORK ESTIMATE', number: numFull, ref: inv ? 'EST-' + ymd + '-' + s.number : '', date: d ? `${m}/${d}/${y}` : '',
       client: s.client, desc: s.desc, terms: s.terms, total: money(total),
+      simple: inv, showProcess: !inv && s.showProcess, process: s.process.map(p => ({ text: p.text, detail: p.detail || '' })), processIntro: s.processIntro,
+      extras: inv && s.showExtras !== false ? s.extras.filter(x => x.desc || num(x.amount)).map(x => ({ desc: x.desc, amount: money(num(x.amount)) })) : [],
+      workTotal: money(work), extrasTotal: money(extrasTotal),
       hasDeposit: s.dep !== 'none', depLabel: inv ? 'Deposit received' + pdfTag : 'Deposit required' + pdfTag, dep: (inv ? '−' : '') + money(dep),
       balLabel: inv ? 'Balance due' : 'Balance due upon completion', balance: money(total - dep),
       rows: s.items.map(i => ({
@@ -567,18 +803,18 @@ function calc(s) {
   };
 }
 const STATIC_EST = calc(SAMPLE()).pdf;
-const STATIC_INV = calc({ ...SAMPLE(), docType: 'invoice', dep: '30', terms: 'Payment is due upon receipt. Thank you for your business.' }).pdf;
+const STATIC_INV = calc({ ...SAMPLE(), docType: 'invoice', dep: '30', terms: 'Payment is due upon receipt of this invoice. Please make checks payable to Sosa\'s Constructions and reference the invoice number. We appreciate the opportunity to work in your home.' }).pdf;
 const SWATCHES = [
   ['walnut-900', '#2A1A10', 'Barras, fondo oscuro'], ['walnut-700', '#3A2416', 'Títulos, botón secundario'], ['walnut-500', '#6B4226', 'Madera oscura (logo)'], ['oak-300', '#E8C58F', 'Texto sobre oscuro'],
-  ['oak-500', '#D9A866', 'Madera clara, decorativo'], ['gold-500', '#C9962E', 'Dorado del logo, solo líneas'], ['orange-100', '#FCEBDF', 'Tinte PDF, fondos suaves'], ['orange-400', '#EE7A30', 'CTA sobre fondo oscuro'],
-  ['orange-500', '#E06A1F', 'Naranja marca, solo líneas'], ['orange-700', '#B5470F', 'CTA primario, barras PDF, foco'], ['orange-800', '#8F3709', 'Hover / pressed'], ['paper', '#F6F1EA', 'Fondo de la app'],
+  ['oak-500', '#D9A866', 'Madera clara, decorativo'], ['gold-500', '#C9962E', 'Dorado del logo, solo líneas'], ['red-100', '#F6E4E1', 'Tinte PDF, fondos suaves'], ['crimson-cta', '#A51C30', 'CTA sobre barra oscura (blanco 7:1)'],
+  ['red-500', '#9E1F1F', 'Rojo camisa, filetes'], ['red-700', '#7F1A1A', 'CTA primario, títulos PDF, foco'], ['red-800', '#5C1212', 'Hover / pressed'], ['paper', '#F6F1EA', 'Fondo de la app'],
   ['surface', '#FFFFFF', 'Campos, tarjetas, PDF'], ['line', '#CDBBA7', 'Bordes de tarjeta'], ['field-border', '#7A6656', 'Borde de campo (5.4:1)'], ['ink', '#1F1712', 'Texto principal'],
   ['ink-muted', '#5C4A3D', 'Texto secundario'], ['error', '#B3261E', 'Errores'], ['error-bg', '#FBE9E7', 'Fondo de error'], ['success', '#2F6B3A', 'Guardado / OK'],
 ].map(([name, hex, use]) => ({ name, hex, use }));
 const TYPE = [
   ['display', '32/1.0 Cond 700', "'Barlow Condensed'", '32px', 700, '$18,356.75'],
   ['h1', '28/1.1 Cond 700', "'Barlow Condensed'", '28px', 700, 'NUEVO DOCUMENTO'],
-  ['h2 sección', '22/1.1 Cond 700', "'Barlow Condensed'", '22px', 700, '04 PARTIDAS'],
+  ['h2 sección', '22/1.1 Cond 700', "'Barlow Condensed'", '22px', 700, '04 TRABAJOS'],
   ['botón', '20/1 Cond 700', "'Barlow Condensed'", '20px', 700, 'VER PDF'],
   ['body / campo', '17/1.4 Barlow 400', 'Barlow', '17px', 400, 'Install and refinish'],
   ['label', '15/1.3 Barlow 600', 'Barlow', '15px', 600, 'Cantidad'],
@@ -587,7 +823,20 @@ const TYPE = [
 const SPACES = [['space-1', '4px'], ['space-2', '8px'], ['space-3', '12px'], ['space-4', '16px'], ['space-5', '20px'], ['space-6', '24px'], ['space-8', '32px'], ['space-12', '48px']].map(([name, px]) => ({ name, px }));
 
 class Component extends DCLogic {
-  state = { ...SAMPLE(), undo: null, screen: 'form' };
+  state = (() => { const s = { ...SAMPLE(), undo: null, screen: 'form', demo: [{ id: 901, desc: 'Refinish steps and handrails (15 steps, 10 sticks)', unit: 'lump', qty: '', price: '', amount: '3000.00', other: '' }, { id: 902, desc: 'Furniture moving', unit: 'other', qty: '3', price: '75.00', amount: '', other: 'rooms' }] }; s.openStep = s.process[1].id; return s; })();
+  updIn(key, id, patch) { this.setState(s => ({ [key]: s[key].map(i => i.id === id ? { ...i, ...patch } : i) })); }
+  moveIn(key, from, to) {
+    this.setState(s => {
+      if (to < 0 || to >= s[key].length || from === to) return null;
+      const arr = [...s[key]]; const [x] = arr.splice(from, 1); arr.splice(to, 0, x); return { [key]: arr };
+    });
+  }
+  delIn(key, idx, label) {
+    const it = this.state[key][idx];
+    clearTimeout(this.t);
+    this.setState(s => ({ [key]: s[key].filter((_, i) => i !== idx), undo: { key, it, idx, label } }));
+    this.t = setTimeout(() => this.setState({ undo: null }), 6000);
+  }
   componentWillUnmount() { clearTimeout(this.t); }
   set(patch) { this.setState(patch); }
   upd(id, patch) { this.setState(s => ({ items: s.items.map(i => i.id === id ? { ...i, ...patch } : i) })); }
@@ -597,17 +846,29 @@ class Component extends DCLogic {
       const items = [...s.items]; const [x] = items.splice(from, 1); items.splice(to, 0, x); return { items };
     });
   }
-  del(idx) {
-    const it = this.state.items[idx];
-    clearTimeout(this.t);
-    this.setState(s => ({ items: s.items.filter((_, i) => i !== idx), undo: { it, idx, n: idx + 1 } }));
-    this.t = setTimeout(() => this.setState({ undo: null }), 6000);
-  }
+  del(idx) { this.delIn('items', idx, `Trabajo #${idx + 1} eliminado`); }
   renderVals() {
     const s = this.state, c = calc(s);
     const ev = f => e => f(e.target.value);
+    const UNITS = [['sqft', 'sq ft'], ['lft', 'linear ft'], ['steps', 'steps'], ['each', 'each'], ['hours', 'hours'], ['lump', 'lump sum'], ['other', 'other']];
+    const extraItem = (i, key) => {
+      const ul = i.unit === 'other' ? (i.other || 'unidad') : UNIT[i.unit];
+      const up = p => key === 'items' ? this.upd(i.id, p) : this.updIn(key, i.id, p);
+      return {
+        unitLabel: ul,
+        mathStr: i.unit === 'lump' ? 'Lump sum' : `${num(i.qty).toLocaleString('en-US')} ${ul} × ${money(num(i.price))}`,
+        units: UNITS.map(([k, l]) => { const on = i.unit === k; return { label: l, on, onClick: () => up({ unit: k }), bg: on ? '#3A2416' : '#FFFFFF', fg: on ? '#FFFFFF' : '#3A2416', bd: on ? '#3A2416' : '#7A6656' }; }),
+      };
+    };
+    const demoItems = s.demo.map((i, idx) => ({
+      ...i, ...extraItem(i, 'demo'), n: idx + 3, isLump: i.unit === 'lump', notLump: i.unit !== 'lump', isOther: i.unit === 'other',
+      isFirst: false, isLast: idx === s.demo.length - 1, amountStr: money(amt(i)),
+      onDesc: ev(v => this.updIn('demo', i.id, { desc: v })), onUnit: ev(v => this.updIn('demo', i.id, { unit: v })), onQty: ev(v => this.updIn('demo', i.id, { qty: v })), onPrice: ev(v => this.updIn('demo', i.id, { price: v })),
+      onAmount: ev(v => this.updIn('demo', i.id, { amount: v })), onOther: ev(v => this.updIn('demo', i.id, { other: v })),
+      onUp: () => this.moveIn('demo', idx, idx - 1), onDown: () => this.moveIn('demo', idx, idx + 1), onDel: () => this.delIn('demo', idx, `Trabajo #${idx + 3} eliminado`),
+    }));
     const items = s.items.map((i, idx) => ({
-      ...i, n: idx + 1, isLump: i.unit === 'lump', notLump: i.unit !== 'lump', isOther: i.unit === 'other',
+      ...i, ...extraItem(i, 'items'), n: idx + 1, isLump: i.unit === 'lump', notLump: i.unit !== 'lump', isOther: i.unit === 'other',
       isFirst: idx === 0, isLast: idx === s.items.length - 1, amountStr: money(amt(i)),
       qtyCell: i.unit === 'lump' ? '—' : i.qty, priceCell: i.unit === 'lump' ? '—' : i.price, cellBg: i.unit === 'lump' ? '#EFE7DC' : '#FFFFFF',
       onDesc: ev(v => this.upd(i.id, { desc: v })), onUnit: ev(v => this.upd(i.id, { unit: v })),
@@ -623,14 +884,37 @@ class Component extends DCLogic {
       return { label, span, on, onClick: () => this.set({ dep: key }), bg: on ? '#3A2416' : '#FFFFFF', fg: on ? '#FFFFFF' : '#3A2416' };
     };
     const seg = (key, label) => { const on = s.docType === key; return { label, on, onClick: () => this.set({ docType: key }), bg: on ? '#3A2416' : '#FFFFFF', fg: on ? '#FFFFFF' : '#3A2416' }; };
+    const steps = s.process.map((p, idx) => ({
+      ...p, n: idx + 1, isFirst: idx === 0, isLast: idx === s.process.length - 1, editMode: s.pMode === 'edit', orderMode: s.pMode === 'order',
+      onText: ev(v => this.updIn('process', p.id, { text: v })), onDetail: ev(v => this.updIn('process', p.id, { detail: v })), onUp: () => this.moveIn('process', idx, idx - 1), onDown: () => this.moveIn('process', idx, idx + 1),
+      onDel: () => { this.set({ openStep: null }); this.delIn('process', idx, `Paso ${idx + 1} eliminado`); },
+      total: s.process.length, isCollapsed: s.pMode === 'edit' && s.openStep !== p.id, isOpen: s.pMode === 'edit' && s.openStep === p.id,
+      titleShown: String(p.text || '').trim() || 'Paso sin título', preview: String(p.detail || '').trim() || 'Sin explicación · toca para escribir',
+      onOpen: () => this.set({ openStep: p.id }), onClose: () => this.set({ openStep: null }),
+      nextLabel: idx < s.process.length - 1 ? 'Listo · siguiente' : 'Listo',
+      onNext: () => this.set({ openStep: idx < s.process.length - 1 ? s.process[idx + 1].id : null }),
+    }));
+    const extras = s.extras.map((x, idx) => ({ ...x, n: idx + 1, onDesc: ev(v => this.updIn('extras', x.id, { desc: v })), onAmount: ev(v => this.updIn('extras', x.id, { amount: v })), onDel: () => this.delIn('extras', idx, 'Cargo extra eliminado') }));
+    const addExtra = desc => this.setState(st => ({ extras: [...st.extras, { id: uid++, desc, amount: '' }] }));
+    const pm = (key, label) => { const on = s.pMode === key; return { label, on, onClick: () => this.set({ pMode: key }), bg: on ? '#3A2416' : '#FFFFFF', fg: on ? '#FFFFFF' : '#3A2416' }; };
+    const procSrc = (c.pdf.showProcess ? c.pdf.process : []).filter(p => String(p.text).trim() || String(p.detail).trim());
+    const procPages = procSrc.length ? chunkProcess(procSrc, s.processIntro).map((p, i) => ({ ...p, pageNo: i + 2 })) : [];
     const cl = k => ev(v => this.setState(st => ({ client: { ...st.client, [k]: v } })));
     return {
+      isInvoice: c.inv, secDep: c.inv ? '06' : '05', workStr: money(c.work), extrasTotalStr: money(s.extras.reduce((t, e) => t + num(e.amount), 0)),
+      showProcess: s.showProcess, toggleProcess: () => this.set({ showProcess: !s.showProcess }),
+      swBg: s.showProcess ? '#7F1A1A' : '#7A6656', swKnob: s.showProcess ? '25px' : '3px',
+      processOff: !s.showProcess, processHint: 'No sale en el PDF. Actívalo si el cliente quiere ver el paso a paso.',
+      steps, pModes: [pm('edit', 'Editar texto'), pm('order', 'Ordenar')],
+      addStep: () => this.setState(st => { const id = uid++; return { process: [...st.process, { id, text: '', detail: '' }], pMode: 'edit', openStep: id }; }),
+      resetSteps: () => this.set({ process: PROC() }),
+      extras, noExtras: extras.length === 0, addExtra: () => addExtra(''),
       docSeg: [seg('estimate', 'Estimate'), seg('invoice', 'Invoice')],
       isEstimate: !c.inv, docLabel: c.inv ? 'Invoice' : 'Work Estimate', numberFull: c.numberFull,
       date: s.date, onDate: ev(v => this.set({ date: v })),
       client: s.client, onName: cl('name'), onAddress: cl('address'), onPhone: cl('phone'), onEmail: cl('email'),
       desc: s.desc, onDesc: ev(v => this.set({ desc: v })), terms: s.terms, onTerms: ev(v => this.set({ terms: v })),
-      items, noItems: items.length === 0, itemCount: items.length === 1 ? '1 partida' : `${items.length} partidas`,
+      items, demoItems, noItems: items.length === 0, itemCount: items.length === 1 ? '1 trabajo' : `${items.length} trabajos`,
       addItem: () => this.setState(st => ({ items: [...st.items, { id: uid++, desc: '', unit: 'sqft', qty: '', price: '', amount: '', other: '' }] })),
       depTitle: c.inv ? 'Anticipo recibido' : 'Anticipo',
       depOpts: [opt('20', '20 %', 2), opt('30', '30 %', 2), opt('pct', 'Otro %', 2), opt('fixed', 'Monto fijo', 3), opt('none', 'Sin anticipo', 3)],
@@ -638,14 +922,21 @@ class Component extends DCLogic {
       onDepPct: ev(v => this.set({ depPct: v })), onDepFixed: ev(v => this.set({ depFixed: v })),
       totalStr: money(c.total), depLabel: c.depLabel, depStr: (c.inv && c.dep ? '−' : '') + money(c.dep), balLabel: c.balLabel, balStr: money(c.bal),
       barSub: c.hasDep ? `${c.balLabel}: ${money(c.bal)}` : 'Sin anticipo',
-      hasUndo: !!s.undo, undoLabel: s.undo ? `Partida #${s.undo.n} eliminada` : '',
-      doUndo: () => { clearTimeout(this.t); this.setState(st => { const items = [...st.items]; items.splice(st.undo.idx, 0, st.undo.it); return { items, undo: null }; }); },
+      hasUndo: !!s.undo, undoLabel: s.undo ? s.undo.label : '',
+      doUndo: () => { clearTimeout(this.t); this.setState(st => { const k = st.undo.key; const arr = [...st[k]]; arr.splice(st.undo.idx, 0, st.undo.it); return { [k]: arr, undo: null }; }); },
       isForm: s.screen === 'form', isPreview: s.screen === 'preview',
+      extrasOn: s.showExtras !== false, extrasOff: s.showExtras === false, toggleExtras: () => this.set({ showExtras: s.showExtras === false }),
+      exSwBg: s.showExtras !== false ? '#7F1A1A' : '#7A6656', exSwKnob: s.showExtras !== false ? '25px' : '3px',
+      menuOpen: !!s.menuOpen, toggleMenu: () => this.set({ menuOpen: !s.menuOpen }),
+      menuNew: () => this.setState({ ...SAMPLE(), docType: 'estimate', number: '02', client: { name: '', address: '', phone: '', email: '' }, desc: '', items: [], screen: 'form', undo: null, showProcess: false, process: PROC(), processIntro: PROCESS_INTRO, extras: [], pMode: 'edit' , menuOpen: false }), menuConvert: () => this.set({ menuOpen: false, docType: 'invoice' }),
+      numberShort: '#' + c.numberFull.replace(/^[A-Z]+-/, ''),
       goPreview: () => this.set({ screen: 'preview' }), goForm: () => this.set({ screen: 'form' }),
       convert: () => this.set({ docType: 'invoice' }),
-      newDoc: () => this.setState({ ...SAMPLE(), docType: 'estimate', number: '02', client: { name: '', address: '', phone: '', email: '' }, desc: '', items: [], screen: 'form', undo: null }),
+      newDoc: () => this.setState({ ...SAMPLE(), docType: 'estimate', number: '02', client: { name: '', address: '', phone: '', email: '' }, desc: '', items: [], screen: 'form', undo: null, showProcess: false, process: PROC(), processIntro: PROCESS_INTRO, extras: [], pMode: 'edit' }),
       fileName: `${c.numberFull}-${(s.client.name.split(' ').pop() || 'cliente')}.pdf`,
-      pdfDoc: c.pdf, pdfEstimate: STATIC_EST, pdfInvoice: STATIC_INV,
+      pdfDoc: c.pdf, procPages: procPages, pdfPages: procPages.length + 1,
+      previewPages: procPages.length ? `Carta · ${procPages.length + 1} páginas` : 'Carta · 1 de 1',
+      processIntro: s.processIntro, onProcessIntro: ev(v => this.set({ processIntro: v })), pdfEstimate: STATIC_EST, pdfInvoice: STATIC_INV,
       swatches: SWATCHES, typeScale: TYPE, spaces: SPACES,
     };
   }
