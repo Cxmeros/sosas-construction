@@ -12,8 +12,8 @@ describe('formatDocNumber', () => {
 });
 
 describe('dates', () => {
-  it('formats MM-DD-YYYY', () => {
-    expect(formatDateUS('2026-10-05')).toBe('10-05-2026');
+  it('formats MM/DD/YYYY', () => {
+    expect(formatDateUS('2026-10-05')).toBe('10/05/2026');
   });
   it('builds a local ISO date', () => {
     expect(toIsoDate(new Date(2026, 0, 9))).toBe('2026-01-09');
@@ -21,17 +21,13 @@ describe('dates', () => {
 });
 
 describe('documentFileName', () => {
-  it('matches the SPEC example', () => {
-    expect(documentFileName('estimate', 'EST-20261005-01', 'John Smith')).toBe(
-      'Estimate_EST-20261005-01_John-Smith.pdf',
-    );
+  it('matches the SPEC example: number + last name', () => {
+    expect(documentFileName('EST-20261005-01', 'Margaret Kelly')).toBe('EST-20261005-01-Kelly.pdf');
   });
   it('strips accents and unsafe characters', () => {
-    expect(documentFileName('invoice', 'INV-1/2', "José O'Brien & Hijos")).toBe(
-      'Invoice_INV-12_Jose-OBrien-Hijos.pdf',
-    );
+    expect(documentFileName('INV-1/2', "José O'Brien-Núñez")).toBe('INV-12-OBrien-Nunez.pdf');
   });
   it('omits an empty customer', () => {
-    expect(documentFileName('estimate', 'EST-1', '  ')).toBe('Estimate_EST-1.pdf');
+    expect(documentFileName('EST-1', '  ')).toBe('EST-1.pdf');
   });
 });

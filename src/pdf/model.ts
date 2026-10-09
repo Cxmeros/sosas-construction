@@ -131,6 +131,6 @@ export function buildPdfModel(doc: DocumentData): PdfModel {
     options,
     terms: doc.terms,
     footer: { left: `${COMPANY.name} · ${COMPANY.tagline}`, center: doc.number },
-    fileName: documentFileName(doc.type, doc.number, doc.customer.name),
+    fileName: documentFileName(doc.number, doc.customer.name),
   };
 }

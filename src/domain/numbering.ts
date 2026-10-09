@@ -19,10 +19,10 @@ export function toIsoDate(date: Date): string {
   return `${y}-${m}-${d}`;
 }
 
-/** yyyy-mm-dd → MM-DD-YYYY. */
+/** yyyy-mm-dd → MM/DD/YYYY (the PDF date, SPEC §3.2). */
 export function formatDateUS(isoDate: string): string {
   const [y = '', m = '', d = ''] = isoDate.split('-');
-  return `${m}-${d}-${y}`;
+  return `${m}/${d}/${y}`;
 }
 
 function slug(value: string): string {
@@ -36,10 +36,8 @@ function slug(value: string): string {
     .replace(/^-|-$/g, '');
 }
 
-/** `Estimate_EST-20261005-01_John-Smith.pdf` — only `[A-Za-z0-9_-]` (SPEC §7). */
-export function documentFileName(type: DocType, number: string, customerName: string): string {
-  const parts = [type === 'estimate' ? 'Estimate' : 'Invoice', slug(number) || 'document'];
-  const customer = slug(customerName);
-  if (customer) parts.push(customer);
-  return `${parts.join('_')}.pdf`;
+/** `EST-20261005-01-Kelly.pdf`: number + customer's last name, only `[A-Za-z0-9-]` (SPEC §7). */
+export function documentFileName(number: string, customerName: string): string {
+  const lastName = slug(customerName.trim().split(/\s+/).pop() ?? '');
+  return `${[slug(number) || 'document', lastName].filter(Boolean).join('-')}.pdf`;
 }

@@ -48,7 +48,7 @@ test('full flow: estimate → PDF → convert to invoice → new document', asyn
   const download = page.waitForEvent('download');
   await page.getByRole('button', { name: mobile ? 'Descargar' : 'Descargar PDF' }).click();
   const file = await download;
-  expect(file.suggestedFilename()).toBe(`Estimate_${number}_Margaret-Kelly.pdf`);
+  expect(file.suggestedFilename()).toBe(`${number}-Kelly.pdf`);
   const path = info.outputPath('estimate.pdf');
   await file.saveAs(path);
   const text = pdfText(path);
@@ -221,7 +221,7 @@ test('share uses the Web Share API with the PDF file', async ({ page }, info) =>
     .poll(() => page.evaluate(() => (window as unknown as { shared: unknown[] }).shared))
     .toEqual([
       {
-        name: expect.stringMatching(/^Estimate_EST-\d{8}-01_Margaret-Kelly\.pdf$/),
+        name: expect.stringMatching(/^EST-\d{8}-01-Kelly\.pdf$/),
         type: 'application/pdf',
       },
     ]);
@@ -246,9 +246,7 @@ test('without file sharing, the panel offers WhatsApp, email and download', asyn
   ).toBeVisible();
   const download = page.waitForEvent('download');
   await dialog.getByRole('button', { name: 'Descargar PDF' }).click();
-  expect((await download).suggestedFilename()).toMatch(
-    /^Estimate_EST-\d{8}-01_Margaret-Kelly\.pdf$/,
-  );
+  expect((await download).suggestedFilename()).toMatch(/^EST-\d{8}-01-Kelly\.pdf$/);
   await dialog.getByRole('button', { name: 'Cancelar' }).click();
   await expect(dialog).toBeHidden();
 });

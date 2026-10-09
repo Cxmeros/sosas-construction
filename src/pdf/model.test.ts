@@ -13,13 +13,17 @@ const withItems = (items: LineItem[], doc: DocumentData = SAMPLE_ESTIMATE): Docu
 const rowsOf = (pages: PdfPage[]) => pages.flatMap((p) => p.segments.flatMap((s) => s.rows));
 
 describe('buildPdfModel', () => {
+  it('always prints the date chosen in the form (bug 0)', () => {
+    expect(buildPdfModel({ ...SAMPLE_ESTIMATE, date: '2026-12-25' }).date).toBe('12/25/2026');
+  });
+
   it('builds the sample estimate (SPEC §7)', () => {
     const m = buildPdfModel(SAMPLE_ESTIMATE);
     expect(m.title).toBe('WORK ESTIMATE');
-    expect(m.date).toBe('10-05-2026');
+    expect(m.date).toBe('10/05/2026');
     expect(m.multi).toBe(false);
     expect(m.estimateRef).toBe('');
-    expect(m.fileName).toBe('Estimate_EST-20261005-01_Margaret-Kelly.pdf');
+    expect(m.fileName).toBe('EST-20261005-01-Kelly.pdf');
     const [option] = m.options;
     expect(option).toMatchObject({
       label: 'SERVICES AND MATERIALS',

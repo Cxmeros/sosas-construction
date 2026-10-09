@@ -5,6 +5,12 @@ Danilo Sosa (contratista de pisos en Lansdowne, PA) hace sus estimates y factura
 un Word: el formato se mueve, tiene que buscar el archivo cada vez y borrar a mano.
 Quiere llenar campos y obtener un PDF listo para mandar al cliente.
 
+## 0. Para qué sirve cada documento (oct 2026)
+- **Estimate**: convence al cliente. Lleva todo el detalle y, si hace falta, el proceso paso a paso
+  (Work Process, §3.13).
+- **Invoice**: cobra un trabajo ya aceptado. Es directo, sin medidas, y puede llevar cargos extra
+  que salieron durante la obra (§3.12).
+
 ## 2. Decisiones
 ### Confirmadas por el cliente
 - **Sin TAX.** No existe línea de impuestos.
@@ -13,8 +19,14 @@ Quiere llenar campos y obtener un PDF listo para mandar al cliente.
 - **Celular y computadora por igual** → responsive, ambos tamaños con la misma prioridad.
 - **Estimate e Invoice**, mismo formato; cambian título, numeración, depósito y términos.
 - **Sin métodos de pago impresos.** El invoice lleva un texto de términos genérico y editable.
-- **Logo:** se usa `assets/logo-placeholder.png` (extraído del PDF, 525×245 px, fondo blanco).
-  Va en un solo lugar (`src/assets/`) para reemplazarlo sin tocar código.
+- **Logo provisional:** `src/assets/logo-ai-red.jpg`. Es la única referencia al logo, para la app y
+  el PDF (`config/company.ts`); cambiarlo no toca código. **Pendiente:** logo oficial.
+- **Empresa** (`config/company.ts`, nada escrito a mano en el PDF): nombre visible
+  "Danilo & Carlos Sosa" y debajo "Sosa's Constructions"; 29 E Providence Rd, Lansdowne, PA 19050;
+  teléfonos sin nombre 435-512-4801 · 208-600-7776; beneficiario de los cheques configurable
+  (provisional "Sosa's Constructions", **pendiente de confirmar**).
+- **Pendientes del cliente** (todo configurable, no inventar): logo oficial, a nombre de quién van
+  los cheques, encabezado liso o con madera (variante E2 detrás de un flag, apagada).
 - **No hay más ejemplos de trabajos.** Las unidades deben ser flexibles (ver §3.5).
 
 ### Supuestos
@@ -24,29 +36,60 @@ Quiere llenar campos y obtener un PDF listo para mandar al cliente.
 ## 3. Alcance
 ### MVP
 1. Tipo de documento: Estimate | Invoice.
-2. Número de documento autogenerado y editable; fecha (hoy por defecto, formato MM-DD-YYYY).
-3. Datos del cliente: nombre (requerido), dirección, teléfono, email (opcionales).
+2. Número de documento autogenerado y editable; fecha (hoy por defecto). El PDF usa **siempre** la
+   fecha del formulario, en formato **MM/DD/YYYY**; el input de la app sigue el formato del teléfono.
+3. Datos del cliente: nombre (requerido), dirección, teléfono, email (opcionales). Teléfono: 10
+   dígitos ("Faltan dígitos: usa 10 números."); en la app y el PDF se muestra `(XXX) XXX-XXXX`.
 4. Job description (texto libre, máx. 1 500 caracteres).
-5. Partidas (1–30):
-   - description (req., máx. 200), qty, unit, unit price, amount (calculado).
-   - Units: `sq ft`, `linear ft`, `steps`, `each`, `hours`, `lump sum` y **`other`** (texto libre,
-     máx. 15 caracteres) porque no tenemos más ejemplos de sus trabajos.
-   - `lump sum`: no pide qty ni unit price; se escribe el monto directo.
-     (Caso real: "Refinish step and handrails — 15 steps, 10 sticks — $3,000".)
-   - Agregar, eliminar (con deshacer), reordenar.
-6. Deposit:
-   - Estimate: ninguno | porcentaje (botones 20 % / 30 % + personalizado) | monto fijo.
-     Muestra "Deposit required" y "Balance due upon completion".
-   - Invoice: "Deposit received" (monto) → "Balance due".
-   - El depósito nunca puede superar el total.
+5. **Trabajos** (antes "partidas"; en la interfaz no queda ningún "partida"), 1–30:
+   - descripción (req., máx. 200), **detalle opcional** (la línea pequeña bajo la descripción, ej.
+     "15 steps, 10 sticks", máx. 200), qty, unit, unit price, amount = qty × unit price (redondeo
+     a centavos, CLAUDE.md principio 3).
+   - Units: `sq ft`, `linear ft`, `steps`, `each`, `hours`, `lump sum` y **`other`** (nombre de la
+     unidad, máx. 15 caracteres).
+   - `lump sum`: solo pide "Monto total"; en el PDF qty y unit price salen como "—".
+   - El orden en la app es el orden en el PDF: flechas ↑↓ en el celular, arrastrar en escritorio.
+   - Agregar y eliminar con deshacer (§3.14).
+6. Anticipo (estimate e invoice): 20 %, 30 % (por defecto), Otro %, Monto fijo, Sin anticipo.
+   - Estimate: "Anticipo" → PDF "Deposit required (X%)" y "Balance due upon completion".
+   - Invoice: "Anticipo recibido" → PDF "Deposit received", en negativo (–$5,507.03); el saldo
+     ("Balance due") va en rojo.
+   - "Sin anticipo": se oculta la fila y saldo = total.
+   - Se calcula **solo sobre los trabajos**, nunca sobre los cargos extra, y no puede ser mayor que
+     ese total (Zod, error en español).
 7. Terms & conditions: texto por defecto según tipo, editable.
-8. Vista previa del PDF → **Compartir** (Web Share API con archivo: WhatsApp, Mensajes,
-   correo) con respaldo a **Descargar**.
-9. **"Convertir en Invoice"**: crea un invoice a partir del estimate actual conservando
-   cliente y partidas (cambia número, tipo, fecha y términos).
-10. **Borrador automático** del documento en curso (sobrevive a cerrar la app);
-    "Nuevo documento" lo limpia previa confirmación.
-11. **Opciones en el estimate** (pedido del cliente, oct 2026): de 1 a 3 opciones, cada una con
+   - Invoice: "Payment is due upon receipt of this invoice. Please make checks payable to {payee}
+     and reference the invoice number. We appreciate the opportunity to work in your home."
+     ({payee} sale de `config/company.ts`).
+8. Vista previa del PDF → Compartir, Descargar, Convertir en Invoice (solo estimate), Nuevo
+   documento. Compartir usa `navigator.share` con el archivo. Sin eso, panel con WhatsApp y correo:
+   como wa.me y mailto no adjuntan archivos, primero descarga el PDF y el mensaje dice "adjunta el
+   PDF descargado".
+9. **"Convertir en Invoice"** (solo estimates; vista previa y barra de escritorio): copia cliente,
+   descripción, trabajos y anticipo; la etiqueta pasa a "recibido", genera un número INV- nuevo y
+   guarda el EST- como "Estimate ref.". El Work Process no pasa.
+10. **Borrador automático** cada ~2 s con indicador "Guardado"; al abrir con borrador pendiente,
+    aviso "Recuperamos tu borrador" con "Seguir editando" / "Descartar" (diálogo propio, no
+    `confirm()`). El schema está versionado y tiene migración; si un borrador viejo no se puede
+    migrar, se descarta sin error.
+12. **Cargos extra** (solo invoice), opcional con interruptor. Apagado: no salen ni suman, pero lo
+    escrito se guarda. Líneas: descripción + monto. El encabezado de la sección muestra la suma.
+    PDF: bloque "ADDITIONAL CHARGES" con borde punteado y la nota "Not included in the original
+    estimate"; sin líneas válidas no aparece. Totales del invoice: Work, Additional charges, Total,
+    Deposit received (negativo), Balance due.
+13. **Work Process** (solo estimate), opcional con interruptor. Apagado desaparecen las hojas y el
+    aviso de la primera página, pero lo escrito se guarda. Sin plantillas ni pasos por defecto.
+    Nota inicial opcional + pasos (título obligatorio, explicación opcional), en inglés.
+    Límites: título 120, explicación 1 500, nota 1 500, máximo 25 pasos (contador visible al
+    acercarse). Pasos vacíos se ignoran; si no queda nada, la sección no se renderiza. PDF: hoja
+    nueva al final, encabezado compacto "WORK ESTIMATE · Work process" + "No. · fecha · cliente",
+    pasos numerados 01, 02…, nunca se parte un paso. Aviso en la primera página: "Step-by-step work
+    process on page N." (N real).
+14. **Deshacer**: quitar un trabajo, un paso o un cargo muestra "… eliminado · DESHACER" 6 s.
+15. **Invoice**: los trabajos salen solo con descripción (+ detalle) y monto; "Estimate ref." en el
+    encabezado si viene de una conversión.
+11. **Opciones en el estimate** (DESACTIVADO en esta versión con `FEATURES.estimateOptions` en
+    `config/company.ts`; el código se conserva): de 1 a 3 opciones, cada una con
     nombre (requerido si hay 2 o más), descripción opcional, sus propias partidas (1–30) y su total.
     - El anticipo elegido se aplica al total de cada opción (monto fijo: no puede superar la opción
       más barata).
@@ -69,6 +112,7 @@ Esto **no** es historial y debe quedar claro en el código:
 - `draft` — documento en curso (uno solo).
 - `counters` — secuencia diaria para la numeración.
 - `prefs` — último porcentaje de depósito usado.
+El borrador incluye Work Process y cargos extra aunque estén apagados.
 Todo validado con Zod al leer; si falla, se descarta sin romper la app.
 
 ## 5. Numeración
@@ -80,6 +124,11 @@ Se basa en fecha para minimizar choques si usa celular y computadora. Siempre ed
 - `totalCents = Σ lineAmountCents`
 - `depositCents = Math.round(totalCents * pct / 100)` o monto fijo (≤ total).
 - `balanceCents = totalCents − depositCents`
+- Con cargos extra (invoice): `workCents = Σ trabajos`, `extrasCents = Σ cargos` (0 si apagados),
+  `depositCents` sobre `workCents`, `totalCents = workCents + extrasCents`,
+  `balanceCents = totalCents − depositCents`.
+- Caso obligatorio: trabajo $18,356.75 + extras $240.00 = **$18,596.75**; anticipo 30 % (sobre el
+  trabajo) = **$5,507.03**; saldo **$13,089.72**.
 - Límites: qty ≤ 1 000 000; unit price ≤ $100 000; total ≤ $10 000 000; nada negativo.
 
 ### Casos de prueba obligatorios (del estimate real de ejemplo)
@@ -111,8 +160,13 @@ Basado en el formato actual de Danilo, con correcciones:
      additional information or unforeseen conditions."
    - Invoice: "Payment is due upon receipt. Thank you for your business."
      (por defecto, editable en cada documento).
-8. Pie: "Page X of Y".
-- Nombre del archivo: `Estimate_EST-20261005-01_John-Smith.pdf` (solo `[A-Za-z0-9_-]`).
+8. Pie en todas las hojas: "Sosa's Constructions · 435-512-4801 · 208-600-7776", el número del
+   documento y "Page X of Y".
+9. Paginación: nunca se parte una fila; si la tabla no cabe, "Subtotal this page" y "Continued on
+   page N →", y las hojas siguientes usan "WORK ESTIMATE (continued)" / "INVOICE (continued)".
+   Totales y términos van juntos. Debe leerse bien impreso en blanco y negro.
+- Nombre del archivo: `<número>-<apellido>.pdf`, ej. `EST-20261005-01-Kelly.pdf` (apellido = última
+  palabra del nombre, solo `[A-Za-z0-9-]`).
 - El diseño visual final sale del entregable de Claude Design (ver DESIGN_BRIEF.md).
 
 ## 8. Seguridad
