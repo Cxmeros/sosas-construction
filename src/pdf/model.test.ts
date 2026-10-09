@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { LONG_ESTIMATE, SAMPLE_ESTIMATE, SAMPLE_INVOICE } from './fixtures';
 import { buildPdfModel, splitDescription } from './model';
-import { paginate } from './layout';
+import { paginate, processStartPage, type DocPage, type PdfPage } from './layout';
+
+const docPages = (pages: PdfPage[]) => pages.filter((p): p is DocPage => p.kind === 'document');
 import { countLines } from './measure';
 
 describe('buildPdfModel', () => {
@@ -41,7 +43,8 @@ describe('buildPdfModel', () => {
     expect(m.estimateRef).toBe('EST-20261005-01');
     expect(m.deposit).toEqual({ label: 'Deposit received (30%)', value: '−$5,507.03' });
     expect(m.balanceLabel).toBe('Balance due');
-    expect(m.terms).toBe('Payment is due upon receipt. Thank you for your business.');
+    expect(m.simple).toBe(true);
+    expect(m.terms).toContain('Please make checks payable to');
   });
 
   it('omits the deposit row and labels fixed deposits without a percentage', () => {
@@ -91,7 +94,7 @@ describe('paginate', () => {
     const model = buildPdfModel(LONG_ESTIMATE);
     const pages = paginate(model);
     expect(pages).toHaveLength(2);
-    const [first, second] = pages as [(typeof pages)[0], (typeof pages)[0]];
+    const [first, second] = docPages(pages) as [DocPage, DocPage];
     expect(first.fullHeader).toBe(true);
     expect(first.showTotals).toBe(false);
     expect(first.continued?.nextPage).toBe(2);
@@ -118,8 +121,8 @@ describe('paginate', () => {
       terms: 'term '.repeat(200),
     };
     const pages = paginate(buildPdfModel(doc));
-    expect(pages.flatMap((p) => p.rows)).toHaveLength(30);
-    expect(pages.at(-1)?.showTotals).toBe(true);
+    expect(docPages(pages).flatMap((p) => p.rows)).toHaveLength(30);
+    expect(docPages(pages).at(-1)?.showTotals).toBe(true);
     pages.forEach((p, i) => {
       expect(p.pageNo).toBe(i + 1);
       expect(p.pageCount).toBe(pages.length);
@@ -129,7 +132,50 @@ describe('paginate', () => {
   it('renders an empty table on one page when there are no rows', () => {
     const pages = paginate(buildPdfModel({ ...SAMPLE_ESTIMATE, items: [] }));
     expect(pages).toHaveLength(1);
-    expect(pages[0]?.rows).toEqual([]);
+    expect(docPages(pages)[0]?.rows).toEqual([]);
+  });
+});
+
+describe('invoice extras and work process', () => {
+  it('invoice with extras: Work / Additional charges subtotals', () => {
+    const m = buildPdfModel({
+      ...SAMPLE_INVOICE,
+      extras: [{ id: 'x', description: 'Debris disposal', cents: 24000 }],
+    });
+    expect(m.subtotals).toEqual({ work: '$18,356.75', extras: '$240.00' });
+    expect(m.total).toBe('$18,596.75');
+    expect(m.balance).toBe('$13,089.72');
+  });
+
+  it('work process starts on a new page at the end and the note names that page', () => {
+    const steps = Array.from({ length: 7 }, (_, i) => ({
+      id: String(i),
+      title: `Step ${String(i + 1)}`,
+      body: 'Sand the floor in three passes and apply two coats of finish. '.repeat(5),
+    }));
+    const pages = paginate(
+      buildPdfModel({ ...SAMPLE_ESTIMATE, process: { note: 'Plan for your home.', steps } }),
+    );
+    expect(pages[0]?.kind).toBe('document');
+    expect(processStartPage(pages)).toBe(2);
+    const process = pages.filter((p) => p.kind === 'process');
+    expect(process.flatMap((p) => p.steps).map((s) => s.nn)).toEqual([
+      '01',
+      '02',
+      '03',
+      '04',
+      '05',
+      '06',
+      '07',
+    ]);
+    expect(process[0]?.first).toBe(true);
+    pages.forEach((p) => {
+      expect(p.pageCount).toBe(pages.length);
+    });
+  });
+
+  it('no work process → no process pages and no note', () => {
+    expect(processStartPage(paginate(buildPdfModel(SAMPLE_ESTIMATE)))).toBeNull();
   });
 });
 

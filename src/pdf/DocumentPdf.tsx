@@ -3,14 +3,30 @@ import {
   Font,
   Image,
   Page,
+  Path,
   StyleSheet,
+  Svg,
   Text,
   View,
   type Styles,
 } from '@react-pdf/renderer';
+import type { ReactNode } from 'react';
 import { COLORS as C, COMPANY } from '../config/company';
 import { formatCents } from '../domain/money';
-import { BAR, BOX, CELL, COLS, PAGE, TYPE, paginate, type PdfPage } from './layout';
+import {
+  COLS,
+  CUSTOMER,
+  EXTRAS,
+  LOGO_HEIGHT,
+  PAGE,
+  STEP,
+  TYPE,
+  paginate,
+  processStartPage,
+  type DocPage,
+  type PdfPage,
+  type ProcessPage,
+} from './layout';
 import type { PdfModel, PdfRow } from './model';
 
 type Style = Styles[string];
@@ -35,44 +51,28 @@ export function registerFonts(sources: FontSources): void {
   registered = true;
 }
 
-const lh = TYPE.lineHeight;
-
+/** Mirrors PageView.tsx (design/project/Sosa PDF.dc.html), in points. */
 const s = StyleSheet.create({
   page: {
     paddingTop: pt(PAGE.padTop),
     paddingHorizontal: pt(PAGE.padX),
     fontFamily: 'Barlow',
     fontSize: pt(TYPE.body),
-    lineHeight: lh,
+    lineHeight: TYPE.lineHeight,
     color: C.ink,
     backgroundColor: '#FFFFFF',
     flexDirection: 'column',
-    gap: pt(PAGE.gap),
   },
   cond: { fontFamily: 'Barlow Condensed', fontWeight: 700 },
-  bar: {
+  label: {
     fontFamily: 'Barlow Condensed',
     fontWeight: 700,
     fontSize: pt(TYPE.label),
-    letterSpacing: pt(TYPE.label) * 0.1,
-    color: '#FFFFFF',
-    backgroundColor: C.orange600,
-    paddingVertical: pt(BAR.padY),
-    paddingHorizontal: pt(BAR.padX),
+    letterSpacing: pt(TYPE.label) * 0.08,
+    color: C.red700,
   },
-  box: {
-    backgroundColor: C.orange100,
-    paddingVertical: pt(BOX.padY),
-    paddingHorizontal: pt(BOX.padX),
-    gap: pt(BOX.gap),
-  },
+  ruled: { borderBottomWidth: pt(1), borderBottomColor: C.line, paddingBottom: pt(4) },
   row: { flexDirection: 'row' },
-  descCell: {
-    flexGrow: 1,
-    flexBasis: 0,
-    paddingVertical: pt(CELL.padY),
-    paddingHorizontal: pt(CELL.padX),
-  },
   footer: {
     position: 'absolute',
     left: pt(PAGE.padX),
@@ -88,20 +88,19 @@ const s = StyleSheet.create({
   },
 });
 
-/** Fixed-width column with a light grid line on its left. */
-const col = (width: number, align: 'left' | 'right'): Style => ({
+const cell = (width: number, align: 'left' | 'right', padY: number, last = false): Style => ({
   width: pt(width),
-  paddingVertical: pt(CELL.padY),
-  paddingHorizontal: pt(CELL.padX),
-  borderLeftWidth: pt(1),
-  borderLeftColor: C.orange200,
+  paddingVertical: pt(padY),
+  paddingLeft: pt(6),
+  paddingRight: last ? 0 : pt(6),
   textAlign: align,
 });
-const tableSides: Style = {
-  borderLeftWidth: pt(1),
-  borderRightWidth: pt(1),
-  borderColor: C.orange200,
-};
+const descCell = (padY: number): Style => ({
+  flexGrow: 1,
+  flexBasis: 0,
+  paddingVertical: pt(padY),
+  paddingRight: pt(8),
+});
 
 function FullHeader({ model, logoSrc }: { model: PdfModel; logoSrc: string }) {
   const meta: [string, string][] = [
@@ -117,26 +116,18 @@ function FullHeader({ model, logoSrc }: { model: PdfModel; logoSrc: string }) {
         alignItems: 'flex-end',
         paddingBottom: pt(14),
         borderBottomWidth: pt(3),
-        borderBottomColor: C.orange500,
+        borderBottomColor: C.red500,
       }}
     >
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: pt(14) }}>
-        <Image src={logoSrc} style={{ height: pt(92), width: pt((92 * 525) / 245) }} />
-        <View
-          style={{
-            borderLeftWidth: pt(1),
-            borderLeftColor: C.lineSoft,
-            paddingLeft: pt(14),
-            fontSize: pt(TYPE.company),
-            color: C.inkMuted,
-          }}
-        >
-          <Text style={{ color: C.ink, fontSize: pt(13), fontWeight: 700 }}>{COMPANY.owner}</Text>
-          <Text>{COMPANY.addressLine1}</Text>
-          <Text>{COMPANY.addressLine2}</Text>
-          {COMPANY.phones.map((p) => (
-            <Text key={p}>{p}</Text>
-          ))}
+      <View style={{ flexDirection: 'row', alignItems: 'flex-end', gap: pt(16) }}>
+        <Image src={logoSrc} style={{ height: pt(LOGO_HEIGHT.full) }} />
+        <View style={{ fontSize: pt(TYPE.company), lineHeight: 1.35, paddingBottom: pt(2) }}>
+          <Text style={[s.cond, { fontSize: pt(TYPE.owners), lineHeight: 1.1 }]}>
+            {COMPANY.owners}
+          </Text>
+          <Text style={{ color: C.inkMuted }}>{COMPANY.name}</Text>
+          <Text style={{ color: C.inkMuted }}>{COMPANY.address}</Text>
+          <Text>{COMPANY.phones.join(' · ')}</Text>
         </View>
       </View>
       <View style={{ alignItems: 'flex-end', gap: pt(8) }}>
@@ -146,7 +137,7 @@ function FullHeader({ model, logoSrc }: { model: PdfModel; logoSrc: string }) {
             {
               fontSize: pt(TYPE.title),
               lineHeight: 0.95,
-              color: C.orange600,
+              color: C.red700,
               letterSpacing: pt(TYPE.title) * 0.02,
             },
           ]}
@@ -169,7 +160,7 @@ function FullHeader({ model, logoSrc }: { model: PdfModel; logoSrc: string }) {
               >
                 {k}
               </Text>
-              <Text style={{ fontWeight: 600, minWidth: pt(96), textAlign: 'right' }}>{v}</Text>
+              <Text style={{ fontWeight: 600, minWidth: pt(110), textAlign: 'right' }}>{v}</Text>
             </View>
           ))}
         </View>
@@ -178,7 +169,7 @@ function FullHeader({ model, logoSrc }: { model: PdfModel; logoSrc: string }) {
   );
 }
 
-function CompactHeader({ model, logoSrc }: { model: PdfModel; logoSrc: string }) {
+function CompactHeader({ model, logoSrc, tag }: { model: PdfModel; logoSrc: string; tag: string }) {
   return (
     <View
       style={{
@@ -187,10 +178,10 @@ function CompactHeader({ model, logoSrc }: { model: PdfModel; logoSrc: string })
         alignItems: 'center',
         paddingBottom: pt(10),
         borderBottomWidth: pt(3),
-        borderBottomColor: C.orange500,
+        borderBottomColor: C.red500,
       }}
     >
-      <Image src={logoSrc} style={{ height: pt(48), width: pt((48 * 525) / 245) }} />
+      <Image src={logoSrc} style={{ height: pt(LOGO_HEIGHT.compact) }} />
       <View style={{ alignItems: 'flex-end', gap: pt(2) }}>
         <Text
           style={[
@@ -198,12 +189,12 @@ function CompactHeader({ model, logoSrc }: { model: PdfModel; logoSrc: string })
             {
               fontSize: pt(TYPE.compactTitle),
               lineHeight: 1,
-              color: C.orange600,
+              color: C.red700,
               letterSpacing: pt(TYPE.compactTitle) * 0.02,
             },
           ]}
         >
-          {model.title} <Text style={{ color: C.inkMuted, fontWeight: 600 }}>(continued)</Text>
+          {model.title} <Text style={{ color: C.inkMuted, fontWeight: 600 }}>{tag}</Text>
         </Text>
         <Text style={{ fontSize: pt(TYPE.meta), fontWeight: 600 }}>
           No. {model.number} · {model.date} · {model.customer.name}
@@ -213,32 +204,394 @@ function CompactHeader({ model, logoSrc }: { model: PdfModel; logoSrc: string })
   );
 }
 
-function Row({ row }: { row: PdfRow }) {
+function Customer({ model }: { model: PdfModel }) {
+  const c = model.customer;
+  const left: Style = { flexGrow: 1.3, flexBasis: 0 };
+  const right: Style = { flexGrow: 1, flexBasis: 0 };
   return (
     <View
-      style={[s.row, tableSides, { borderBottomWidth: pt(1), borderBottomColor: C.orange200 }]}
+      style={{
+        paddingVertical: pt(CUSTOMER.padY),
+        paddingHorizontal: pt(CUSTOMER.padX),
+        borderWidth: pt(1.5),
+        borderColor: C.ink,
+        gap: pt(2),
+      }}
       wrap={false}
     >
-      <View style={s.descCell}>
+      <Text style={[s.label, { paddingBottom: pt(2) }]}>CUSTOMER INFORMATION</Text>
+      <View style={[s.row, { gap: pt(CUSTOMER.colGap) }]}>
+        <Text style={[left, { fontSize: pt(TYPE.customerName), fontWeight: 700 }]}>{c.name}</Text>
+        <Text style={right}>{c.phone}</Text>
+      </View>
+      {c.address || c.email ? (
+        <View style={[s.row, { gap: pt(CUSTOMER.colGap) }]}>
+          <Text style={left}>{c.address}</Text>
+          <Text style={right}>{c.email}</Text>
+        </View>
+      ) : null}
+    </View>
+  );
+}
+
+function Row({ row, simple }: { row: PdfRow; simple: boolean }) {
+  const padY = simple ? 8 : 7;
+  return (
+    <View style={[s.row, { borderBottomWidth: pt(1), borderBottomColor: C.lineSoft }]} wrap={false}>
+      <View style={descCell(padY)}>
         <Text style={{ fontWeight: 500 }}>{row.description}</Text>
         {row.note ? (
           <Text style={{ fontSize: pt(TYPE.note), color: C.inkMuted }}>{row.note}</Text>
         ) : null}
       </View>
-      <Text style={col(COLS.qty, 'right')}>{row.qty}</Text>
-      <Text style={col(COLS.unit, 'left')}>{row.unit}</Text>
-      <Text style={col(COLS.unitPrice, 'right')}>{row.unitPrice}</Text>
-      <Text style={[col(COLS.amount, 'right'), { fontWeight: 600 }]}>{row.amount}</Text>
+      {simple ? null : (
+        <>
+          <Text style={cell(COLS.qty, 'right', padY)}>{row.qty}</Text>
+          <Text style={cell(COLS.unit, 'left', padY)}>{row.unit}</Text>
+          <Text style={cell(COLS.unitPrice, 'right', padY)}>{row.unitPrice}</Text>
+        </>
+      )}
+      <Text
+        style={[
+          cell(simple ? COLS.simpleAmount : COLS.amount, 'right', padY, true),
+          { fontWeight: 600 },
+        ]}
+      >
+        {row.amount}
+      </Text>
     </View>
   );
 }
 
-function Section({ label, text, style }: { label: string; text: string; style: Style }) {
+function Table({ model, page }: { model: PdfModel; page: DocPage }) {
   return (
-    <View wrap={false}>
-      <Text style={s.bar}>{label}</Text>
-      <View style={s.box}>
-        <Text style={style}>{text}</Text>
+    <View>
+      <Text style={[s.label, { paddingBottom: pt(6) }]}>SERVICES AND MATERIALS</Text>
+      <View
+        style={[
+          s.row,
+          {
+            borderTopWidth: pt(2),
+            borderTopColor: C.ink,
+            borderBottomWidth: pt(1),
+            borderBottomColor: C.ink,
+            fontWeight: 700,
+            fontSize: pt(TYPE.tableHead),
+            letterSpacing: pt(TYPE.tableHead) * 0.08,
+          },
+        ]}
+      >
+        <Text style={descCell(7)}>DESCRIPTION</Text>
+        {model.simple ? null : (
+          <>
+            <Text style={cell(COLS.qty, 'right', 7)}>QTY</Text>
+            <Text style={cell(COLS.unit, 'left', 7)}>UNIT</Text>
+            <Text style={cell(COLS.unitPrice, 'right', 7)}>UNIT PRICE</Text>
+          </>
+        )}
+        <Text style={cell(model.simple ? COLS.simpleAmount : COLS.amount, 'right', 7, true)}>
+          AMOUNT
+        </Text>
+      </View>
+      {page.rows.map((row) => (
+        <Row key={row.key} row={row} simple={model.simple} />
+      ))}
+      {page.continued ? (
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            paddingTop: pt(8),
+            fontSize: pt(TYPE.note),
+            color: C.inkMuted,
+          }}
+        >
+          <Text>
+            Subtotal this page:{' '}
+            <Text style={{ color: C.ink, fontWeight: 700 }}>
+              {formatCents(page.continued.subtotalCents)}
+            </Text>
+          </Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: pt(4) }}>
+            <Text style={{ color: C.ink, fontWeight: 700 }}>
+              Continued on page {page.continued.nextPage}
+            </Text>
+            {/* Barlow (latin subset) has no "→": drawn instead. */}
+            <Svg width={pt(10)} height={pt(8)} viewBox="0 0 10 8">
+              <Path d="M0 4h8M5 1l3 3-3 3" stroke={C.ink} strokeWidth={1.4} fill="none" />
+            </Svg>
+          </View>
+        </View>
+      ) : null}
+    </View>
+  );
+}
+
+function Extras({ model }: { model: PdfModel }) {
+  return (
+    <View
+      style={{
+        borderWidth: pt(1),
+        borderStyle: 'dashed',
+        borderColor: C.fieldBorder,
+        paddingTop: pt(EXTRAS.padTop),
+        paddingBottom: pt(EXTRAS.padBottom),
+        paddingHorizontal: pt(EXTRAS.padX),
+      }}
+      wrap={false}
+    >
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'flex-end',
+          paddingBottom: pt(4),
+        }}
+      >
+        <Text style={s.label}>ADDITIONAL CHARGES</Text>
+        <Text style={{ fontSize: pt(12), color: C.inkMuted }}>
+          Not included in the original estimate
+        </Text>
+      </View>
+      {model.extras.map((x) => (
+        <View key={x.key} style={[s.row, { borderTopWidth: pt(1), borderTopColor: C.lineSoft }]}>
+          <Text style={[descCell(4), { fontWeight: 500 }]}>{x.description}</Text>
+          <Text
+            style={{
+              width: pt(COLS.simpleAmount),
+              paddingVertical: pt(4),
+              textAlign: 'right',
+              fontWeight: 600,
+            }}
+          >
+            {x.amount}
+          </Text>
+        </View>
+      ))}
+    </View>
+  );
+}
+
+function Totals({ model }: { model: PdfModel }) {
+  const line: Style = { flexDirection: 'row', justifyContent: 'space-between' };
+  return (
+    <View
+      style={{ alignSelf: 'flex-end', width: pt(380), borderWidth: pt(1.5), borderColor: C.ink }}
+      wrap={false}
+    >
+      {model.subtotals ? (
+        <>
+          <View style={[line, { paddingVertical: pt(4), paddingHorizontal: pt(14) }]}>
+            <Text>Work</Text>
+            <Text>{model.subtotals.work}</Text>
+          </View>
+          <View
+            style={[
+              line,
+              {
+                paddingVertical: pt(4),
+                paddingHorizontal: pt(14),
+                borderTopWidth: pt(1),
+                borderTopColor: C.line,
+              },
+            ]}
+          >
+            <Text>Additional charges</Text>
+            <Text>{model.subtotals.extras}</Text>
+          </View>
+        </>
+      ) : null}
+      <View
+        style={[
+          line,
+          {
+            paddingVertical: pt(7),
+            paddingHorizontal: pt(14),
+            fontSize: pt(TYPE.totalsTotal),
+            fontWeight: 700,
+            borderTopWidth: model.subtotals ? pt(2) : 0,
+            borderTopColor: C.ink,
+          },
+        ]}
+      >
+        <Text>Total</Text>
+        <Text>{model.total}</Text>
+      </View>
+      {model.deposit ? (
+        <View
+          style={[
+            line,
+            {
+              paddingVertical: pt(7),
+              paddingHorizontal: pt(14),
+              borderTopWidth: pt(1),
+              borderTopColor: C.line,
+              fontSize: pt(TYPE.totalsRow),
+            },
+          ]}
+        >
+          <Text>{model.deposit.label}</Text>
+          <Text style={{ fontWeight: 600 }}>{model.deposit.value}</Text>
+        </View>
+      ) : null}
+      <View
+        style={[
+          line,
+          {
+            alignItems: 'flex-end',
+            paddingVertical: pt(10),
+            paddingHorizontal: pt(14),
+            backgroundColor: C.red700,
+            color: '#FFFFFF',
+          },
+        ]}
+      >
+        <Text style={{ fontWeight: 700, fontSize: pt(TYPE.totalsRow), paddingBottom: pt(3) }}>
+          {model.balanceLabel}
+        </Text>
+        <Text style={[s.cond, { fontSize: pt(TYPE.balance), lineHeight: 1 }]}>{model.balance}</Text>
+      </View>
+    </View>
+  );
+}
+
+function RuledSection({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <View style={{ gap: pt(5) }} wrap={false}>
+      <Text style={[s.label, s.ruled]}>{label}</Text>
+      {children}
+    </View>
+  );
+}
+
+function DocumentPageView({
+  model,
+  page,
+  logoSrc,
+  processPage,
+  gap,
+}: {
+  model: PdfModel;
+  page: DocPage;
+  logoSrc: string;
+  processPage: number | null;
+  gap: number;
+}) {
+  return (
+    <View style={{ gap: pt(gap) }}>
+      {page.fullHeader ? (
+        <>
+          <FullHeader model={model} logoSrc={logoSrc} />
+          <Customer model={model} />
+          {model.jobDescription || processPage ? (
+            <RuledSection label="JOB DESCRIPTION">
+              {model.jobDescription ? (
+                <Text style={{ fontSize: pt(TYPE.jobDescription) }}>{model.jobDescription}</Text>
+              ) : null}
+              {processPage ? (
+                <Text style={{ color: C.inkMuted }}>
+                  Step-by-step work process on page {processPage}.
+                </Text>
+              ) : null}
+            </RuledSection>
+          ) : null}
+        </>
+      ) : (
+        <CompactHeader model={model} logoSrc={logoSrc} tag="(continued)" />
+      )}
+      {page.showTable ? <Table model={model} page={page} /> : null}
+      {page.showTotals ? (
+        <>
+          {model.extras.length ? <Extras model={model} /> : null}
+          <Totals model={model} />
+          {model.terms ? (
+            <View style={{ gap: pt(6) }} wrap={false}>
+              <Text style={[s.label, s.ruled]}>TERMS AND CONDITIONS</Text>
+              <Text style={{ fontSize: pt(TYPE.terms), color: C.walnut700 }}>{model.terms}</Text>
+            </View>
+          ) : null}
+        </>
+      ) : null}
+    </View>
+  );
+}
+
+function ProcessPageView({
+  model,
+  page,
+  logoSrc,
+  gap,
+}: {
+  model: PdfModel;
+  page: ProcessPage;
+  logoSrc: string;
+  gap: number;
+}) {
+  const note = model.process?.note ?? '';
+  const body: Style = {
+    fontSize: pt(TYPE.body),
+    lineHeight: TYPE.processLineHeight,
+    maxWidth: pt(STEP.textWidth),
+  };
+  return (
+    <View style={{ gap: pt(gap) }}>
+      <CompactHeader model={model} logoSrc={logoSrc} tag="· Work process" />
+      {page.first ? (
+        <View style={{ gap: pt(6), paddingTop: pt(4) }}>
+          <Text
+            style={[
+              s.cond,
+              {
+                fontSize: pt(TYPE.processTitle),
+                lineHeight: 1,
+                color: C.red700,
+                letterSpacing: pt(TYPE.processTitle) * 0.02,
+              },
+            ]}
+          >
+            WORK PROCESS
+          </Text>
+          {note ? <Text style={[body, { fontSize: pt(TYPE.jobDescription) }]}>{note}</Text> : null}
+        </View>
+      ) : null}
+      <View style={{ borderTopWidth: pt(2), borderTopColor: C.ink }}>
+        {page.steps.map((step) => (
+          <View
+            key={step.key}
+            style={[
+              s.row,
+              {
+                gap: pt(STEP.colGap),
+                paddingVertical: pt(STEP.padY),
+                borderBottomWidth: pt(1),
+                borderBottomColor: C.lineSoft,
+              },
+            ]}
+            wrap={false}
+          >
+            <Text
+              style={[
+                s.cond,
+                {
+                  width: pt(STEP.numberCol),
+                  fontSize: pt(TYPE.stepNumber),
+                  lineHeight: 1,
+                  color: C.red700,
+                },
+              ]}
+            >
+              {step.nn}
+            </Text>
+            <View style={{ flexGrow: 1, flexBasis: 0, gap: pt(3) }}>
+              {step.title ? (
+                <Text style={{ fontSize: pt(TYPE.stepTitle), fontWeight: 700, lineHeight: 1.25 }}>
+                  {step.title}
+                </Text>
+              ) : null}
+              {step.body ? <Text style={[body, { color: C.walnut700 }]}>{step.body}</Text> : null}
+            </View>
+          </View>
+        ))}
       </View>
     </View>
   );
@@ -248,161 +601,27 @@ function PdfPageView({
   model,
   page,
   logoSrc,
+  processPage,
 }: {
   model: PdfModel;
   page: PdfPage;
   logoSrc: string;
+  processPage: number | null;
 }) {
+  const gap = model.extras.length ? PAGE.gapWithExtras : PAGE.gap;
   return (
     <Page size="LETTER" style={s.page}>
-      {page.fullHeader ? (
-        <>
-          <FullHeader model={model} logoSrc={logoSrc} />
-          <View wrap={false}>
-            <Text style={s.bar}>CUSTOMER INFORMATION</Text>
-            <View style={s.box}>
-              <Text style={{ fontSize: pt(TYPE.customerName), fontWeight: 700 }}>
-                {model.customer.name}
-              </Text>
-              {model.customer.address ? <Text>{model.customer.address}</Text> : null}
-              {model.customer.contact ? <Text>{model.customer.contact}</Text> : null}
-            </View>
-          </View>
-          {model.jobDescription ? (
-            <Section
-              label="JOB DESCRIPTION"
-              text={model.jobDescription}
-              style={{ fontSize: pt(TYPE.jobDescription) }}
-            />
-          ) : null}
-        </>
+      {page.kind === 'document' ? (
+        <DocumentPageView
+          model={model}
+          page={page}
+          logoSrc={logoSrc}
+          processPage={processPage}
+          gap={gap}
+        />
       ) : (
-        <CompactHeader model={model} logoSrc={logoSrc} />
+        <ProcessPageView model={model} page={page} logoSrc={logoSrc} gap={gap} />
       )}
-
-      {page.showTable ? (
-        <View>
-          <Text style={[s.bar, { marginBottom: pt(6) }]}>SERVICES AND MATERIALS</Text>
-          <View
-            style={[
-              s.row,
-              tableSides,
-              {
-                borderTopWidth: pt(1),
-                borderBottomWidth: pt(1),
-                backgroundColor: C.orange100,
-                color: C.orange800,
-                fontWeight: 700,
-                fontSize: pt(TYPE.tableHead),
-                letterSpacing: pt(TYPE.tableHead) * 0.08,
-              },
-            ]}
-          >
-            <Text style={s.descCell}>DESCRIPTION</Text>
-            <Text style={col(COLS.qty, 'right')}>QTY</Text>
-            <Text style={col(COLS.unit, 'left')}>UNIT</Text>
-            <Text style={col(COLS.unitPrice, 'right')}>UNIT PRICE</Text>
-            <Text style={col(COLS.amount, 'right')}>AMOUNT</Text>
-          </View>
-          {page.rows.map((row) => (
-            <Row key={row.key} row={row} />
-          ))}
-          {page.continued ? (
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                paddingTop: pt(8),
-                fontSize: pt(TYPE.note),
-                color: C.inkMuted,
-              }}
-            >
-              <Text>
-                Subtotal this page:{' '}
-                <Text style={{ color: C.ink, fontWeight: 700 }}>
-                  {formatCents(page.continued.subtotalCents)}
-                </Text>
-              </Text>
-              <Text style={{ color: C.ink, fontWeight: 700 }}>
-                Continued on page {page.continued.nextPage} ›
-              </Text>
-            </View>
-          ) : null}
-        </View>
-      ) : null}
-
-      {page.showTotals ? (
-        <>
-          <View
-            style={{
-              position: 'relative',
-              alignSelf: 'flex-end',
-              width: pt(340),
-              borderWidth: pt(1.5),
-              borderColor: C.orange200,
-            }}
-            wrap={false}
-          >
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                paddingVertical: pt(9),
-                paddingHorizontal: pt(14),
-                fontSize: pt(TYPE.totalsTotal),
-                fontWeight: 700,
-              }}
-            >
-              <Text>Total</Text>
-              <Text>{model.total}</Text>
-            </View>
-            {model.deposit ? (
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  paddingVertical: pt(9),
-                  paddingHorizontal: pt(14),
-                  borderTopWidth: pt(1),
-                  borderTopColor: C.orange200,
-                  fontSize: pt(TYPE.totalsRow),
-                }}
-              >
-                <Text>{model.deposit.label}</Text>
-                <Text style={{ fontWeight: 600 }}>{model.deposit.value}</Text>
-              </View>
-            ) : null}
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                alignItems: 'flex-end',
-                paddingVertical: pt(11),
-                paddingHorizontal: pt(14),
-                borderTopWidth: pt(2),
-                borderTopColor: C.orange600,
-                backgroundColor: C.orange600,
-                color: '#FFFFFF',
-              }}
-            >
-              <Text style={{ fontWeight: 700, fontSize: pt(TYPE.totalsRow), paddingBottom: pt(2) }}>
-                {model.balanceLabel}
-              </Text>
-              <Text style={[s.cond, { fontSize: pt(TYPE.balance), lineHeight: 1 }]}>
-                {model.balance}
-              </Text>
-            </View>
-          </View>
-          {model.terms ? (
-            <Section
-              label="TERMS AND CONDITIONS"
-              text={model.terms}
-              style={{ fontSize: pt(TYPE.terms), color: C.walnut700 }}
-            />
-          ) : null}
-        </>
-      ) : null}
-
       <View style={s.footer} fixed>
         <Text>{model.footer.left}</Text>
         <Text>{model.footer.center}</Text>
@@ -416,6 +635,7 @@ function PdfPageView({
 
 export function DocumentPdf({ model, logoSrc }: { model: PdfModel; logoSrc: string }) {
   const pages = paginate(model);
+  const processPage = processStartPage(pages);
   return (
     <Document
       title={`${model.title === 'INVOICE' ? 'Invoice' : 'Work Estimate'} ${model.number}`}
@@ -425,7 +645,13 @@ export function DocumentPdf({ model, logoSrc }: { model: PdfModel; logoSrc: stri
       language="en-US"
     >
       {pages.map((page) => (
-        <PdfPageView key={page.pageNo} model={model} page={page} logoSrc={logoSrc} />
+        <PdfPageView
+          key={page.pageNo}
+          model={model}
+          page={page}
+          logoSrc={logoSrc}
+          processPage={processPage}
+        />
       ))}
     </Document>
   );

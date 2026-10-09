@@ -1,6 +1,6 @@
-import { useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import type { DocumentData } from '../../domain/types';
-import { paginate, PAGE } from '../../pdf/layout';
+import { paginate, PAGE, processStartPage } from '../../pdf/layout';
 import { buildPdfModel } from '../../pdf/model';
 import { PageView } from '../../pdf/PageView';
 
@@ -33,8 +33,19 @@ export function PdfPreview({
   pageLabel?: (pageNo: number, pageCount: number) => string;
 }) {
   const [ref, available] = useWidth<HTMLDivElement>();
-  const model = useMemo(() => buildPdfModel(doc), [doc]);
+  // Re-layout ~500 ms after the last keystroke, not on every one.
+  const [shown, setShown] = useState(doc);
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setShown(doc);
+    }, 500);
+    return () => {
+      clearTimeout(t);
+    };
+  }, [doc]);
+  const model = useMemo(() => buildPdfModel(shown), [shown]);
   const pages = useMemo(() => paginate(model), [model]);
+  const processPage = processStartPage(pages);
   const width = Math.min(available, maxWidth);
   const scale = width / PAGE.width;
 
@@ -58,7 +69,7 @@ export function PdfPreview({
                   transformOrigin: '0 0',
                 }}
               >
-                <PageView model={model} page={page} />
+                <PageView model={model} page={page} processPage={processPage} />
               </div>
             </div>
             {pageLabel && (

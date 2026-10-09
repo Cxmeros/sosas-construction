@@ -4,6 +4,7 @@ import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { renderToBuffer } from '@react-pdf/renderer';
 import { describe, expect, it } from 'vitest';
+import { LOGO } from '../config/company';
 import { DocumentPdf, registerFonts } from './DocumentPdf';
 import { LONG_ESTIMATE, SAMPLE_ESTIMATE, SAMPLE_INVOICE } from './fixtures';
 import { buildPdfModel } from './model';
@@ -21,7 +22,7 @@ registerFonts({
     fontWeight: w,
   })),
 });
-const logo = join(assets, 'logo-placeholder.png');
+const logo = join(assets, LOGO.file);
 const out = mkdtempSync(join(tmpdir(), 'sosa-pdf-'));
 
 /** Renders the PDF and extracts its text with poppler's pdftotext (real, selectable text). */
@@ -33,9 +34,10 @@ async function renderText(
   const file = join(out, `${name}.pdf`);
   writeFileSync(file, buffer);
   const text = execFileSync('pdftotext', ['-layout', file, '-'], { encoding: 'utf8' });
-  const info = execFileSync('pdfinfo', [file], { encoding: 'utf8' });
-  const pages = Number(/Pages:\s+(\d+)/.exec(info)?.[1]);
-  expect(info).toMatch(/Page size:\s+612 x 792 pts \(letter\)/);
+  // pdftotext ends every page with a form feed (pdfinfo isn't always installed).
+  const pages = text.split('').length - 1;
+  // Letter: 612 × 792 pt in the page's MediaBox.
+  expect(buffer.toString('latin1')).toMatch(/\/MediaBox \[0 0 612 792\]/);
   // Letter-spaced labels come out as "CUSTO MER", so compare without whitespace.
   return { text: text.replace(/\s+/g, ''), pages };
 }
@@ -51,7 +53,8 @@ describe('DocumentPdf', () => {
       'CUSTOMER INFORMATION',
       'Margaret Kelly',
       'JOB DESCRIPTION',
-      'Danilo Sosa',
+      'Danilo & Carlos Sosa',
+      "Sosa's Constructions",
       '29 E Providence Rd',
       'Lansdowne, PA 19050',
       '435-512-4801',
@@ -77,10 +80,42 @@ describe('DocumentPdf', () => {
       'ESTIMATE REF.',
       'Deposit received (30%)',
       'Balance due',
-      'Payment is due upon receipt.',
+      'Payment is due upon receipt of this invoice.',
     ]) {
       expect(text).toContain(s.replace(/\s+/g, ''));
     }
+  });
+
+  it('prints invoice extras and the work process page', async () => {
+    const inv = await renderText(
+      { ...SAMPLE_INVOICE, extras: [{ id: 'x', description: 'Debris disposal', cents: 24000 }] },
+      'extras',
+    );
+    for (const s of [
+      'ADDITIONAL CHARGES',
+      'Not included in the original estimate',
+      '$18,596.75',
+      '$13,089.72',
+    ])
+      expect(inv.text).toContain(s.replace(/\s+/g, ''));
+    const est = await renderText(
+      {
+        ...SAMPLE_ESTIMATE,
+        process: {
+          note: '',
+          steps: [{ id: 's', title: 'Sand and finish', body: 'Three passes.' }],
+        },
+      },
+      'process',
+    );
+    expect(est.pages).toBe(2);
+    for (const s of [
+      'Step-by-step work process on page 2.',
+      'WORK PROCESS',
+      'Sand and finish',
+      'Page 2 of 2',
+    ])
+      expect(est.text).toContain(s.replace(/\s+/g, ''));
   });
 
   it('paginates the long estimate with the table header repeated', async () => {

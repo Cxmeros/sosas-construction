@@ -1,6 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import logoUrl from './assets/logo-placeholder.png';
-import { COMPANY } from './config/company';
+import { COMPANY, LOGO } from './config/company';
 import { computeTotals } from './domain/calc';
 import { formatCents } from './domain/money';
 import type { DocumentData } from './domain/types';
@@ -84,20 +83,11 @@ export function App() {
     withValid((d) => void actions.download(d));
   };
   const convert = () => {
-    const { number, askDeposit } = state.convertToInvoice();
+    const number = state.convertToInvoice();
     setNotice({
-      text: askDeposit
-        ? `Ahora es el Invoice ${number}. Indica el monto del anticipo recibido.`
-        : `Ahora es el Invoice ${number}.`,
+      text: `Ahora es el Invoice ${number}.`,
       action: { label: 'Deshacer', run: state.undoConvert },
     });
-    if (askDeposit) {
-      // The one question an invoice needs answered: what was actually paid.
-      setScreen('form');
-      setTimeout(() => {
-        form.setFocus('depositFixed', { shouldSelect: true });
-      }, 50);
-    }
   };
   const startNew = () => {
     state.newDocument();
@@ -202,7 +192,7 @@ export function App() {
     return (
       <div className="flex h-dvh flex-col bg-paper">
         <header className="flex h-[72px] flex-none items-center gap-5 border-b border-line-soft bg-surface px-6">
-          <img src={logoUrl} alt={COMPANY.name} className="block h-12" />
+          <img src={LOGO.src} alt={COMPANY.name} className="block h-12" />
           <div className="h-9 w-px bg-line-soft" />
           <div className="flex flex-col">
             <h1 className="m-0 font-cond text-[22px] leading-tight font-bold text-walnut-900 uppercase">
@@ -292,7 +282,7 @@ export function App() {
   return (
     <div className="flex h-dvh flex-col bg-paper">
       <header className="flex h-16 flex-none items-center gap-2 border-b border-line-soft bg-surface pr-1 pl-4">
-        <img src={logoUrl} alt={COMPANY.name} className="block h-10" />
+        <img src={LOGO.src} alt={COMPANY.name} className="block h-10" />
         <div className="flex-1" />
         <SavedIndicator savedAt={savedAt} short />
         <button

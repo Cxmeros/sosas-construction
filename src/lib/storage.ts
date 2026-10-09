@@ -12,13 +12,53 @@ import { z } from 'zod';
 import { formValuesSchema, type FormValues } from '../domain/form';
 
 const KEYS = {
-  draft: 'sosa.draft.v1',
+  /** Schema version in the key: a new shape gets a new key plus a migration from the old one. */
+  draft: 'sosa.draft.v2',
+  draftV1: 'sosa.draft.v1',
   counters: 'sosa.counters.v1',
   prefs: 'sosa.prefs.v1',
 } as const;
 
 const draftSchema = z.object({ savedAt: z.number().int().nonnegative(), values: formValuesSchema });
 export type Draft = z.infer<typeof draftSchema>;
+
+const record = (v: unknown): Record<string, unknown> =>
+  v && typeof v === 'object' ? (v as Record<string, unknown>) : {};
+
+/**
+ * v1 → v2: items gain `detail` (taken from the old "description — detail" convention), and the
+ * new extras / work-process fields start empty. Also accepts the short-lived 1–3 options shape
+ * (keeps the first option). Anything that still doesn't validate is dropped by `read`.
+ */
+export function migrateDraftV1(raw: unknown): unknown {
+  const draft = record(raw);
+  const values = record(draft.values);
+  const options = Array.isArray(values.options) ? values.options : null;
+  const items: unknown[] = options
+    ? ((record(options[0]).items as unknown[] | undefined) ?? [])
+    : Array.isArray(values.items)
+      ? values.items
+      : [];
+  const rest = { ...values };
+  delete rest.options;
+  return {
+    ...draft,
+    values: {
+      ...rest,
+      items: items.map((item) => {
+        const i = record(item);
+        const text = typeof i.description === 'string' ? i.description : '';
+        const [description = '', detail = ''] = text.split(/\s+(?:—|–|--)\s+/);
+        return { ...i, description, detail };
+      }),
+      extrasOn: false,
+      extras: [],
+      processOn: false,
+      processNote: '',
+      steps: [],
+    },
+  };
+}
 
 /** Only the current day is kept: `{ "EST-20261005": 2, "INV-20261005": 1 }`. */
 const countersSchema = z.record(z.string().max(20), z.number().int().nonnegative().max(9999));
@@ -65,7 +105,15 @@ function remove(key: string): void {
 }
 
 export function loadDraft(): Draft | null {
-  return read(KEYS.draft, draftSchema);
+  const current = read(KEYS.draft, draftSchema);
+  if (current) return current;
+  const old = read(KEYS.draftV1, z.unknown());
+  if (old === null) return null;
+  remove(KEYS.draftV1);
+  const parsed = draftSchema.safeParse(migrateDraftV1(old));
+  if (!parsed.success) return null;
+  write(KEYS.draft, parsed.data);
+  return parsed.data;
 }
 
 export function saveDraft(values: FormValues, now = Date.now()): void {
@@ -74,6 +122,7 @@ export function saveDraft(values: FormValues, now = Date.now()): void {
 
 export function clearDraft(): void {
   remove(KEYS.draft);
+  remove(KEYS.draftV1);
 }
 
 /** Returns the next sequence for `key` (e.g. "EST-20261005") and records it. */

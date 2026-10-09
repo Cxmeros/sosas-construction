@@ -5,6 +5,7 @@ import type { LineItem } from './types';
 const item = (patch: Partial<LineItem>): LineItem => ({
   id: 'x',
   description: 'x',
+  detail: '',
   unit: 'sq ft',
   otherUnit: '',
   qtyHundredths: 0,
@@ -52,7 +53,7 @@ describe('lineAmountCents', () => {
 
 describe('computeTotals (SPEC §6)', () => {
   it('total = $18,356.75', () => {
-    expect(computeTotals(SAMPLE, { mode: 'none' })).toEqual({
+    expect(computeTotals(SAMPLE, { mode: 'none' })).toMatchObject({
       totalCents: 1835675,
       depositCents: 0,
       balanceCents: 1835675,
@@ -60,7 +61,7 @@ describe('computeTotals (SPEC §6)', () => {
   });
 
   it('deposit 30% = $5,507.03, balance $12,849.72', () => {
-    expect(computeTotals(SAMPLE, { mode: 'percent', percentHundredths: 3000 })).toEqual({
+    expect(computeTotals(SAMPLE, { mode: 'percent', percentHundredths: 3000 })).toMatchObject({
       totalCents: 1835675,
       depositCents: 550703,
       balanceCents: 1284972,
@@ -68,7 +69,7 @@ describe('computeTotals (SPEC §6)', () => {
   });
 
   it('deposit 20% = $3,671.35, balance $14,685.40', () => {
-    expect(computeTotals(SAMPLE, { mode: 'percent', percentHundredths: 2000 })).toEqual({
+    expect(computeTotals(SAMPLE, { mode: 'percent', percentHundredths: 2000 })).toMatchObject({
       totalCents: 1835675,
       depositCents: 367135,
       balanceCents: 1468540,

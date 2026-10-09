@@ -65,30 +65,25 @@ test('full flow: estimate → PDF → convert to invoice → new document', asyn
     expect(text).toContain(s);
   }
 
-  // Convert: keeps customer and items; new INV number, invoice terms, estimate reference.
-  // The requested deposit is never carried over as money received: it asks, with a hint.
+  // Convert (SPEC §3.9): keeps customer, items and deposit (now "received"); new INV number,
+  // invoice terms, estimate reference. "Deshacer" brings the estimate back untouched.
   await page.getByRole('button', { name: 'Convertir en Invoice' }).click();
   await expect(page.getByRole('status').getByText(`INV-${today()}-01`)).toBeVisible();
-  // "Deshacer" brings the estimate back untouched.
   await page.getByRole('button', { name: 'Deshacer' }).click();
-  await expect(page.getByLabel('Número')).toHaveValue(number);
-  if (mobile) await page.getByRole('button', { name: 'Ver PDF' }).click();
+  await expect(preview.getByText('WORK ESTIMATE')).toBeVisible();
   await page.getByRole('button', { name: 'Convertir en Invoice' }).click();
   await expect(page.getByRole('status').getByText(`INV-${today()}-02`)).toBeVisible();
-  await expect(page.getByLabel('Monto recibido $')).toBeFocused();
-  await page.getByRole('button', { name: /Usar \$5,507\.03/ }).click();
-  await expect(page.getByLabel('Monto recibido $')).toHaveValue('5507.03');
-  await expect(page.getByLabel('Nombre')).toHaveValue('Margaret Kelly');
-  await expect(page.getByLabel('Número')).toHaveValue(`INV-${today()}-02`);
-  if (mobile) await page.getByRole('button', { name: 'Ver PDF' }).click();
   await expect(preview.getByText('INVOICE', { exact: true })).toBeVisible();
   await expect(preview.getByText('ESTIMATE REF.')).toBeVisible();
   await expect(preview.getByText(number).first()).toBeVisible();
-  await expect(
-    preview.getByText('Payment is due upon receipt. Thank you for your business.'),
-  ).toBeVisible();
-  await expect(preview.getByText('Deposit received', { exact: true })).toBeVisible();
+  await expect(preview.getByText(/Please make checks payable to/)).toBeVisible();
+  await expect(preview.getByText('Deposit received (30%)')).toBeVisible();
+  await expect(preview.getByText('−$5,507.03')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Convertir en Invoice' })).toHaveCount(0);
+  if (mobile) await page.getByRole('button', { name: 'Editar' }).click();
+  await expect(page.getByLabel('Nombre')).toHaveValue('Margaret Kelly');
+  await expect(page.getByLabel('Número')).toHaveValue(`INV-${today()}-02`);
+  if (mobile) await page.getByRole('button', { name: 'Ver PDF' }).click();
 
   // New document asks first (focus on the safe choice), then clears.
   await page.getByRole('button', { name: 'Nuevo documento' }).click();

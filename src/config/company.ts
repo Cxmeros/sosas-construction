@@ -1,14 +1,23 @@
+import logoUrl from '../assets/logo-ai-red.jpg';
+
 /** Fixed company data printed on every PDF. Editing it from the app is Phase 2 (SPEC §3). */
 export const COMPANY = {
   name: "Sosa's Constructions",
-  owner: 'Danilo Sosa',
-  addressLine1: '29 E Providence Rd',
-  addressLine2: 'Lansdowne, PA 19050',
+  /** Shown big in the PDF header, above the company name. */
+  owners: 'Danilo & Carlos Sosa',
+  address: '29 E Providence Rd, Lansdowne, PA 19050',
   phones: ['435-512-4801', '208-600-7776'],
-  tagline: 'Hardwood floors · Lansdowne, PA',
+  /** Who checks are made payable to. PENDING client confirmation (SPEC §2). */
+  payee: "Sosa's Constructions",
 } as const;
 
-/** Brand colors shared by the app and the PDF (tokens from the Claude Design handoff). */
+/**
+ * The ONLY reference to the logo, for the app and the PDF. Provisional until the official logo
+ * arrives: replace the file (and these numbers if its size changes).
+ */
+export const LOGO = { src: logoUrl, file: 'logo-ai-red.jpg', width: 572, height: 762 } as const;
+
+/** Brand tokens from the Claude Design v2 handoff, shared by the app and the PDF. */
 export const COLORS = {
   walnut900: '#2A1A10',
   walnut700: '#3A2416',
@@ -16,15 +25,13 @@ export const COLORS = {
   oak300: '#E8C58F',
   oak500: '#D9A866',
   gold500: '#C9962E',
-  orange100: '#FCEBDF',
-  /** PDF table grid and box outlines (light orange, as in Danilo's original estimate). */
-  orange200: '#F2C4A2',
-  orange400: '#EE7A30',
-  orange500: '#E06A1F',
-  /** PDF section bars: the brightest orange that keeps white text at AA (4.56:1). */
-  orange600: '#C2551A',
-  orange700: '#B5470F',
-  orange800: '#8F3709',
+  red100: '#F6E4E1',
+  /** Header rule. */
+  red500: '#9E1F1F',
+  /** Titles and labels: 10:1 on white. */
+  red700: '#7F1A1A',
+  red800: '#5C1212',
+  crimsonCta: '#A51C30',
   paper: '#F6F1EA',
   surface: '#FFFFFF',
   line: '#CDBBA7',

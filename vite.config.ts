@@ -74,7 +74,7 @@ export default defineConfig({
       },
       workbox: {
         // Everything, including the lazily loaded react-pdf chunk and fonts, works offline.
-        globPatterns: ['**/*.{js,css,html,png,woff,webmanifest}'],
+        globPatterns: ['**/*.{js,css,html,png,jpg,woff,webmanifest}'],
         maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
         navigateFallback: '/index.html',
         cleanupOutdatedCaches: true,

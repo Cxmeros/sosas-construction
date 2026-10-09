@@ -1,5 +1,5 @@
+import { LOGO } from '../config/company';
 import type { DocumentData } from '../domain/types';
-import logoUrl from '../assets/logo-placeholder.png';
 import { buildPdfModel } from './model';
 
 /** Renders the real PDF. @react-pdf/renderer is loaded on demand (CLAUDE.md stack). */
@@ -11,6 +11,6 @@ export async function renderPdf(doc: DocumentData): Promise<{ blob: Blob; fileNa
   ]);
   registerFonts(FONT_FILES);
   const model = buildPdfModel(doc);
-  const blob = await pdf(<DocumentPdf model={model} logoSrc={logoUrl} />).toBlob();
+  const blob = await pdf(<DocumentPdf model={model} logoSrc={LOGO.src} />).toBlob();
   return { blob, fileName: model.fileName };
 }

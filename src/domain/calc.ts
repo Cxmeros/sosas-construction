@@ -1,4 +1,4 @@
-import type { Deposit, LineItem, Totals } from './types';
+import type { Deposit, DocumentData, LineItem, Totals } from './types';
 
 /** amount = qty × unit price, rounded half-up to the cent. Lump sum uses the entered amount. */
 export function lineAmountCents(item: LineItem): number {
@@ -18,8 +18,18 @@ export function depositCents(totalCents: number, deposit: Deposit): number {
   }
 }
 
-export function computeTotals(items: readonly LineItem[], deposit: Deposit): Totals {
-  const totalCents = items.reduce((sum, item) => sum + lineAmountCents(item), 0);
-  const dep = depositCents(totalCents, deposit);
-  return { totalCents, depositCents: dep, balanceCents: totalCents - dep };
+/** The deposit is calculated on the work only, never on the extra charges (SPEC §3.6). */
+export function computeTotals(
+  items: readonly LineItem[],
+  deposit: Deposit,
+  extras: readonly { cents: number }[] = [],
+): Totals {
+  const workCents = items.reduce((sum, item) => sum + lineAmountCents(item), 0);
+  const extrasCents = extras.reduce((sum, x) => sum + x.cents, 0);
+  const totalCents = workCents + extrasCents;
+  const dep = depositCents(workCents, deposit);
+  return { workCents, extrasCents, totalCents, depositCents: dep, balanceCents: totalCents - dep };
 }
+
+export const documentTotals = (doc: Pick<DocumentData, 'items' | 'deposit' | 'extras'>) =>
+  computeTotals(doc.items, doc.deposit, doc.extras);

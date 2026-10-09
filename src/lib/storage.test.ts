@@ -34,11 +34,11 @@ describe('draft', () => {
   });
 
   it('discards corrupt JSON and invalid shapes', () => {
-    memory.setItem('sosa.draft.v1', '{not json');
+    memory.setItem('sosa.draft.v2', '{not json');
     expect(loadDraft()).toBeNull();
-    memory.setItem('sosa.draft.v1', JSON.stringify({ savedAt: 1, values: { type: 'receipt' } }));
+    memory.setItem('sosa.draft.v2', JSON.stringify({ savedAt: 1, values: { type: 'receipt' } }));
     expect(loadDraft()).toBeNull();
-    expect(memory.getItem('sosa.draft.v1')).toBeNull();
+    expect(memory.getItem('sosa.draft.v2')).toBeNull();
   });
 
   it('survives storage that throws', () => {
@@ -80,5 +80,46 @@ describe('prefs', () => {
     expect(loadPrefs()).toEqual({ depositPercent: '30' });
     savePrefs({ depositPercent: '20' });
     expect(loadPrefs()).toEqual({ depositPercent: '20' });
+  });
+});
+
+describe('draft migration v1 → v2', () => {
+  it('migrates an old draft: detail split out, new sections empty', () => {
+    const v1 = {
+      savedAt: 5,
+      values: {
+        ...emptyForm('estimate', 'EST-20261005-01', '2026-10-05', '30'),
+        items: [
+          {
+            id: 'a',
+            description: 'Refinish steps and handrails — 15 steps, 10 sticks',
+            unit: 'lump sum',
+            otherUnit: '',
+            qty: '',
+            unitPrice: '',
+            lumpSum: '3000',
+          },
+        ],
+        extrasOn: undefined,
+        extras: undefined,
+        processOn: undefined,
+        processNote: undefined,
+        steps: undefined,
+      },
+    };
+    memory.setItem('sosa.draft.v1', JSON.stringify(v1));
+    const draft = loadDraft();
+    expect(draft?.values.items[0]).toMatchObject({
+      description: 'Refinish steps and handrails',
+      detail: '15 steps, 10 sticks',
+    });
+    expect(draft?.values).toMatchObject({ extrasOn: false, processOn: false, steps: [] });
+    expect(memory.getItem('sosa.draft.v1')).toBeNull();
+    expect(memory.getItem('sosa.draft.v2')).not.toBeNull();
+  });
+  it('drops an old draft that cannot be migrated, without throwing', () => {
+    memory.setItem('sosa.draft.v1', JSON.stringify({ savedAt: 1, values: { type: 'receipt' } }));
+    expect(loadDraft()).toBeNull();
+    expect(memory.getItem('sosa.draft.v1')).toBeNull();
   });
 });

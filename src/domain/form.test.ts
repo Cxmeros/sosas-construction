@@ -9,6 +9,7 @@ const valid = (): FormValues => ({
     {
       id: 'a',
       description: 'Remove carpet and hardwood floor',
+      detail: '',
       unit: 'sq ft',
       otherUnit: '',
       qty: '1625',
@@ -18,6 +19,7 @@ const valid = (): FormValues => ({
     {
       id: 'b',
       description: 'Install and refinish',
+      detail: '',
       unit: 'sq ft',
       otherUnit: '',
       qty: '1,625',
@@ -27,6 +29,7 @@ const valid = (): FormValues => ({
     {
       id: 'c',
       description: 'Refinish scraper hardwood floors',
+      detail: '',
       unit: 'sq ft',
       otherUnit: '',
       qty: '447',
@@ -36,6 +39,7 @@ const valid = (): FormValues => ({
     {
       id: 'd',
       description: 'Refinish steps and handrails',
+      detail: '',
       unit: 'lump sum',
       otherUnit: '',
       qty: '',
@@ -55,7 +59,7 @@ const messages = (values: FormValues) => {
 describe('documentSchema', () => {
   it('turns the sample form into the SPEC §6 totals', () => {
     const doc = documentSchema.parse(valid());
-    expect(computeTotals(doc.items, doc.deposit)).toEqual({
+    expect(computeTotals(doc.items, doc.deposit)).toMatchObject({
       totalCents: 1835675,
       depositCents: 550703,
       balanceCents: 1284972,
@@ -109,7 +113,7 @@ describe('documentSchema', () => {
   it('rejects a fixed deposit above the total', () => {
     const values = { ...valid(), depositMode: 'fixed' as const, depositFixed: '20000' };
     expect(messages(values)).toEqual({
-      depositFixed: 'El anticipo no puede ser mayor que el total.',
+      depositFixed: 'El anticipo no puede ser mayor que el total de los trabajos.',
     });
   });
 

@@ -56,7 +56,7 @@ export function DocumentForm({
   totals: Totals;
   desktop: boolean;
 }) {
-  const { form, values, doc, setType, depositHint } = state;
+  const { form, values, doc, setType } = state;
   const { register, formState } = form;
   const errors = formState.errors;
   const err = (path: string) => errorAt(errors, path);
@@ -192,7 +192,7 @@ export function DocumentForm({
         </label>
         <ItemsEditor form={form} desktop totalLabel={formatCents(totals.totalCents)} />
         <div className="grid grid-cols-2 gap-6">
-          <DepositSection form={form} doc={doc} totals={totals} desktop hintCents={depositHint} />
+          <DepositSection form={form} doc={doc} totals={totals} desktop />
           <label className="label gap-3">
             <span className="section-title">
               <span className="n">06</span>Términos
@@ -243,13 +243,7 @@ export function DocumentForm({
         </label>
       </Section>
       <ItemsEditor form={form} desktop={false} totalLabel={formatCents(totals.totalCents)} />
-      <DepositSection
-        form={form}
-        doc={doc}
-        totals={totals}
-        desktop={false}
-        hintCents={depositHint}
-      />
+      <DepositSection form={form} doc={doc} totals={totals} desktop={false} />
       <Section desktop={false}>
         <SectionTitle n="06">Términos</SectionTitle>
         {terms}

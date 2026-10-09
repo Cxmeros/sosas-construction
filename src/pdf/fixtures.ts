@@ -10,15 +10,17 @@ const sqft = (
 ): LineItem => ({
   id: `i${String(++n)}`,
   description,
+  detail: '',
   unit,
   otherUnit: '',
   qtyHundredths: Math.round(qty * 100),
   unitPriceCents: priceCents,
   lumpSumCents: 0,
 });
-const lump = (description: string, cents: number): LineItem => ({
+const lump = (description: string, cents: number, detail = ''): LineItem => ({
   id: `i${String(++n)}`,
   description,
+  detail,
   unit: 'lump sum',
   otherUnit: '',
   qtyHundredths: 0,
@@ -44,9 +46,11 @@ export const SAMPLE_ESTIMATE: DocumentData = {
     sqft('Remove carpet and hardwood floor', 1625, 85),
     sqft('Install and refinish', 1625, 750),
     sqft('Refinish scraper hardwood floors', 447, 400),
-    lump('Refinish steps and handrails — 15 steps, 10 sticks', 300000),
+    lump('Refinish steps and handrails', 300000, '15 steps, 10 sticks'),
   ],
   deposit: { mode: 'percent', percentHundredths: 3000 },
+  extras: [],
+  process: null,
   terms: DEFAULT_TERMS.estimate,
 };
 
@@ -72,7 +76,7 @@ export const LONG_ESTIMATE: DocumentData = {
     sqft('Install and refinish', 1625, 750),
     sqft('Refinish scraper hardwood floors', 447, 400),
     sqft('Stain application — Provincial, 1 coat', 2072, 75),
-    lump('Refinish steps and handrails — 15 steps, 10 sticks', 300000),
+    lump('Refinish steps and handrails', 300000, '15 steps, 10 sticks'),
     sqft('Stair nosing replacement', 15, 2800, 'each'),
     sqft('Quarter round install', 380, 225, 'linear ft'),
     sqft('Baseboard removal and reinstall', 380, 150, 'linear ft'),
