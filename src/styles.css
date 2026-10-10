@@ -112,6 +112,7 @@
 @layer components {
   .field {
     height: 48px;
+    min-height: 48px; /* touch target, also for textareas */
     width: 100%;
     min-width: 0;
     padding: 0 12px;

@@ -278,11 +278,26 @@ function MobileCard({ form, index, count, item, onMove, onDelete }: RowProps) {
             {...register(p('detail'))}
           />
         </Field>
-        <Field label="Unidad" path={p('unit')} error={undefined}>
-          <select className="field px-2.5" {...register(p('unit'))}>
-            <UnitOptions />
-          </select>
-        </Field>
+        {/* Row 2: quantity | unit; row 3: price | amount (lump sum: unit, then the amount). */}
+        <div className={lump ? 'flex flex-col gap-3' : 'grid grid-cols-2 gap-3'}>
+          {!lump && (
+            <Field label="Cantidad" path={p('qty')} error={err('qty')}>
+              <input
+                inputMode="decimal"
+                autoComplete="off"
+                maxLength={20}
+                className="field num"
+                {...invalidProps(p('qty'), err('qty'))}
+                {...register(p('qty'))}
+              />
+            </Field>
+          )}
+          <Field label="Unidad" path={p('unit')} error={undefined}>
+            <select className="field px-2.5" {...register(p('unit'))}>
+              <UnitOptions />
+            </select>
+          </Field>
+        </div>
         {item.unit === 'other' && (
           <Field label="Escribe la unidad" path={p('otherUnit')} error={err('otherUnit')}>
             <input
@@ -306,38 +321,28 @@ function MobileCard({ form, index, count, item, onMove, onDelete }: RowProps) {
             />
           </Field>
         ) : (
-          <>
-            <div className="grid grid-cols-2 gap-3">
-              <Field label="Cantidad" path={p('qty')} error={err('qty')}>
-                <input
-                  inputMode="decimal"
-                  autoComplete="off"
-                  maxLength={20}
-                  className="field num"
-                  {...invalidProps(p('qty'), err('qty'))}
-                  {...register(p('qty'))}
-                />
-              </Field>
-              <Field
-                label={`Precio por ${item.unit === 'other' ? item.otherUnit.trim() || 'unidad' : item.unit} $`}
-                path={p('unitPrice')}
-                error={err('unitPrice')}
-              >
-                <input
-                  inputMode="decimal"
-                  autoComplete="off"
-                  maxLength={20}
-                  className="field num"
-                  {...invalidProps(p('unitPrice'), err('unitPrice'))}
-                  {...register(p('unitPrice'))}
-                />
-              </Field>
+          <div className="grid grid-cols-2 items-start gap-3">
+            <Field
+              label={`Precio por ${item.unit === 'other' ? item.otherUnit.trim() || 'unidad' : item.unit} $`}
+              path={p('unitPrice')}
+              error={err('unitPrice')}
+            >
+              <input
+                inputMode="decimal"
+                autoComplete="off"
+                maxLength={20}
+                className="field num"
+                {...invalidProps(p('unitPrice'), err('unitPrice'))}
+                {...register(p('unitPrice'))}
+              />
+            </Field>
+            <div className="label">
+              Monto
+              <output className="flex min-h-12 items-center justify-end font-cond text-2xl font-bold tabular-nums">
+                {amountOf(item)}
+              </output>
             </div>
-            <div className="flex items-baseline justify-between border-t border-dashed border-line pt-2.5">
-              <span className="text-[15px] font-semibold text-ink-muted">Monto</span>
-              <span className="font-cond text-2xl font-bold tabular-nums">{amountOf(item)}</span>
-            </div>
-          </>
+          </div>
         )}
       </div>
     </li>
