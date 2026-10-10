@@ -7,6 +7,7 @@ import {
   emptyStep,
   formatPhone,
   toAmountOnly,
+  toEstimateItem,
   toInvoiceValues,
   toLenientDocument,
   type FormItem,
@@ -200,7 +201,22 @@ describe('invoice items are amount only (SPEC §3.15)', () => {
       lumpSum: '12187.50',
       qty: '1625',
       unitPrice: '7.50',
+      estimateUnit: 'sq ft',
     });
+  });
+  it('back to estimate: qty × price return when the amount was not touched', () => {
+    const original = item('Install', '1625', '7.50', 'linear ft');
+    expect(toEstimateItem(toAmountOnly(original))).toEqual(original);
+  });
+  it('back to estimate: an amount changed on the invoice is kept as a lump sum', () => {
+    const edited = { ...toAmountOnly(item('Install', '1625', '7.50')), lumpSum: '12000' };
+    const back = toEstimateItem(edited);
+    expect(back).toMatchObject({ unit: 'lump sum', lumpSum: '12000' });
+    expect(back).not.toHaveProperty('estimateUnit');
+  });
+  it('an unfinished item round-trips too', () => {
+    const original = item('Install', '', '7.50');
+    expect(toEstimateItem(toAmountOnly(original))).toEqual(original);
   });
   it('an unfinished item gets an empty amount; a lump sum is left as is', () => {
     expect(toAmountOnly(item('Install', '', '7.50')).lumpSum).toBe('');

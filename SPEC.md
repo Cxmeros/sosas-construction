@@ -89,7 +89,8 @@ Quiere llenar campos y obtener un PDF listo para mandar al cliente.
 15. **Invoice**: los trabajos salen solo con descripción (+ detalle) y monto; "Estimate ref." en el
     encabezado si viene de una conversión.
     En el formulario también: solo descripción, detalle y "Monto total". Al pasar a Invoice cada
-    trabajo queda como `lump sum` con el mismo monto (qty y precio se conservan ocultos).
+    trabajo queda como `lump sum` con el mismo monto; qty, precio y unidad se guardan en el borrador.
+    Al volver a Estimate regresan, salvo que el monto se haya cambiado en el Invoice (gana el nuevo).
 16. **Orden del formulario** (reunión oct 2026): Cliente, Documento, Trabajos (con la descripción
     del trabajo), Pasos (estimate) o Cargos extra (invoice), Anticipo, Términos.
 11. **Opciones en el estimate** (NO va en esta versión: se revirtió de `main` y el código se conserva

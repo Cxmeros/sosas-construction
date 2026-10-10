@@ -47,6 +47,8 @@ export const formValuesSchema = z.object({
         qty: numeric,
         unitPrice: numeric,
         lumpSum: numeric,
+        /** Unit it had on the estimate before becoming an invoice amount (see `toAmountOnly`). */
+        estimateUnit: z.enum(UNITS).optional(),
       }),
     )
     .max(LIMITS.maxItems),
@@ -154,11 +156,27 @@ export function toLenientItem(item: FormItem): LineItem {
 }
 
 /** Invoice items are just an amount (SPEC §3.15): qty × price becomes a lump sum of the same cents.
- * qty and price stay in the item, so picking a unit again on an estimate brings them back. */
+ * qty, price and the unit stay in the item (saved with the draft) so `toEstimateItem` can undo it. */
 export function toAmountOnly(item: FormItem): FormItem {
   if (item.unit === 'lump sum') return item;
   const cents = lineAmountCents(toLenientItem(item));
-  return { ...item, unit: 'lump sum', lumpSum: cents > 0 ? (cents / 100).toFixed(2) : '' };
+  return {
+    ...item,
+    unit: 'lump sum',
+    lumpSum: cents > 0 ? (cents / 100).toFixed(2) : '',
+    estimateUnit: item.unit,
+  };
+}
+
+/** Back to estimate: qty × price comes back unless the amount was changed on the invoice,
+ * in which case the new amount wins (restoring would silently undo that correction). */
+export function toEstimateItem(item: FormItem): FormItem {
+  const { estimateUnit, ...rest } = item;
+  if (!estimateUnit) return item;
+  const restored = { ...rest, unit: estimateUnit, lumpSum: '' };
+  const unchanged =
+    lineAmountCents(toLenientItem(restored)) === (parseMoneyToCents(item.lumpSum) ?? 0);
+  return unchanged ? restored : rest;
 }
 
 /** Best-effort conversion for the live total and live preview: anything unparseable counts as 0. */

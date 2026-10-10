@@ -5,6 +5,7 @@ import {
   emptyForm,
   documentSchema,
   toAmountOnly,
+  toEstimateItem,
   toInvoiceValues,
   toLenientDocument,
   type FormValues,
@@ -124,7 +125,11 @@ export function useDocument() {
       if (current.terms.trim() === DEFAULT_TERMS[current.type])
         setValue('terms', DEFAULT_TERMS[type], opts);
       if (type === 'estimate') setValue('estimateRef', '', opts);
-      if (type === 'invoice') setValue('items', current.items.map(toAmountOnly), opts);
+      setValue(
+        'items',
+        current.items.map(type === 'invoice' ? toAmountOnly : toEstimateItem),
+        opts,
+      );
       setValue('type', type, opts);
     },
     [getValues, setValue, form.formState.isSubmitted],
