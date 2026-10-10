@@ -81,10 +81,10 @@
   html {
     -webkit-text-size-adjust: 100%;
   }
-  /* Desktop scrolls the page under a 72 px sticky header: keep focused fields clear of it. */
+  /* Desktop scrolls the page under a 88 px sticky header: keep focused fields clear of it. */
   @media (min-width: 1024px) {
     html {
-      scroll-padding-top: 96px;
+      scroll-padding-top: 112px;
     }
   }
   body {

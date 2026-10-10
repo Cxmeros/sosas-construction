@@ -41,7 +41,7 @@ export function MobilePreview({
 
   return (
     <div className="on-dark flex h-dvh flex-col bg-walnut-900">
-      <header className="flex h-16 flex-none items-center gap-2 pr-1 pl-1 text-white">
+      <header className="flex h-[76px] flex-none items-center gap-2 pr-3 pl-1 text-white">
         <button
           type="button"
           onClick={onBack}
@@ -56,9 +56,9 @@ export function MobilePreview({
           type="button"
           onClick={onNew}
           aria-label="Nuevo documento"
-          className="flex min-h-12 flex-none items-center gap-1.5 px-2.5 text-[15px] font-semibold text-oak-300"
+          className="flex min-h-12 flex-none items-center gap-2 rounded-field border-[1.5px] border-oak-300 px-3.5 text-[17px] font-semibold text-white"
         >
-          <FilePlusIcon size={20} /> Nuevo
+          <FilePlusIcon size={22} /> Nuevo
         </button>
       </header>
       <NoticeToast notice={notice} onDone={onNoticeDone} className="flex-none" />

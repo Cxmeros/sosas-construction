@@ -193,8 +193,8 @@ export function App() {
     return (
       // One page scroll: header and preview stay put, only the form moves.
       <div className="flex min-h-dvh flex-col bg-paper">
-        <header className="sticky top-0 z-20 flex h-[72px] flex-none items-center gap-5 border-b border-line-soft bg-surface px-6">
-          <img src={LOGO.src} alt={COMPANY.name} className="block h-12" />
+        <header className="sticky top-0 z-20 flex h-[88px] flex-none items-center gap-5 border-b border-line-soft bg-surface px-6">
+          <img src={LOGO.src} alt={COMPANY.name} className="block h-[72px]" />
           <div className="h-9 w-px bg-line-soft" />
           <div className="flex flex-col">
             <h1 className="m-0 font-cond text-[22px] leading-tight font-bold text-walnut-900 uppercase">
@@ -237,7 +237,7 @@ export function App() {
         <NoticeToast
           notice={notice}
           onDone={clearNotice}
-          className="fixed top-[84px] right-6 max-w-[520px]"
+          className="fixed top-[100px] right-6 max-w-[520px]"
         />
         <div className="grid flex-1 grid-cols-[minmax(0,1fr)_440px]">
           <div className="flex min-w-0 flex-col">
@@ -248,12 +248,12 @@ export function App() {
           </div>
           <aside className="bg-desk">
             {/* Sized so page 1 always fits; extra pages scroll here without moving the form. */}
-            <div className="sticky top-[72px] flex max-h-[calc(100dvh-72px)] flex-col items-center gap-2.5 overflow-y-auto overscroll-contain p-5">
+            <div className="sticky top-[88px] flex max-h-[calc(100dvh-88px)] flex-col items-center gap-2.5 overflow-y-auto overscroll-contain p-5">
               <div className="flex self-stretch justify-between text-[13px] font-semibold tracking-[0.06em] text-oak-300 uppercase">
                 <span>Vista previa en vivo</span>
                 <span>Carta · {pages === 1 ? '1 de 1' : `${String(pages)} páginas`}</span>
               </div>
-              <PdfPreview doc={doc} maxWidth={400} maxHeight={viewportHeight - 72 - 72} />
+              <PdfPreview doc={doc} maxWidth={400} maxHeight={viewportHeight - 88 - 72} />
             </div>
           </aside>
         </div>
@@ -286,17 +286,17 @@ export function App() {
 
   return (
     <div className="flex h-dvh flex-col bg-paper">
-      <header className="flex h-16 flex-none items-center gap-2 border-b border-line-soft bg-surface pr-1 pl-4">
-        <img src={LOGO.src} alt={COMPANY.name} className="block h-10" />
+      <header className="flex h-[76px] flex-none items-center gap-2 border-b border-line-soft bg-surface pr-3 pl-4">
+        <img src={LOGO.src} alt={COMPANY.name} className="block h-16" />
         <div className="flex-1" />
         <SavedIndicator savedAt={savedAt} short />
         <button
           type="button"
           onClick={askNew}
           aria-label="Nuevo documento"
-          className="flex min-h-12 items-center gap-1.5 rounded-field px-2.5 text-[15px] font-semibold text-walnut-700 hover:bg-cream"
+          className="flex min-h-12 items-center gap-2 rounded-field border-[1.5px] border-walnut-700 px-3.5 text-[17px] font-semibold text-walnut-700 hover:bg-cream"
         >
-          <FilePlusIcon size={20} /> Nuevo
+          <FilePlusIcon size={22} /> Nuevo
         </button>
       </header>
       {recoveredBanner}
