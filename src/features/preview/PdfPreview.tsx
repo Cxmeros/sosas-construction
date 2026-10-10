@@ -26,10 +26,13 @@ function useWidth<T extends HTMLElement>() {
 export function PdfPreview({
   doc,
   maxWidth = PAGE.width,
+  maxHeight = Infinity,
   pageLabel,
 }: {
   doc: DocumentData;
   maxWidth?: number;
+  /** Page height cap, so a whole page fits on screen. */
+  maxHeight?: number;
   pageLabel?: (pageNo: number, pageCount: number) => string;
 }) {
   const [ref, available] = useWidth<HTMLDivElement>();
@@ -46,7 +49,7 @@ export function PdfPreview({
   const model = useMemo(() => buildPdfModel(shown), [shown]);
   const pages = useMemo(() => paginate(model), [model]);
   const processPage = processStartPage(pages);
-  const width = Math.min(available, maxWidth);
+  const width = Math.min(available, maxWidth, (maxHeight * PAGE.width) / PAGE.height);
   const scale = width / PAGE.width;
 
   return (

@@ -16,7 +16,7 @@ import { ConfirmDialog } from './ui/Dialog';
 import { CheckIcon, FileIcon, FilePlusIcon, UndoIcon } from './ui/Icons';
 import { NoticeToast, type Notice } from './ui/NoticeToast';
 import { UpdateBar } from './ui/UpdateBar';
-import { useIsDesktop } from './ui/useMediaQuery';
+import { useIsDesktop, useViewportHeight } from './ui/useMediaQuery';
 
 function SavedIndicator({ savedAt, short = false }: { savedAt: number | null; short?: boolean }) {
   if (savedAt === null) return null;
@@ -29,6 +29,7 @@ function SavedIndicator({ savedAt, short = false }: { savedAt: number | null; sh
 
 export function App() {
   const desktop = useIsDesktop();
+  const viewportHeight = useViewportHeight();
   const state = useDocument();
   const { form, doc, savedAt, recovered } = state;
   const totals = documentTotals(doc);
@@ -190,8 +191,9 @@ export function App() {
     const outline =
       'min-h-12 rounded-field border-[1.5px] border-ink bg-transparent px-[18px] text-base font-semibold text-ink hover:bg-ink/5 disabled:opacity-60';
     return (
-      <div className="flex h-dvh flex-col bg-paper">
-        <header className="flex h-[72px] flex-none items-center gap-5 border-b border-line-soft bg-surface px-6">
+      // One page scroll: header and preview stay put, only the form moves.
+      <div className="flex min-h-dvh flex-col bg-paper">
+        <header className="sticky top-0 z-20 flex h-[72px] flex-none items-center gap-5 border-b border-line-soft bg-surface px-6">
           <img src={LOGO.src} alt={COMPANY.name} className="block h-12" />
           <div className="h-9 w-px bg-line-soft" />
           <div className="flex flex-col">
@@ -237,19 +239,22 @@ export function App() {
           onDone={clearNotice}
           className="fixed top-[84px] right-6 max-w-[520px]"
         />
-        <div className="grid min-h-0 flex-1 grid-cols-[minmax(0,1fr)_440px]">
-          <div className="flex min-h-0 flex-col overflow-y-auto">
+        <div className="grid flex-1 grid-cols-[minmax(0,1fr)_440px]">
+          <div className="flex min-w-0 flex-col">
             {recoveredBanner}
             <main className="scroll-py-6 px-8 pt-6 pb-8">
               <DocumentForm state={state} totals={totals} desktop />
             </main>
           </div>
-          <aside className="flex flex-col items-center gap-2.5 overflow-y-auto bg-desk p-5">
-            <div className="flex self-stretch justify-between text-[13px] font-semibold tracking-[0.06em] text-oak-300 uppercase">
-              <span>Vista previa en vivo</span>
-              <span>Carta · {pages === 1 ? '1 de 1' : `${String(pages)} páginas`}</span>
+          <aside className="bg-desk">
+            {/* Sized so page 1 always fits; extra pages scroll here without moving the form. */}
+            <div className="sticky top-[72px] flex max-h-[calc(100dvh-72px)] flex-col items-center gap-2.5 overflow-y-auto overscroll-contain p-5">
+              <div className="flex self-stretch justify-between text-[13px] font-semibold tracking-[0.06em] text-oak-300 uppercase">
+                <span>Vista previa en vivo</span>
+                <span>Carta · {pages === 1 ? '1 de 1' : `${String(pages)} páginas`}</span>
+              </div>
+              <PdfPreview doc={doc} maxWidth={400} maxHeight={viewportHeight - 72 - 72} />
             </div>
-            <PdfPreview doc={doc} maxWidth={400} />
           </aside>
         </div>
         {dialogs}
@@ -296,7 +301,7 @@ export function App() {
       </header>
       {recoveredBanner}
       <NoticeToast notice={notice} onDone={clearNotice} className="flex-none" />
-      <main ref={formScroll} className="flex-1 scroll-py-6 overflow-y-auto px-4 pt-4 pb-6">
+      <main ref={formScroll} className="relative flex-1 scroll-py-6 overflow-y-auto px-4 pt-4 pb-6">
         <DocumentForm state={state} totals={totals} desktop={false} />
       </main>
       <div className="on-dark flex flex-none items-center justify-between gap-3 border-t-[3px] border-red-500 bg-walnut-900 pt-2.5 pr-3 pb-[calc(14px+env(safe-area-inset-bottom))] pl-4">

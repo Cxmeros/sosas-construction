@@ -81,6 +81,12 @@
   html {
     -webkit-text-size-adjust: 100%;
   }
+  /* Desktop scrolls the page under a 72 px sticky header: keep focused fields clear of it. */
+  @media (min-width: 1024px) {
+    html {
+      scroll-padding-top: 96px;
+    }
+  }
   body {
     margin: 0;
     background: var(--color-paper);
