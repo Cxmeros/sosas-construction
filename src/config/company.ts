@@ -1,4 +1,4 @@
-import logoUrl from '../assets/logo-ai-red.jpg';
+import logoUrl from '../assets/logo.jpg';
 
 /** Fixed company data printed on every PDF. Editing it from the app is Phase 2 (SPEC §3). */
 export const COMPANY = {
@@ -12,21 +12,22 @@ export const COMPANY = {
 } as const;
 
 /**
- * The ONLY reference to the logo, for the app and the PDF. Provisional until the official logo
- * arrives: replace the file.
+ * The ONLY reference to the logo, for the app and the PDF. Official logo (Oct 2026), flattened on
+ * white: it always sits on white (SPEC §7). Changing it means replacing the file.
  */
-export const LOGO = { src: logoUrl, file: 'logo-ai-red.jpg' } as const;
+export const LOGO = { src: logoUrl, file: 'logo.jpg' } as const;
 
 /** Brand tokens the PDF uses (design v2); the app reads the same values from styles.css. */
 export const COLORS = {
-  walnut700: '#3A2416',
+  walnut700: '#27272A',
   /** Header rule. */
-  red500: '#9E1F1F',
-  /** Titles and labels: 10:1 on white. */
-  red700: '#7F1A1A',
-  line: '#CDBBA7',
-  lineSoft: '#D8CBBB',
-  fieldBorder: '#7A6656',
-  ink: '#1F1712',
-  inkMuted: '#5C4A3D',
+  red500: '#C1121F',
+  /** Titles and labels: 13:1 on white. */
+  red700: '#780000',
+  /** A shade darker than the app's #E4E4E7 so table rules survive black-and-white printing. */
+  line: '#D4D4D8',
+  lineSoft: '#E4E4E7',
+  fieldBorder: '#71717A',
+  ink: '#18181B',
+  inkMuted: '#52525B',
 } as const;

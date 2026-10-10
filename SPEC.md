@@ -19,13 +19,14 @@ Quiere llenar campos y obtener un PDF listo para mandar al cliente.
 - **Celular y computadora por igual** → responsive, ambos tamaños con la misma prioridad.
 - **Estimate e Invoice**, mismo formato; cambian título, numeración, depósito y términos.
 - **Sin métodos de pago impresos.** El invoice lleva un texto de términos genérico y editable.
-- **Logo provisional:** `src/assets/logo-ai-red.jpg`. Es la única referencia al logo, para la app y
-  el PDF (`config/company.ts`); cambiarlo no toca código. **Pendiente:** logo oficial.
+- **Logo oficial** (oct 2026): `src/assets/logo.jpg` (450×600, sobre blanco). Es la única referencia al
+  logo, para la app y el PDF (`config/company.ts`); cambiarlo no toca código. Los íconos de la PWA
+  (`public/*.png`) salen del mismo logo.
 - **Empresa** (`config/company.ts`, nada escrito a mano en el PDF): nombre visible
   "Danilo & Carlos Sosa" y debajo "Sosa's Constructions"; 29 E Providence Rd, Lansdowne, PA 19050;
   teléfonos sin nombre 435-512-4801 · 208-600-7776; beneficiario de los cheques configurable
   (provisional "Sosa's Constructions", **pendiente de confirmar**).
-- **Pendientes del cliente** (todo configurable, no inventar): logo oficial, a nombre de quién van
+- **Pendientes del cliente** (todo configurable, no inventar): a nombre de quién van
   los cheques, encabezado liso o con madera (variante E2 detrás de un flag, apagada).
 - **No hay más ejemplos de trabajos.** Las unidades deben ser flexibles (ver §3.5).
 
