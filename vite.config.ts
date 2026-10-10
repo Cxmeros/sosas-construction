@@ -51,9 +51,9 @@ export default defineConfig({
       useCredentials: true,
       includeAssets: ['favicon.png', 'apple-touch-icon.png'],
       manifest: {
-        name: "Sosa's Constructions · Estimates",
+        name: "Sosa's Hardwood Floors · Estimates",
         short_name: 'Sosa Estimates',
-        description: 'Estimates e invoices en PDF para Sosa’s Constructions.',
+        description: 'Estimates e invoices en PDF para Sosa’s Hardwood Floors.',
         lang: 'es',
         start_url: '/',
         scope: '/',

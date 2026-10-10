@@ -23,11 +23,11 @@ Quiere llenar campos y obtener un PDF listo para mandar al cliente.
   logo, para la app y el PDF (`config/company.ts`); cambiarlo no toca código. Los íconos de la PWA
   (`public/*.png`) salen del mismo logo.
 - **Empresa** (`config/company.ts`, nada escrito a mano en el PDF): nombre visible
-  "Danilo & Carlos Sosa" y debajo "Sosa's Constructions"; 29 E Providence Rd, Lansdowne, PA 19050;
-  teléfonos sin nombre 435-512-4801 · 208-600-7776; beneficiario de los cheques configurable
-  (provisional "Sosa's Constructions", **pendiente de confirmar**).
-- **Pendientes del cliente** (todo configurable, no inventar): a nombre de quién van
-  los cheques, encabezado liso o con madera (variante E2 detrás de un flag, apagada).
+  "Danilo & Carlos Sosa" y debajo "Sosa's Hardwood Floors" (nombre del logo oficial); 29 E Providence Rd, Lansdowne, PA 19050;
+  teléfonos sin nombre 435-512-4801 · 208-600-7776.
+- **Sin cheques ni forma de pago** (oct 2026): el cliente nunca pidió "payable to"; los términos
+  del invoice solo piden referenciar el número.
+- **Pendientes del cliente** (todo configurable, no inventar): encabezado liso o con madera (variante E2 detrás de un flag, apagada).
 - **No hay más ejemplos de trabajos.** Las unidades deben ser flexibles (ver §3.5).
 
 ### Supuestos
@@ -59,9 +59,8 @@ Quiere llenar campos y obtener un PDF listo para mandar al cliente.
    - Se calcula **solo sobre los trabajos**, nunca sobre los cargos extra, y no puede ser mayor que
      ese total (Zod, error en español).
 7. Terms & conditions: texto por defecto según tipo, editable.
-   - Invoice: "Payment is due upon receipt of this invoice. Please make checks payable to {payee}
-     and reference the invoice number. We appreciate the opportunity to work in your home."
-     ({payee} sale de `config/company.ts`).
+   - Invoice: "Payment is due upon receipt of this invoice. Please reference the invoice number
+     with your payment. We appreciate the opportunity to work in your home."
 8. Vista previa del PDF → Compartir, Descargar, Convertir en Invoice (solo estimate), Nuevo
    documento. Compartir usa `navigator.share` con el archivo. Sin eso, panel con WhatsApp y correo:
    como wa.me y mailto no adjuntan archivos, primero descarga el PDF y el mensaje dice "adjunta el
@@ -166,7 +165,7 @@ Basado en el formato actual de Danilo, con correcciones:
      additional information or unforeseen conditions."
    - Invoice: "Payment is due upon receipt. Thank you for your business."
      (por defecto, editable en cada documento).
-8. Pie en todas las hojas: "Sosa's Constructions · 435-512-4801 · 208-600-7776", el número del
+8. Pie en todas las hojas: "Sosa's Hardwood Floors · 435-512-4801 · 208-600-7776", el número del
    documento y "Page X of Y".
 9. Paginación: nunca se parte una fila; si la tabla no cabe, "Subtotal this page" y "Continued on
    page N →", y las hojas siguientes usan "WORK ESTIMATE (continued)" / "INVOICE (continued)".

@@ -54,7 +54,7 @@ describe('DocumentPdf', () => {
       'Margaret Kelly',
       'JOB DESCRIPTION',
       'Danilo & Carlos Sosa',
-      "Sosa's Constructions",
+      "Sosa's Hardwood Floors",
       '29 E Providence Rd',
       'Lansdowne, PA 19050',
       '435-512-4801',

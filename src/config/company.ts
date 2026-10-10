@@ -2,13 +2,11 @@ import logoUrl from '../assets/logo.jpg';
 
 /** Fixed company data printed on every PDF. Editing it from the app is Phase 2 (SPEC §3). */
 export const COMPANY = {
-  name: "Sosa's Constructions",
+  name: "Sosa's Hardwood Floors",
   /** Shown big in the PDF header, above the company name. */
   owners: 'Danilo & Carlos Sosa',
   address: '29 E Providence Rd, Lansdowne, PA 19050',
   phones: ['435-512-4801', '208-600-7776'],
-  /** Who checks are made payable to. PENDING client confirmation (SPEC §2). */
-  payee: "Sosa's Constructions",
 } as const;
 
 /**

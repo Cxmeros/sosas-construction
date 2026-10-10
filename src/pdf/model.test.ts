@@ -44,7 +44,7 @@ describe('buildPdfModel', () => {
     expect(m.deposit).toEqual({ label: 'Deposit received (30%)', value: '−$5,507.03' });
     expect(m.balanceLabel).toBe('Balance due');
     expect(m.simple).toBe(true);
-    expect(m.terms).toContain('Please make checks payable to');
+    expect(m.terms).toContain('Please reference the invoice number');
   });
 
   it('omits the deposit row and labels fixed deposits without a percentage', () => {

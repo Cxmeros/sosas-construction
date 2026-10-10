@@ -134,8 +134,9 @@ describe('convert estimate → invoice (SPEC §3.9)', () => {
     expect(inv).toMatchObject({ processOn: false, steps: [] });
     expect(toLenientDocument(inv).process).toBeNull();
   });
-  it('the terms name the payee', () => {
-    expect(inv.terms).toContain("Please make checks payable to Sosa's Constructions");
+  it('the terms ask to reference the invoice number, with no payment method', () => {
+    expect(inv.terms).toContain('Please reference the invoice number with your payment.');
+    expect(inv.terms).not.toMatch(/check/i);
   });
 });
 

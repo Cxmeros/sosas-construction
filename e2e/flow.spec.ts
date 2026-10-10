@@ -76,7 +76,7 @@ test('full flow: estimate → PDF → convert to invoice → new document', asyn
   await expect(preview.getByText('INVOICE', { exact: true })).toBeVisible();
   await expect(preview.getByText('ESTIMATE REF.')).toBeVisible();
   await expect(preview.getByText(number).first()).toBeVisible();
-  await expect(preview.getByText(/Please make checks payable to/)).toBeVisible();
+  await expect(preview.getByText(/Please reference the invoice number/)).toBeVisible();
   await expect(preview.getByText('Deposit received (30%)')).toBeVisible();
   await expect(preview.getByText('−$5,507.03')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Convertir en Invoice' })).toHaveCount(0);

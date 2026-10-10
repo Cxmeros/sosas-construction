@@ -12,7 +12,7 @@ test('is installable: manifest and icons', async ({ page, request }) => {
     icons: { src: string; sizes: string; purpose?: string }[];
   };
   expect(manifest).toMatchObject({
-    name: "Sosa's Constructions · Estimates",
+    name: "Sosa's Hardwood Floors · Estimates",
     display: 'standalone',
     start_url: '/',
   });
