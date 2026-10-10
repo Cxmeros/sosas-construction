@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { computeTotals } from './calc';
+import { computeTotals, lineAmountCents } from './calc';
 import { LIMITS } from './limits';
 import { parseMoneyToCents, parseQtyToHundredths } from './money';
 import { DEFAULT_TERMS } from './terms';
@@ -151,6 +151,14 @@ export function toLenientItem(item: FormItem): LineItem {
     unitPriceCents: lump ? 0 : (parseMoneyToCents(item.unitPrice) ?? 0),
     lumpSumCents: lump ? (parseMoneyToCents(item.lumpSum) ?? 0) : 0,
   };
+}
+
+/** Invoice items are just an amount (SPEC §3.15): qty × price becomes a lump sum of the same cents.
+ * qty and price stay in the item, so picking a unit again on an estimate brings them back. */
+export function toAmountOnly(item: FormItem): FormItem {
+  if (item.unit === 'lump sum') return item;
+  const cents = lineAmountCents(toLenientItem(item));
+  return { ...item, unit: 'lump sum', lumpSum: cents > 0 ? (cents / 100).toFixed(2) : '' };
 }
 
 /** Best-effort conversion for the live total and live preview: anything unparseable counts as 0. */
@@ -317,6 +325,7 @@ export function toInvoiceValues(est: FormValues, number: string, today: string):
     date: today,
     estimateRef: est.type === 'estimate' ? est.number : est.estimateRef,
     terms: DEFAULT_TERMS.invoice,
+    items: est.items.map(toAmountOnly),
     processOn: false,
     processNote: '',
     steps: [],

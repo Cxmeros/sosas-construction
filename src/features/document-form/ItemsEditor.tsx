@@ -1,4 +1,4 @@
-import { useRef, useState, type KeyboardEvent } from 'react';
+import { useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
 import { useFieldArray, type UseFormReturn } from 'react-hook-form';
 import { lineAmountCents } from '../../domain/calc';
 import { emptyItem, toLenientItem, type FormItem, type FormValues } from '../../domain/form';
@@ -31,10 +31,16 @@ export function ItemsEditor({
   form,
   desktop,
   totalLabel,
+  simple,
+  children,
 }: {
   form: Form;
   desktop: boolean;
   totalLabel: string;
+  /** Invoice: description and amount only, no qty / unit / price (SPEC §3.15). */
+  simple: boolean;
+  /** Shown under the section title (the job description). */
+  children: ReactNode;
 }) {
   const { control, watch, formState, setFocus, clearErrors } = form;
   const { fields, append, remove, move, insert } = useFieldArray({
@@ -51,7 +57,7 @@ export function ItemsEditor({
 
   const add = () => {
     const n = fields.length;
-    append(emptyItem(), { shouldFocus: false });
+    append(simple ? { ...emptyItem(), unit: 'lump sum' } : emptyItem(), { shouldFocus: false });
     setTimeout(() => {
       // A new, untouched item is not an error yet, even after a failed "Ver PDF".
       clearErrors(`items.${n}`);
@@ -92,8 +98,9 @@ export function ItemsEditor({
     return (
       <section className="flex flex-col gap-3" aria-labelledby="items-title">
         <div id="items-title">
-          <SectionTitle n="04">Trabajos</SectionTitle>
+          <SectionTitle n="03">Trabajos</SectionTitle>
         </div>
+        {children}
         <FieldError path="items" message={listError} />
         {fields.length === 0 ? (
           <>
@@ -102,14 +109,21 @@ export function ItemsEditor({
           </>
         ) : (
           <div className="border border-line bg-surface">
-            <div className="items-grid h-10 items-center bg-walnut-900 px-2 text-[13px] font-bold tracking-[0.06em] text-white uppercase">
+            <div
+              data-simple={simple || undefined}
+              className="items-grid h-10 items-center bg-walnut-900 px-2 text-[13px] font-bold tracking-[0.06em] text-white uppercase"
+            >
               <span />
               {/* Labels over boxes are centered on the box; free text and amounts line up with their text. */}
               <span className="pl-[11.5px]">Descripción</span>
-              <span className="text-center">Cant.</span>
-              <span className="text-center">Unidad</span>
-              <span className="text-center">Precio</span>
-              <span className="text-right">Monto</span>
+              {!simple && (
+                <>
+                  <span className="text-center">Cant.</span>
+                  <span className="text-center">Unidad</span>
+                  <span className="text-center">Precio</span>
+                </>
+              )}
+              <span className={simple ? 'text-center' : 'text-right'}>Monto</span>
               <span />
             </div>
             <ol className="m-0 list-none p-0">
@@ -119,6 +133,7 @@ export function ItemsEditor({
                   form={form}
                   index={index}
                   count={fields.length}
+                  simple={simple}
                   item={items[index] ?? field}
                   onMove={(to) => {
                     if (to >= 0 && to < fields.length) move(index, to);
@@ -158,10 +173,11 @@ export function ItemsEditor({
   return (
     <section className="flex flex-col gap-3" aria-labelledby="items-title-m">
       <div id="items-title-m">
-        <SectionTitle n="04" aside={fields.length > 0 ? countLabel : undefined}>
+        <SectionTitle n="03" aside={fields.length > 0 ? countLabel : undefined}>
           Trabajos
         </SectionTitle>
       </div>
+      {children}
       <FieldError path="items" message={listError} />
       {empty}
       <ol className="m-0 flex list-none flex-col gap-3 p-0">
@@ -171,6 +187,7 @@ export function ItemsEditor({
             form={form}
             index={index}
             count={fields.length}
+            simple={simple}
             item={items[index] ?? field}
             onMove={(to) => {
               if (to >= 0 && to < fields.length) move(index, to);
@@ -202,12 +219,13 @@ interface RowProps {
   form: Form;
   index: number;
   count: number;
+  simple: boolean;
   item: FormItem;
   onMove: (to: number) => void;
   onDelete: () => void;
 }
 
-function MobileCard({ form, index, count, item, onMove, onDelete }: RowProps) {
+function MobileCard({ form, index, count, simple, item, onMove, onDelete }: RowProps) {
   const { register, formState } = form;
   const p = (f: keyof FormItem) => `items.${index}.${f}` as const;
   const err = (f: keyof FormItem) => errorAt(formState.errors, p(f));
@@ -279,25 +297,27 @@ function MobileCard({ form, index, count, item, onMove, onDelete }: RowProps) {
           />
         </Field>
         {/* Row 2: quantity | unit; row 3: price | amount (lump sum: unit, then the amount). */}
-        <div className={lump ? 'flex flex-col gap-3' : 'grid grid-cols-2 gap-3'}>
-          {!lump && (
-            <Field label="Cantidad" path={p('qty')} error={err('qty')}>
-              <input
-                inputMode="decimal"
-                autoComplete="off"
-                maxLength={20}
-                className="field num"
-                {...invalidProps(p('qty'), err('qty'))}
-                {...register(p('qty'))}
-              />
+        {!simple && (
+          <div className={lump ? 'flex flex-col gap-3' : 'grid grid-cols-2 gap-3'}>
+            {!lump && (
+              <Field label="Cantidad" path={p('qty')} error={err('qty')}>
+                <input
+                  inputMode="decimal"
+                  autoComplete="off"
+                  maxLength={20}
+                  className="field num"
+                  {...invalidProps(p('qty'), err('qty'))}
+                  {...register(p('qty'))}
+                />
+              </Field>
+            )}
+            <Field label="Unidad" path={p('unit')} error={undefined}>
+              <select className="field px-2.5" {...register(p('unit'))}>
+                <UnitOptions />
+              </select>
             </Field>
-          )}
-          <Field label="Unidad" path={p('unit')} error={undefined}>
-            <select className="field px-2.5" {...register(p('unit'))}>
-              <UnitOptions />
-            </select>
-          </Field>
-        </div>
+          </div>
+        )}
         {item.unit === 'other' && (
           <Field label="Escribe la unidad" path={p('otherUnit')} error={err('otherUnit')}>
             <input
@@ -353,6 +373,7 @@ function DesktopRow({
   form,
   index,
   count,
+  simple,
   item,
   onMove,
   onDelete,
@@ -394,7 +415,7 @@ function DesktopRow({
       }}
       className={`border-b border-line-faint p-2 hover:bg-paper-hover ${dragOver ? 'bg-red-100' : ''}`}
     >
-      <div className="items-grid items-center">
+      <div data-simple={simple || undefined} className="items-grid items-center">
         <button
           type="button"
           draggable
@@ -426,60 +447,64 @@ function DesktopRow({
             {...register(p('detail'))}
           />
         </div>
-        {lump ? (
-          <input
-            aria-label={`Cantidad trabajo ${String(index + 1)}`}
-            value="—"
-            disabled
-            className="field num px-2.5 text-base"
-          />
-        ) : (
-          <input
-            aria-label={`Cantidad trabajo ${String(index + 1)}`}
-            inputMode="decimal"
-            autoComplete="off"
-            maxLength={20}
-            className="field num px-2.5 text-base"
-            {...invalidProps(p('qty'), err('qty'))}
-            {...register(p('qty'))}
-          />
-        )}
-        <div className="flex min-w-0 flex-col gap-1">
-          <select
-            aria-label={`Unidad trabajo ${String(index + 1)}`}
-            className="field px-1.5 text-base"
-            {...register(p('unit'))}
-          >
-            <UnitOptions />
-          </select>
-          {item.unit === 'other' && (
-            <input
-              aria-label={`Unidad escrita trabajo ${String(index + 1)}`}
-              placeholder="ej. rooms"
-              maxLength={15}
-              className="field px-2.5 text-base"
-              {...invalidProps(p('otherUnit'), err('otherUnit'))}
-              {...register(p('otherUnit'))}
-            />
-          )}
-        </div>
-        {lump ? (
-          <input
-            aria-label={`Precio trabajo ${String(index + 1)}`}
-            value="—"
-            disabled
-            className="field num px-2.5 text-base"
-          />
-        ) : (
-          <input
-            aria-label={`Precio trabajo ${String(index + 1)}`}
-            inputMode="decimal"
-            autoComplete="off"
-            maxLength={20}
-            className="field num px-2.5 text-base"
-            {...invalidProps(p('unitPrice'), err('unitPrice'))}
-            {...register(p('unitPrice'))}
-          />
+        {!simple && (
+          <>
+            {lump ? (
+              <input
+                aria-label={`Cantidad trabajo ${String(index + 1)}`}
+                value="—"
+                disabled
+                className="field num px-2.5 text-base"
+              />
+            ) : (
+              <input
+                aria-label={`Cantidad trabajo ${String(index + 1)}`}
+                inputMode="decimal"
+                autoComplete="off"
+                maxLength={20}
+                className="field num px-2.5 text-base"
+                {...invalidProps(p('qty'), err('qty'))}
+                {...register(p('qty'))}
+              />
+            )}
+            <div className="flex min-w-0 flex-col gap-1">
+              <select
+                aria-label={`Unidad trabajo ${String(index + 1)}`}
+                className="field px-1.5 text-base"
+                {...register(p('unit'))}
+              >
+                <UnitOptions />
+              </select>
+              {item.unit === 'other' && (
+                <input
+                  aria-label={`Unidad escrita trabajo ${String(index + 1)}`}
+                  placeholder="ej. rooms"
+                  maxLength={15}
+                  className="field px-2.5 text-base"
+                  {...invalidProps(p('otherUnit'), err('otherUnit'))}
+                  {...register(p('otherUnit'))}
+                />
+              )}
+            </div>
+            {lump ? (
+              <input
+                aria-label={`Precio trabajo ${String(index + 1)}`}
+                value="—"
+                disabled
+                className="field num px-2.5 text-base"
+              />
+            ) : (
+              <input
+                aria-label={`Precio trabajo ${String(index + 1)}`}
+                inputMode="decimal"
+                autoComplete="off"
+                maxLength={20}
+                className="field num px-2.5 text-base"
+                {...invalidProps(p('unitPrice'), err('unitPrice'))}
+                {...register(p('unitPrice'))}
+              />
+            )}
+          </>
         )}
         {lump ? (
           <input

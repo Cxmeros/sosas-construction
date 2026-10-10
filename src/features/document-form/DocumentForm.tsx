@@ -173,12 +173,27 @@ export function DocumentForm({
     />
   );
 
+  const jobLabel = (
+    <label className="label">
+      Descripción del trabajo
+      {jobDescription}
+    </label>
+  );
+  const termsHint = (
+    <span className="text-sm font-normal text-ink-muted">Este texto sale en inglés en el PDF.</span>
+  );
+
+  // SPEC order (Oct 2026 meeting): client, document, work, steps or extras, deposit, terms.
   if (desktop) {
     return (
       <div className="flex flex-col gap-6">
         <ErrorSummary count={errorCount} />
         <Section desktop>
-          <SectionTitle n="01">Documento</SectionTitle>
+          <SectionTitle n="01">Cliente</SectionTitle>
+          <div className="grid grid-cols-2 gap-x-4 gap-y-3">{customer}</div>
+        </Section>
+        <Section desktop>
+          <SectionTitle n="02">Documento</SectionTitle>
           <div className="grid grid-cols-[280px_1fr_1fr] items-start gap-4">
             <div className="label">
               <span aria-hidden="true">Tipo</span>
@@ -188,31 +203,29 @@ export function DocumentForm({
             {dateField}
           </div>
         </Section>
-        <Section desktop>
-          <SectionTitle n="02">Cliente</SectionTitle>
-          <div className="grid grid-cols-2 gap-x-4 gap-y-3">{customer}</div>
-        </Section>
-        <label className="label gap-2">
-          <span className="section-title">
-            <span className="n">03</span>Descripción del trabajo
-          </span>
-          {jobDescription}
-        </label>
-        <ItemsEditor form={form} desktop totalLabel={formatCents(totals.workCents)} />
-        {invoice && <ExtrasSection form={form} desktop n="05" />}
+        <ItemsEditor
+          form={form}
+          desktop
+          totalLabel={formatCents(totals.workCents)}
+          simple={invoice}
+        >
+          {jobLabel}
+        </ItemsEditor>
+        {invoice ? (
+          <ExtrasSection form={form} desktop n="04" />
+        ) : (
+          <ProcessSection form={form} desktop n="04" />
+        )}
         <div className="grid grid-cols-2 gap-6">
-          <DepositSection form={form} doc={doc} totals={totals} desktop n={invoice ? '06' : '05'} />
+          <DepositSection form={form} doc={doc} totals={totals} desktop n="05" />
           <label className="label gap-3">
             <span className="section-title">
-              <span className="n">07</span>Términos
+              <span className="n">06</span>Términos
             </span>
             {terms}
-            <span className="text-sm font-normal text-ink-muted">
-              Este texto sale en inglés en el PDF.
-            </span>
+            {termsHint}
           </label>
         </div>
-        {!invoice && <ProcessSection form={form} desktop n="06" />}
       </div>
     );
   }
@@ -230,42 +243,39 @@ export function DocumentForm({
           <h1 className="btn-cond m-0 text-[28px] leading-[1.1] text-walnut-900">
             Nuevo documento
           </h1>
-          <span className="text-base text-ink-muted">Elige el tipo y empieza por el cliente.</span>
+          <span className="text-base text-ink-muted">Empieza por el cliente.</span>
         </div>
       )}
       <Section desktop={false}>
-        <SectionTitle n="01">Documento</SectionTitle>
+        <SectionTitle n="01">Cliente</SectionTitle>
+        {customer}
+      </Section>
+      <Section desktop={false}>
+        <SectionTitle n="02">Documento</SectionTitle>
         {typeSwitch}
         <div className="grid grid-cols-1 gap-3 min-[420px]:grid-cols-[1fr_1.3fr]">
           {numberField}
           {dateField}
         </div>
       </Section>
-      <Section desktop={false}>
-        <SectionTitle n="02">Cliente</SectionTitle>
-        {customer}
-      </Section>
-      <Section desktop={false}>
-        <SectionTitle n="03">Trabajo</SectionTitle>
-        <label className="label">
-          Descripción del trabajo
-          {jobDescription}
-        </label>
-      </Section>
-      <ItemsEditor form={form} desktop={false} totalLabel={formatCents(totals.workCents)} />
-      {invoice && <ExtrasSection form={form} desktop={false} n="05" />}
-      <DepositSection
+      <ItemsEditor
         form={form}
-        doc={doc}
-        totals={totals}
         desktop={false}
-        n={invoice ? '06' : '05'}
-      />
-      {!invoice && <ProcessSection form={form} desktop={false} n="06" />}
+        totalLabel={formatCents(totals.workCents)}
+        simple={invoice}
+      >
+        {jobLabel}
+      </ItemsEditor>
+      {invoice ? (
+        <ExtrasSection form={form} desktop={false} n="04" />
+      ) : (
+        <ProcessSection form={form} desktop={false} n="04" />
+      )}
+      <DepositSection form={form} doc={doc} totals={totals} desktop={false} n="05" />
       <Section desktop={false}>
-        <SectionTitle n="07">Términos</SectionTitle>
+        <SectionTitle n="06">Términos</SectionTitle>
         {terms}
-        <span className="text-sm text-ink-muted">Este texto sale en inglés en el PDF.</span>
+        {termsHint}
       </Section>
     </div>
   );

@@ -186,3 +186,7 @@
   grid-template-columns: 28px minmax(0, 1fr) 76px 112px 88px 100px 48px;
   gap: 6px;
 }
+/* Invoice: description and amount only. */
+.items-grid[data-simple] {
+  grid-template-columns: 28px minmax(0, 1fr) 160px 48px;
+}

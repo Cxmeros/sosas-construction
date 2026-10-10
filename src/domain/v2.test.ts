@@ -6,6 +6,7 @@ import {
   emptyForm,
   emptyStep,
   formatPhone,
+  toAmountOnly,
   toInvoiceValues,
   toLenientDocument,
   type FormItem,
@@ -124,7 +125,7 @@ describe('convert estimate → invoice (SPEC §3.9)', () => {
       date: '2026-10-06',
       estimateRef: 'EST-20261005-01',
       customer: est.customer,
-      items: est.items,
+      items: est.items.map(toAmountOnly),
       depositMode: '30',
     });
   });
@@ -189,5 +190,26 @@ describe('phone (SPEC §3.3)', () => {
     const v = estimate();
     v.customer.phone = '610 555';
     expect(messages(v)).toEqual({ 'customer.phone': 'Faltan dígitos: usa 10 números.' });
+  });
+});
+
+describe('invoice items are amount only (SPEC §3.15)', () => {
+  it('qty × price becomes a lump sum with the same cents; qty and price are kept', () => {
+    expect(toAmountOnly(item('Install', '1625', '7.50'))).toMatchObject({
+      unit: 'lump sum',
+      lumpSum: '12187.50',
+      qty: '1625',
+      unitPrice: '7.50',
+    });
+  });
+  it('an unfinished item gets an empty amount; a lump sum is left as is', () => {
+    expect(toAmountOnly(item('Install', '', '7.50')).lumpSum).toBe('');
+    const lump = { ...item('Steps', '', '', 'lump sum'), lumpSum: '3000' };
+    expect(toAmountOnly(lump)).toBe(lump);
+  });
+  it('converting to invoice keeps the work total', () => {
+    const v = invoice();
+    expect(v.items.every((i) => i.unit === 'lump sum')).toBe(true);
+    expect(documentTotals(toLenientDocument(v)).workCents).toBe(1835675);
   });
 });

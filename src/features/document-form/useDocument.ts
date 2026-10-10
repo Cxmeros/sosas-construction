@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import {
   emptyForm,
   documentSchema,
+  toAmountOnly,
   toInvoiceValues,
   toLenientDocument,
   type FormValues,
@@ -52,7 +53,12 @@ interface Initial {
 }
 
 function initialState(): Initial {
-  const draft = loadDraft();
+  const loaded = loadDraft();
+  // Invoice drafts from before amount-only items get their items collapsed too.
+  const draft =
+    loaded?.values.type === 'invoice'
+      ? { ...loaded, values: { ...loaded.values, items: loaded.values.items.map(toAmountOnly) } }
+      : loaded;
   if (draft) return { values: draft.values, recovered: hasContent(draft.values) ? draft : null };
   const values = freshForm();
   // Saved right away so reopening the app reuses this number instead of taking a new one.
@@ -118,6 +124,7 @@ export function useDocument() {
       if (current.terms.trim() === DEFAULT_TERMS[current.type])
         setValue('terms', DEFAULT_TERMS[type], opts);
       if (type === 'estimate') setValue('estimateRef', '', opts);
+      if (type === 'invoice') setValue('items', current.items.map(toAmountOnly), opts);
       setValue('type', type, opts);
     },
     [getValues, setValue, form.formState.isSubmitted],

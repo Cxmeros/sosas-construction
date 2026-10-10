@@ -88,6 +88,10 @@ Quiere llenar campos y obtener un PDF listo para mandar al cliente.
 14. **Deshacer**: quitar un trabajo, un paso o un cargo muestra "… eliminado · DESHACER" 6 s.
 15. **Invoice**: los trabajos salen solo con descripción (+ detalle) y monto; "Estimate ref." en el
     encabezado si viene de una conversión.
+    En el formulario también: solo descripción, detalle y "Monto total". Al pasar a Invoice cada
+    trabajo queda como `lump sum` con el mismo monto (qty y precio se conservan ocultos).
+16. **Orden del formulario** (reunión oct 2026): Cliente, Documento, Trabajos (con la descripción
+    del trabajo), Pasos (estimate) o Cargos extra (invoice), Anticipo, Términos.
 11. **Opciones en el estimate** (NO va en esta versión: se revirtió de `main` y el código se conserva
     en la rama `feat/estimate-options`): de 1 a 3 opciones, cada una con
     nombre (requerido si hay 2 o más), descripción opcional, sus propias partidas (1–30) y su total.
