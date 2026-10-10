@@ -41,7 +41,7 @@ test('works offline after the first visit, including the PDF', async ({ page, co
   await page.reload();
   await expect(page.getByLabel('Nombre')).toBeVisible();
   await fillSample(page, mobile);
-  if (mobile) await page.getByRole('button', { name: 'Ver PDF' }).click();
+  if (mobile) await page.getByRole('button', { name: 'Ver vista previa (PDF)' }).click();
   const download = page.waitForEvent('download');
   await page.getByRole('button', { name: mobile ? 'Descargar' : 'Descargar PDF' }).click();
   const path = info.outputPath('offline.pdf');

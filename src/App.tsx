@@ -320,9 +320,9 @@ export function App() {
         <button
           type="button"
           onClick={openPreview}
-          className="btn-cond flex min-h-14 items-center gap-2 rounded-field bg-crimson-cta px-5 text-[22px] text-ink hover:bg-red-700"
+          className="flex min-h-14 max-w-[52%] items-center gap-2 rounded-field bg-crimson-cta px-4 text-left text-[17px] leading-tight font-bold text-white hover:bg-red-700"
         >
-          <FileIcon strokeWidth={1.75} /> Ver PDF
+          <FileIcon strokeWidth={1.75} className="flex-none" /> Ver vista previa (PDF)
         </button>
       </div>
       {dialogs}

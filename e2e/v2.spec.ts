@@ -7,7 +7,7 @@ test.beforeEach(async ({ page }) => {
 
 const preview = (page: Page) => page.getByLabel('Vista previa del PDF');
 const openPreview = async (page: Page, mobile: boolean) => {
-  if (mobile) await page.getByRole('button', { name: 'Ver PDF' }).click();
+  if (mobile) await page.getByRole('button', { name: 'Ver vista previa (PDF)' }).click();
 };
 
 /** A saved v2 draft: 18 trabajos (the table needs two pages) and a 7-step work process. */

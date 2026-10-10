@@ -36,7 +36,7 @@ test('full flow: estimate → PDF → convert to invoice → new document', asyn
   await page.getByText('30 %', { exact: true }).click();
 
   if (mobile) {
-    await page.getByRole('button', { name: 'Ver PDF' }).click();
+    await page.getByRole('button', { name: 'Ver vista previa (PDF)' }).click();
     await expect(page.getByText('Para Margaret Kelly')).toBeVisible();
   }
   const preview = page.getByLabel('Vista previa del PDF');
@@ -83,7 +83,7 @@ test('full flow: estimate → PDF → convert to invoice → new document', asyn
   if (mobile) await page.getByRole('button', { name: 'Editar' }).click();
   await expect(page.getByLabel('Nombre')).toHaveValue('Margaret Kelly');
   await expect(page.getByLabel('Número')).toHaveValue(`INV-${today()}-02`);
-  if (mobile) await page.getByRole('button', { name: 'Ver PDF' }).click();
+  if (mobile) await page.getByRole('button', { name: 'Ver vista previa (PDF)' }).click();
 
   // New document asks first (focus on the safe choice), then clears.
   await page.getByRole('button', { name: 'Nuevo documento' }).click();
@@ -101,7 +101,7 @@ test('full flow: estimate → PDF → convert to invoice → new document', asyn
 
 test('validation errors appear next to each field, in Spanish', async ({ page }, info) => {
   const mobile = isMobile(info);
-  await page.getByRole('button', { name: mobile ? 'Ver PDF' : 'Compartir' }).click();
+  await page.getByRole('button', { name: mobile ? 'Ver vista previa (PDF)' : 'Compartir' }).click();
   await expect(page.getByRole('alert')).toContainText('Faltan 2 datos para crear el PDF');
   await expect(page.getByText('Escribe el nombre del cliente.')).toBeVisible();
   await expect(page.getByText('Agrega al menos un trabajo.')).toBeVisible();
@@ -119,7 +119,7 @@ test('validation errors appear next to each field, in Spanish', async ({ page },
   await it.qty.fill('1625');
   // A new item isn't flagged while it's being filled in; the next attempt names what's missing.
   await expect(page.getByText('Falta el precio por sq ft.')).toBeHidden();
-  await page.getByRole('button', { name: mobile ? 'Ver PDF' : 'Compartir' }).click();
+  await page.getByRole('button', { name: mobile ? 'Ver vista previa (PDF)' : 'Compartir' }).click();
   await expect(page.getByText('Falta el precio por sq ft.')).toBeVisible();
 });
 
@@ -210,7 +210,7 @@ test('share uses the Web Share API with the PDF file', async ({ page }, info) =>
   });
   await page.reload();
   await fillSample(page, mobile);
-  if (mobile) await page.getByRole('button', { name: 'Ver PDF' }).click();
+  if (mobile) await page.getByRole('button', { name: 'Ver vista previa (PDF)' }).click();
   await page.getByRole('button', { name: 'Compartir' }).click();
   await expect
     .poll(() => page.evaluate(() => (window as unknown as { shared: unknown[] }).shared))
@@ -231,7 +231,7 @@ test('without file sharing, the panel offers WhatsApp, email and download', asyn
   });
   await page.reload();
   await fillSample(page, mobile);
-  if (mobile) await page.getByRole('button', { name: 'Ver PDF' }).click();
+  if (mobile) await page.getByRole('button', { name: 'Ver vista previa (PDF)' }).click();
   await page.getByRole('button', { name: 'Compartir' }).click();
   const dialog = page.getByRole('dialog', { name: 'Enviar a Margaret Kelly' });
   await expect(dialog).toBeVisible();
