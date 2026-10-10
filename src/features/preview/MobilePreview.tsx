@@ -94,15 +94,13 @@ export function MobilePreview({
           type="button"
           onClick={onShare}
           disabled={busy !== null}
-          className="btn-cond flex min-h-16 flex-col items-center justify-center rounded-field bg-crimson-cta text-white hover:bg-red-700 disabled:opacity-70"
+          className="flex min-h-16 flex-col items-center justify-center rounded-field bg-crimson-cta font-bold text-white hover:bg-red-700 disabled:opacity-70"
         >
-          <span className="flex items-center gap-2.5 text-[22px]">
+          <span className="flex items-center gap-2.5 text-xl">
             <ShareIcon strokeWidth={1.75} />
             {busy === 'share' ? 'Creando PDF…' : 'Compartir'}
           </span>
-          <span className="font-sans text-[13px] font-semibold tracking-normal normal-case">
-            WhatsApp, Mensajes o correo
-          </span>
+          <span className="text-[13px] font-semibold">WhatsApp, Mensajes o correo</span>
         </button>
         <div className="flex gap-2">
           <button type="button" onClick={onDownload} disabled={busy !== null} className={secondary}>

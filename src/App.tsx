@@ -188,7 +188,7 @@ export function App() {
   if (desktop) {
     const pages = pageCountOf(doc);
     const outline =
-      'min-h-12 rounded-field border-[1.5px] border-walnut-700 bg-surface px-[18px] text-base font-semibold text-walnut-700 hover:bg-cream disabled:opacity-60';
+      'min-h-12 rounded-field border-[1.5px] border-ink bg-transparent px-[18px] text-base font-semibold text-ink hover:bg-ink/5 disabled:opacity-60';
     return (
       <div className="flex h-dvh flex-col bg-paper">
         <header className="flex h-[72px] flex-none items-center gap-5 border-b border-line-soft bg-surface px-6">
@@ -227,7 +227,7 @@ export function App() {
             type="button"
             onClick={share}
             disabled={actions.busy !== null}
-            className="btn-cond min-h-12 rounded-field bg-crimson-cta px-[22px] text-xl text-white hover:bg-red-700 disabled:opacity-70"
+            className="min-h-12 rounded-field bg-crimson-cta px-[22px] text-base font-bold text-white hover:bg-red-700 disabled:opacity-70"
           >
             {actions.busy === 'share' ? 'Creando…' : 'Compartir'}
           </button>
