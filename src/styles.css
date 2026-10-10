@@ -37,12 +37,13 @@
   src: url('./assets/fonts/barlow-condensed-latin-700-normal.woff') format('woff');
 }
 
-/* Design tokens from the Claude Design v2 handoff (design/project/Sosa App.dc.html, 07 Tokens). */
+/* Design tokens from the Claude Design v2 handoff (07 Tokens), with the industrial palette
+   from the Oct 2026 audit: CTA #c1121f, hover #780000 (red-700), dark bars, paper #f4f4f5. */
 @theme {
   --font-sans: 'Barlow', system-ui, sans-serif;
   --font-cond: 'Barlow Condensed', 'Barlow', system-ui, sans-serif;
 
-  --color-walnut-900: #2a1a10;
+  --color-walnut-900: #1a1716;
   --color-walnut-700: #3a2416;
   --color-walnut-500: #6b4226;
   --color-walnut-400: #4a3426;
@@ -51,11 +52,11 @@
   --color-gold-500: #c9962e;
   --color-red-100: #f6e4e1;
   --color-red-500: #9e1f1f;
-  --color-red-700: #7f1a1a;
+  --color-red-700: #780000;
   --color-red-800: #5c1212;
-  --color-crimson-cta: #a51c30;
+  --color-crimson-cta: #c1121f;
   --color-cream: #f7e7cc;
-  --color-paper: #f6f1ea;
+  --color-paper: #f4f4f5;
   --color-paper-hover: #fbf6ef;
   --color-desk: #e4dacd;
   --color-readonly: #efe7dc;
