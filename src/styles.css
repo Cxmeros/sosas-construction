@@ -43,31 +43,32 @@
   --font-sans: 'Barlow', system-ui, sans-serif;
   --font-cond: 'Barlow Condensed', 'Barlow', system-ui, sans-serif;
 
+  /* Industrial palette (Oct 2026): neutral zinc greys + red. Old warm names kept so the
+     components don't change; walnut = dark greys, oak = light grey on dark bars. */
   --color-walnut-900: #1a1716;
-  --color-walnut-700: #3a2416;
-  --color-walnut-500: #6b4226;
-  --color-walnut-400: #4a3426;
-  --color-oak-300: #e8c58f;
-  --color-oak-500: #d9a866;
-  --color-gold-500: #c9962e;
-  --color-red-100: #f6e4e1;
-  --color-red-500: #9e1f1f;
+  --color-walnut-700: #27272a;
+  --color-walnut-400: #3f3f46;
+  --color-oak-300: #d4d4d8;
+  --color-red-100: #fde8e9;
+  --color-red-500: #c1121f;
   --color-red-700: #780000;
-  --color-red-800: #5c1212;
+  --color-red-800: #5c0000;
   --color-crimson-cta: #c1121f;
-  --color-cream: #f7e7cc;
+  --color-cream: #f4f4f5;
   --color-paper: #f4f4f5;
-  --color-paper-hover: #fbf6ef;
-  --color-desk: #e4dacd;
-  --color-readonly: #efe7dc;
+  --color-paper-hover: #fafafa;
+  --color-desk: #27272a;
+  --color-readonly: #f4f4f5;
   --color-surface: #ffffff;
-  --color-line: #cdbba7;
-  --color-line-soft: #d8cbbb;
-  --color-line-faint: #e4d8ca;
-  --color-field: #7a6656;
-  --color-placeholder: #76604f;
-  --color-ink: #1f1712;
-  --color-ink-muted: #5c4a3d;
+  --color-line: #e4e4e7;
+  --color-line-soft: #e4e4e7;
+  --color-line-faint: #f4f4f5;
+  /* Requested #d4d4d8 / #a1a1aa are 1.5:1 and 2.6:1 on white: below AA (3:1 for a field's edge,
+     4.5:1 for placeholder text), and the app is used in the sun. Zinc-500 is 4.8:1. */
+  --color-field: #71717a;
+  --color-placeholder: #71717a;
+  --color-ink: #18181b;
+  --color-ink-muted: #52525b;
   --color-error: #b3261e;
   --color-error-ink: #7a1a14;
   --color-error-bg: #fbe9e7;
@@ -127,6 +128,12 @@
     padding: 10px 12px;
     line-height: 1.4;
     resize: vertical;
+  }
+  .field:hover:not(:disabled) {
+    border-color: var(--color-ink-muted);
+  }
+  .field:focus {
+    border-color: var(--color-crimson-cta);
   }
   .field[aria-invalid='true'] {
     border: 2px solid var(--color-error);

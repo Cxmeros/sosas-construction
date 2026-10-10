@@ -116,10 +116,10 @@ export function App() {
   const recoveredBanner = recovered && (
     <div
       role="status"
-      className="flex flex-none flex-wrap items-center gap-x-3 gap-y-1 border-b-2 border-gold-500 bg-cream py-2 pr-2 pl-4"
+      className="mx-4 mt-3 flex flex-none flex-wrap items-center gap-x-3 gap-y-1 rounded-field border border-l-4 border-line border-l-success bg-surface py-2 pr-2 pl-3 text-ink lg:mx-8"
     >
-      <div className="flex min-w-0 flex-1 basis-60 gap-2.5 text-walnut-700">
-        <UndoIcon className="mt-0.5 flex-none" />
+      <div className="flex min-w-0 flex-1 basis-60 gap-2.5">
+        <UndoIcon className="mt-0.5 flex-none text-success" />
         <div className="flex min-w-0 flex-col">
           <strong className="text-[15px]">Recuperamos tu borrador</strong>
           <span className="truncate text-sm">
@@ -134,7 +134,7 @@ export function App() {
           onClick={() => {
             setConfirm('discard');
           }}
-          className="min-h-12 flex-none rounded-field px-3 text-[15px] font-semibold text-walnut-700 underline underline-offset-4 hover:bg-surface"
+          className="min-h-12 flex-none rounded-field px-3 text-[15px] font-semibold text-ink underline underline-offset-4 hover:bg-paper"
         >
           Descartar
         </button>
@@ -244,7 +244,7 @@ export function App() {
               <DocumentForm state={state} totals={totals} desktop />
             </main>
           </div>
-          <aside className="flex flex-col items-center gap-2.5 overflow-y-auto bg-walnut-400 p-5">
+          <aside className="flex flex-col items-center gap-2.5 overflow-y-auto bg-desk p-5">
             <div className="flex self-stretch justify-between text-[13px] font-semibold tracking-[0.06em] text-oak-300 uppercase">
               <span>Vista previa en vivo</span>
               <span>Carta · {pages === 1 ? '1 de 1' : `${String(pages)} páginas`}</span>

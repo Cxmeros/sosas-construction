@@ -63,9 +63,9 @@ export function UpdateBar({ beforeUpdate }: { beforeUpdate: () => void }) {
   return (
     <div
       role="status"
-      className="fixed inset-x-3 top-3 z-40 flex items-center gap-2 border-2 border-walnut-700 bg-cream py-1 pr-1 pl-3 text-walnut-700 shadow-[0_10px_28px_rgba(42,26,16,0.3)] lg:left-auto lg:w-[460px]"
+      className="fixed inset-x-3 top-3 z-40 flex items-center gap-2 rounded-field border border-l-4 border-line border-l-crimson-cta bg-surface py-1 pr-1 pl-3 text-ink shadow-[0_8px_24px_rgba(24,24,27,0.12)] lg:left-auto lg:w-[460px]"
     >
-      <UndoIcon className="flex-none" />
+      <UndoIcon className="flex-none text-crimson-cta" />
       <span className="flex-1 text-[15px] font-semibold">Hay una versión nueva de la app.</span>
       <button
         type="button"

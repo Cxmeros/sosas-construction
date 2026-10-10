@@ -19,10 +19,10 @@ export function NoticeToast({
   return (
     <div
       role="status"
-      className={`z-30 flex items-center justify-between gap-2 bg-success py-1 pr-1 pl-4 text-white shadow-[0_10px_28px_rgba(20,40,24,0.28)] ${className}`}
+      className={`z-30 flex items-center justify-between gap-2 rounded-field border border-l-4 border-line border-l-success bg-surface py-1 pr-1 pl-3 text-ink shadow-[0_8px_24px_rgba(24,24,27,0.12)] ${className}`}
     >
       <span className="flex items-center gap-2 py-2 text-[15px] font-semibold">
-        <CheckIcon size={20} className="flex-none" />
+        <CheckIcon size={20} className="flex-none text-success" />
         {notice.text}
       </span>
       {notice.action && (
