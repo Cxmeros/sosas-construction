@@ -125,7 +125,8 @@
     padding: 0 12px;
     border: 1.5px solid var(--color-field);
     border-radius: var(--radius-field);
-    background: var(--color-surface);
+    /* A shade off the white cards so each box reads as a box (Oct 2026 review). */
+    background: var(--color-paper-hover);
     font-size: 17px;
     color: var(--color-ink);
   }

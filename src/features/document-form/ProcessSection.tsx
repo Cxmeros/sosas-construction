@@ -200,7 +200,7 @@ export function ProcessSection({ form, desktop, n }: { form: Form; desktop: bool
                         <textarea
                           rows={desktop ? 5 : 9}
                           maxLength={LIMITS.stepBody}
-                          placeholder="What you'll do, with which materials, and what the customer should know"
+                          placeholder="e.g. We cover floors, doorways and furniture with plastic and tape to keep dust out of the rest of the house."
                           className="field font-normal"
                           {...register(`steps.${i}.body`)}
                         />

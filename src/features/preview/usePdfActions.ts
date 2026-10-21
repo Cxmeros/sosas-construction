@@ -33,11 +33,15 @@ export function usePdfActions() {
     }
   };
 
-  /** Resolves to 'shared' when the OS share sheet completed, so the app can confirm it. */
-  const share = (doc: DocumentData) =>
+  /**
+   * Resolves to 'shared' when the OS share sheet completed, so the app can confirm it.
+   * `preferPanel` (desktop): the Windows share sheet can't hand the file to Discord and its
+   * "Copy" puts nothing pasteable on the clipboard, so a computer gets download + drag instead.
+   */
+  const share = (doc: DocumentData, preferPanel = false) =>
     run('share', doc, async ({ blob, fileName }) => {
       const file = new File([blob], fileName, { type: 'application/pdf' });
-      const result = await shareFile(file, fileName);
+      const result = preferPanel ? 'unsupported' : await shareFile(file, fileName);
       if (result === 'unsupported') setFallback({ blob, fileName, doc });
       return result;
     });

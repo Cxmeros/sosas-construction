@@ -77,7 +77,7 @@ export function ExtrasSection({ form, desktop, n }: { form: Form; desktop: boole
                 >
                   <input
                     maxLength={LIMITS.extraDescription}
-                    placeholder="ej. Debris disposal"
+                    placeholder="e.g. Additional work: subfloor repair"
                     className="field"
                     {...invalidProps(`extras.${String(i)}.description`, err(i, 'description'))}
                     {...register(`extras.${i}.description`)}
@@ -102,6 +102,7 @@ export function ExtrasSection({ form, desktop, n }: { form: Form; desktop: boole
                   inputMode="decimal"
                   autoComplete="off"
                   maxLength={LIMITS.numericInput}
+                  placeholder="ej. 240.00"
                   className="field num"
                   {...invalidProps(`extras.${String(i)}.amount`, err(i, 'amount'))}
                   {...register(`extras.${i}.amount`)}

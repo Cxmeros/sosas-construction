@@ -43,8 +43,8 @@ export function SharePanel({ file, onClose }: { file: PdfFile | null; onClose: (
         Enviar a {name}
       </h2>
       <p className="m-0 text-[15px] text-ink-muted">
-        Este aparato no puede compartir archivos. Al elegir una opción se descarga el PDF: adjunta
-        el PDF descargado en el mensaje.
+        Al elegir una opción se descarga el PDF. Después adjúntalo en el mensaje, o arrástralo desde
+        Descargas a la conversación (WhatsApp, correo, Discord).
       </p>
       {wa && (
         <button

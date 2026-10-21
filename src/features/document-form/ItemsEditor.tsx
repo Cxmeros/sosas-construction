@@ -4,7 +4,7 @@ import { lineAmountCents } from '../../domain/calc';
 import { emptyItem, toLenientItem, type FormItem, type FormValues } from '../../domain/form';
 import { LIMITS } from '../../domain/limits';
 import { formatCents } from '../../domain/money';
-import { UNITS, type DocumentData } from '../../domain/types';
+import { UNITS, type DocumentData, type Unit } from '../../domain/types';
 import { DownIcon, GripIcon, PlusIcon, TrashIcon, UpIcon } from '../../ui/Icons';
 import { removedLabel, useUndoRemove } from '../../ui/useUndoRemove';
 import { errorAt, Field, FieldError, invalidProps, SectionTitle } from './fields';
@@ -14,6 +14,25 @@ type Form = UseFormReturn<FormValues, unknown, DocumentData>;
 function amountOf(item: FormItem): string {
   return formatCents(lineAmountCents(toLenientItem(item)));
 }
+
+/** Placeholders: `ej.` for numbers only Danilo sees, `e.g.` for English text that goes to the PDF. */
+const PRICE_EXAMPLE: Record<Unit, string> = {
+  'sq ft': 'ej. 4.50',
+  'linear ft': 'ej. 12',
+  steps: 'ej. 150',
+  each: 'ej. 50',
+  hours: 'ej. 85',
+  'lump sum': '',
+  other: 'ej. 100',
+};
+const descriptionExample = (simple: boolean) =>
+  simple
+    ? 'e.g. Sand and refinish red oak floors, living room and hallway'
+    : 'e.g. Install 3/4" solid oak hardwood, including underlayment';
+const DETAIL_EXAMPLE = 'e.g. 15 steps, 10 sticks';
+const QTY_EXAMPLE = 'ej. 600';
+const AMOUNT_EXAMPLE = 'ej. 2,850.00';
+const UNIT_EXAMPLE = 'e.g. rooms';
 
 function UnitOptions() {
   return (
@@ -283,6 +302,7 @@ function MobileCard({ form, index, count, simple, item, onMove, onDelete }: RowP
           <textarea
             rows={2}
             maxLength={200}
+            placeholder={descriptionExample(simple)}
             className="field"
             {...invalidProps(p('description'), err('description'))}
             {...register(p('description'))}
@@ -291,7 +311,7 @@ function MobileCard({ form, index, count, simple, item, onMove, onDelete }: RowP
         <Field label="Detalle (opcional)" path={p('detail')} error={undefined}>
           <input
             maxLength={200}
-            placeholder="ej. 15 steps, 10 sticks"
+            placeholder={DETAIL_EXAMPLE}
             className="field"
             {...register(p('detail'))}
           />
@@ -305,6 +325,7 @@ function MobileCard({ form, index, count, simple, item, onMove, onDelete }: RowP
                   inputMode="decimal"
                   autoComplete="off"
                   maxLength={20}
+                  placeholder={QTY_EXAMPLE}
                   className="field num"
                   {...invalidProps(p('qty'), err('qty'))}
                   {...register(p('qty'))}
@@ -322,7 +343,7 @@ function MobileCard({ form, index, count, simple, item, onMove, onDelete }: RowP
           <Field label="Escribe la unidad" path={p('otherUnit')} error={err('otherUnit')}>
             <input
               className="field"
-              placeholder="ej. rooms"
+              placeholder={UNIT_EXAMPLE}
               maxLength={15}
               {...invalidProps(p('otherUnit'), err('otherUnit'))}
               {...register(p('otherUnit'))}
@@ -335,6 +356,7 @@ function MobileCard({ form, index, count, simple, item, onMove, onDelete }: RowP
               inputMode="decimal"
               autoComplete="off"
               maxLength={20}
+              placeholder={AMOUNT_EXAMPLE}
               className="field num text-[19px] font-semibold"
               {...invalidProps(p('lumpSum'), err('lumpSum'))}
               {...register(p('lumpSum'))}
@@ -351,6 +373,7 @@ function MobileCard({ form, index, count, simple, item, onMove, onDelete }: RowP
                 inputMode="decimal"
                 autoComplete="off"
                 maxLength={20}
+                placeholder={PRICE_EXAMPLE[item.unit]}
                 className="field num"
                 {...invalidProps(p('unitPrice'), err('unitPrice'))}
                 {...register(p('unitPrice'))}
@@ -435,6 +458,7 @@ function DesktopRow({
             aria-label={`Descripción trabajo ${String(index + 1)}`}
             rows={1}
             maxLength={200}
+            placeholder={descriptionExample(simple)}
             className="field min-h-12 resize-none px-2.5 text-base field-sizing-content"
             {...invalidProps(p('description'), err('description'))}
             {...register(p('description'))}
@@ -442,7 +466,7 @@ function DesktopRow({
           <input
             aria-label={`Detalle trabajo ${String(index + 1)} (opcional)`}
             maxLength={200}
-            placeholder="Detalle (opcional)"
+            placeholder={`Detalle (opcional) · ${DETAIL_EXAMPLE}`}
             className="field px-2.5 text-sm"
             {...register(p('detail'))}
           />
@@ -462,6 +486,7 @@ function DesktopRow({
                 inputMode="decimal"
                 autoComplete="off"
                 maxLength={20}
+                placeholder={QTY_EXAMPLE}
                 className="field num px-2.5 text-base"
                 {...invalidProps(p('qty'), err('qty'))}
                 {...register(p('qty'))}
@@ -478,7 +503,7 @@ function DesktopRow({
               {item.unit === 'other' && (
                 <input
                   aria-label={`Unidad escrita trabajo ${String(index + 1)}`}
-                  placeholder="ej. rooms"
+                  placeholder={UNIT_EXAMPLE}
                   maxLength={15}
                   className="field px-2.5 text-base"
                   {...invalidProps(p('otherUnit'), err('otherUnit'))}
@@ -499,6 +524,7 @@ function DesktopRow({
                 inputMode="decimal"
                 autoComplete="off"
                 maxLength={20}
+                placeholder={PRICE_EXAMPLE[item.unit]}
                 className="field num px-2.5 text-base"
                 {...invalidProps(p('unitPrice'), err('unitPrice'))}
                 {...register(p('unitPrice'))}
@@ -512,6 +538,7 @@ function DesktopRow({
             inputMode="decimal"
             autoComplete="off"
             maxLength={20}
+            placeholder={AMOUNT_EXAMPLE}
             className="field num border-ink px-2.5 text-base font-semibold"
             {...invalidProps(p('lumpSum'), err('lumpSum'))}
             {...register(p('lumpSum'))}

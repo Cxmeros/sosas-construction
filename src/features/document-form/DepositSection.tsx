@@ -70,6 +70,7 @@ export function DepositSection({
             inputMode="decimal"
             autoComplete="off"
             maxLength={6}
+            placeholder="ej. 40"
             className="field num"
             {...invalidProps('depositPercent', pctError)}
             {...register('depositPercent', {
@@ -90,6 +91,7 @@ export function DepositSection({
             inputMode="decimal"
             autoComplete="off"
             maxLength={20}
+            placeholder="ej. 1,500.00"
             className="field num"
             {...invalidProps('depositFixed', fixedError)}
             {...register('depositFixed')}

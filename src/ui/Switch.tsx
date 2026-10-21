@@ -17,8 +17,15 @@ export function Switch({
       onClick={() => {
         onChange(!checked);
       }}
-      className="flex min-h-12 min-w-16 flex-none items-center justify-end"
+      className="flex min-h-12 min-w-16 flex-none items-center justify-end gap-2"
     >
+      {/* Spelled-out state: the track alone didn't read as on/off at a glance. */}
+      <span
+        aria-hidden="true"
+        className={`text-[15px] font-bold ${checked ? 'text-red-700' : 'text-ink-muted'}`}
+      >
+        {checked ? 'Sí' : 'No'}
+      </span>
       <span
         className={`relative block h-[30px] w-[52px] rounded-[2px] transition-colors ${checked ? 'bg-red-700' : 'bg-field'}`}
       >

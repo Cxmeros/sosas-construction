@@ -1,6 +1,7 @@
 import { get, type FieldErrors } from 'react-hook-form';
-import type { ReactNode } from 'react';
+import { useId, useState, type ReactNode } from 'react';
 import type { FormValues } from '../../domain/form';
+import { DownIcon } from '../../ui/Icons';
 
 export function errorAt(errors: FieldErrors<FormValues>, path: string): string | undefined {
   const error: unknown = get(errors, path);
@@ -77,10 +78,74 @@ export function SectionTitle({
   );
 }
 
-/** Mobile section card; on desktop sections sit directly on the page. */
+/** Mobile section card (white on the grey page); on desktop sections sit directly on the page. */
 export function Section({ desktop, children }: { desktop: boolean; children: ReactNode }) {
   if (desktop) return <section className="flex flex-col gap-3">{children}</section>;
-  return <section className="flex flex-col gap-3.5 border border-line p-4">{children}</section>;
+  return (
+    <section className="flex flex-col gap-3.5 border border-line bg-surface p-4">
+      {children}
+    </section>
+  );
+}
+
+/**
+ * Mobile card that folds to a one-line summary once filled, so the work items come sooner.
+ * `forceOpen` (empty or with errors) keeps it open; inputs stay mounted while folded.
+ */
+export function FoldSection({
+  n,
+  title,
+  summary,
+  defaultOpen,
+  forceOpen,
+  children,
+}: {
+  n: string;
+  title: string;
+  summary: string;
+  defaultOpen: boolean;
+  forceOpen: boolean;
+  children: ReactNode;
+}) {
+  const [open, setOpen] = useState(defaultOpen);
+  const id = useId();
+  // Once forced open it stays open, so it doesn't fold mid-typing when the name gets its first letter.
+  if (forceOpen && !open) setOpen(true);
+
+  return (
+    <section className="flex flex-col border border-line bg-surface">
+      <h2 className="m-0 text-base font-normal">
+        <button
+          type="button"
+          aria-expanded={open}
+          aria-controls={id}
+          onClick={() => {
+            setOpen(!open || forceOpen);
+          }}
+          className="flex min-h-12 w-full items-center gap-2 p-4 text-left"
+        >
+          <span className="flex min-w-0 flex-1 flex-col gap-1">
+            <span className="section-title">
+              <span className="n">{n}</span>
+              {title}
+            </span>
+            {!open && summary && (
+              <span className="text-[15px] font-semibold break-words text-ink-muted">
+                {summary}
+              </span>
+            )}
+          </span>
+          <span className="flex-none text-sm font-semibold text-walnut-700 underline underline-offset-4">
+            {open ? 'Cerrar' : 'Editar'}
+          </span>
+          <DownIcon size={24} className={`flex-none text-walnut-700 ${open ? 'rotate-180' : ''}`} />
+        </button>
+      </h2>
+      <div id={id} hidden={!open} className="flex flex-col gap-3.5 px-4 pb-4">
+        {children}
+      </div>
+    </section>
+  );
 }
 
 /** Segmented control built on native radios (arrow keys, screen readers). */

@@ -71,7 +71,7 @@ export function App() {
   };
   const share = () => {
     withValid((d) => {
-      void actions.share(d).then((result) => {
+      void actions.share(d, desktop).then((result) => {
         if (result === 'shared')
           setNotice({
             text: 'PDF compartido.',
@@ -194,7 +194,10 @@ export function App() {
       // One page scroll: header and preview stay put, only the form moves.
       <div className="flex min-h-dvh flex-col bg-paper">
         <header className="sticky top-0 z-20 flex h-[88px] flex-none items-center gap-5 border-b border-line-soft bg-surface px-6">
-          <img src={LOGO.src} alt={COMPANY.name} className="block h-[72px]" />
+          <img src={LOGO.src} alt="" className="block h-[72px]" />
+          <span className="font-cond text-[22px] leading-tight font-bold text-walnut-900">
+            {COMPANY.name}
+          </span>
           <div className="h-9 w-px bg-line-soft" />
           <div className="flex flex-col">
             <h1 className="m-0 font-cond text-[22px] leading-tight font-bold text-walnut-900 uppercase">
@@ -205,7 +208,7 @@ export function App() {
           {/* Starting over wipes the draft, so it sits apart from the export actions. */}
           <button
             type="button"
-            className="flex min-h-12 items-center gap-2 rounded-field border-[1.5px] border-walnut-700 bg-surface px-4 text-base font-semibold text-walnut-700 hover:bg-cream"
+            className="flex min-h-12 items-center gap-2 rounded-field px-3 text-base font-semibold text-ink-muted hover:bg-cream hover:text-ink"
             onClick={askNew}
           >
             <FilePlusIcon size={20} />
@@ -286,17 +289,22 @@ export function App() {
 
   return (
     <div className="flex h-dvh flex-col bg-paper">
-      <header className="flex h-[76px] flex-none items-center gap-2 border-b border-line-soft bg-surface pr-3 pl-4">
-        <img src={LOGO.src} alt={COMPANY.name} className="block h-16" />
-        <div className="flex-1" />
-        <SavedIndicator savedAt={savedAt} short />
+      <header className="flex h-[76px] flex-none items-center gap-2.5 border-b border-line-soft bg-surface pr-1 pl-4">
+        <img src={LOGO.src} alt="" className="block h-16" />
+        <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+          <span className="font-cond text-[19px] leading-tight font-bold text-walnut-900">
+            {COMPANY.name}
+          </span>
+          <SavedIndicator savedAt={savedAt} short />
+        </div>
+        {/* Secondary on purpose: it wipes the draft, and the red bar below is the main action. */}
         <button
           type="button"
           onClick={askNew}
           aria-label="Nuevo documento"
-          className="flex min-h-12 items-center gap-2 rounded-field border-[1.5px] border-walnut-700 px-3.5 text-[17px] font-semibold text-walnut-700 hover:bg-cream"
+          className="flex min-h-12 flex-none items-center gap-1.5 rounded-field px-3 text-base font-semibold text-ink-muted hover:bg-cream hover:text-ink"
         >
-          <FilePlusIcon size={22} /> Nuevo
+          <FilePlusIcon size={20} /> Nuevo
         </button>
       </header>
       {recoveredBanner}
@@ -312,7 +320,7 @@ export function App() {
           <span className="font-cond text-[32px] leading-none font-bold text-white">
             {formatCents(totals.totalCents)}
           </span>
-          <span className="text-[13px] text-oak-300">
+          <span className="text-[15px] font-semibold text-white">
             {totals.totalCents === 0
               ? doc.items.length > 0
                 ? 'Completa los trabajos'
@@ -322,12 +330,17 @@ export function App() {
                 : `${labels.balance}: ${formatCents(totals.balanceCents)}`}
           </span>
         </div>
+        {/* Looks off at $0 but still answers a tap: validation then points at what's missing. */}
         <button
           type="button"
           onClick={openPreview}
-          className="flex min-h-14 max-w-[52%] items-center gap-2 rounded-field bg-crimson-cta px-4 text-left text-[17px] leading-tight font-bold text-white hover:bg-red-700"
+          className={`flex min-h-14 flex-none items-center gap-2 rounded-field px-4 text-[17px] font-bold whitespace-nowrap ${
+            totals.totalCents === 0
+              ? 'bg-walnut-400 text-oak-300'
+              : 'bg-crimson-cta text-white hover:bg-red-700'
+          }`}
         >
-          <FileIcon strokeWidth={1.75} className="flex-none" /> Ver vista previa (PDF)
+          <FileIcon strokeWidth={1.75} className="flex-none" /> Vista previa
         </button>
       </div>
       {dialogs}

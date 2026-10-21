@@ -9,7 +9,15 @@ import type { DocumentState } from './useDocument';
 import { DepositSection } from './DepositSection';
 import { ExtrasSection } from './ExtrasSection';
 import { ProcessSection } from './ProcessSection';
-import { errorAt, Field, invalidProps, Section, SectionTitle, Segmented } from './fields';
+import {
+  errorAt,
+  Field,
+  FoldSection,
+  invalidProps,
+  Section,
+  SectionTitle,
+  Segmented,
+} from './fields';
 import { ItemsEditor } from './ItemsEditor';
 
 const DOC_OPTIONS: readonly { value: DocType; label: string }[] = [
@@ -87,6 +95,7 @@ export function DocumentForm({
         {...invalidProps('number', err('number'))}
         {...register('number')}
       />
+      <span className="text-sm font-normal text-ink-muted">Se llena solo; puedes cambiarlo.</span>
     </Field>
   );
   const dateField = (
@@ -111,7 +120,7 @@ export function DocumentForm({
         <input
           autoComplete="name"
           maxLength={LIMITS.customerName}
-          placeholder={isBlank ? 'ej. Margaret Kelly' : undefined}
+          placeholder="ej. Danilo Sosa"
           className="field"
           {...invalidProps('customer.name', err('customer.name'))}
           {...register('customer.name')}
@@ -121,6 +130,7 @@ export function DocumentForm({
         <input
           autoComplete="street-address"
           maxLength={LIMITS.address}
+          placeholder="ej. 29 E Providence Rd, Lansdowne, PA 19050"
           className="field"
           {...register('customer.address')}
         />
@@ -131,7 +141,7 @@ export function DocumentForm({
           inputMode="tel"
           autoComplete="tel"
           maxLength={LIMITS.phone}
-          placeholder={isBlank ? '(610) 555-0000' : undefined}
+          placeholder="(000) 000-0000"
           className="field"
           {...invalidProps('customer.phone', err('customer.phone'))}
           {...register('customer.phone', {
@@ -148,6 +158,7 @@ export function DocumentForm({
           inputMode="email"
           autoComplete="email"
           maxLength={LIMITS.email}
+          placeholder="ej. email@gmail.com"
           className="field"
           {...invalidProps('customer.email', err('customer.email'))}
           {...register('customer.email')}
@@ -159,6 +170,7 @@ export function DocumentForm({
     <textarea
       rows={desktop ? 3 : 4}
       maxLength={LIMITS.jobDescription}
+      placeholder="e.g. Sand and refinish 600 sq ft red oak floors, living room and hallway"
       className="field font-normal"
       {...register('jobDescription')}
     />
@@ -246,18 +258,31 @@ export function DocumentForm({
           <span className="text-base text-ink-muted">Empieza por el cliente.</span>
         </div>
       )}
-      <Section desktop={false}>
-        <SectionTitle n="01">Cliente</SectionTitle>
+      <FoldSection
+        n="01"
+        title="Cliente"
+        summary={[values.customer.name, values.customer.phone]
+          .map((s) => s.trim())
+          .filter(Boolean)
+          .join(' · ')}
+        defaultOpen={!values.customer.name.trim()}
+        forceOpen={!values.customer.name.trim() || Boolean(errors.customer)}
+      >
         {customer}
-      </Section>
-      <Section desktop={false}>
-        <SectionTitle n="02">Documento</SectionTitle>
+      </FoldSection>
+      <FoldSection
+        n="02"
+        title="Documento"
+        summary={`${invoice ? 'Invoice' : 'Estimate'} · ${values.number}${values.date ? ` · ${formatDateUS(values.date)}` : ''}`}
+        defaultOpen={isBlank}
+        forceOpen={Boolean(errors.number ?? errors.date)}
+      >
         {typeSwitch}
         <div className="grid grid-cols-1 gap-3 min-[420px]:grid-cols-[1fr_1.3fr]">
           {numberField}
           {dateField}
         </div>
-      </Section>
+      </FoldSection>
       <ItemsEditor
         form={form}
         desktop={false}
