@@ -31,7 +31,8 @@ const descriptionExample = (simple: boolean) =>
     : 'e.g. Install 3/4" solid oak hardwood, including underlayment';
 const DETAIL_EXAMPLE = 'e.g. 15 steps, 10 sticks';
 const QTY_EXAMPLE = 'ej. 600';
-const AMOUNT_EXAMPLE = 'ej. 2,850.00';
+/** Lump sum: the whole price of the job on an estimate, the amount billed on an invoice. */
+const amountExample = (simple: boolean) => (simple ? 'ej. 2,850.00' : 'ej. 1200');
 const UNIT_EXAMPLE = 'e.g. rooms';
 
 function UnitOptions() {
@@ -356,7 +357,7 @@ function MobileCard({ form, index, count, simple, item, onMove, onDelete }: RowP
               inputMode="decimal"
               autoComplete="off"
               maxLength={20}
-              placeholder={AMOUNT_EXAMPLE}
+              placeholder={amountExample(simple)}
               className="field num text-[19px] font-semibold"
               {...invalidProps(p('lumpSum'), err('lumpSum'))}
               {...register(p('lumpSum'))}
@@ -538,7 +539,7 @@ function DesktopRow({
             inputMode="decimal"
             autoComplete="off"
             maxLength={20}
-            placeholder={AMOUNT_EXAMPLE}
+            placeholder={amountExample(simple)}
             className="field num border-ink px-2.5 text-base font-semibold"
             {...invalidProps(p('lumpSum'), err('lumpSum'))}
             {...register(p('lumpSum'))}

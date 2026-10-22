@@ -1,5 +1,7 @@
 import { expect, test } from '@playwright/test';
-import { expectNoErrors, fillSample, isMobile, pdfText, watchConsole } from './helpers';
+import { DAY, expectNoErrors, fillSample, isMobile, pdfText, watchConsole } from './helpers';
+
+test.use({ serviceWorkers: 'allow' });
 
 test('is installable: manifest and icons', async ({ page, request }) => {
   await page.goto('/');
@@ -41,12 +43,24 @@ test('works offline after the first visit, including the PDF', async ({ page, co
   await page.reload();
   await expect(page.getByLabel('Nombre')).toBeVisible();
   await fillSample(page, mobile);
+  // No number yet and no connection: it says so instead of making one up (SPEC §5).
+  const action = mobile ? 'Vista previa' : 'Descargar PDF';
+  await page.getByRole('button', { name: action }).click();
+  await expect(
+    page.getByText('Sin internet. Conéctate para asignar el número o escríbelo a mano.'),
+  ).toBeVisible();
+  // A hand-typed number works offline and waits to be reported to the counter.
+  const number = `EST-${DAY}-07`;
+  await page.getByLabel('Número').fill(number);
   if (mobile) await page.getByRole('button', { name: 'Vista previa' }).click();
   const download = page.waitForEvent('download');
   await page.getByRole('button', { name: mobile ? 'Descargar' : 'Descargar PDF' }).click();
   const path = info.outputPath('offline.pdf');
   await (await download).saveAs(path);
   expect(pdfText(path)).toContain('$18,356.75');
+  expect(await page.evaluate(() => window.localStorage.getItem('sosa.pending.v1'))).toBe(
+    JSON.stringify([number]),
+  );
   await context.setOffline(false);
   await expectNoErrors(errors);
 });

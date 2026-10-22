@@ -66,11 +66,27 @@ export function App() {
     })();
   };
 
+  /** Validated document with its number, asked from the shared counter the first time. */
+  const withNumber = (fn: (d: DocumentData) => void) => {
+    withValid((d) => {
+      void state.ensureNumber().then((res) => {
+        if (res.ok) fn({ ...d, number: res.value });
+        else
+          setNotice({
+            text:
+              res.reason === 'offline'
+                ? 'Sin internet. Conéctate para asignar el número o escríbelo a mano.'
+                : 'No se pudo asignar el número. Inténtalo otra vez o escríbelo a mano.',
+          });
+      });
+    });
+  };
+
   const askNew = () => {
     setConfirm('new');
   };
   const share = () => {
-    withValid((d) => {
+    withNumber((d) => {
       void actions.share(d, desktop).then((result) => {
         if (result === 'shared')
           setNotice({
@@ -81,13 +97,23 @@ export function App() {
     });
   };
   const download = () => {
-    withValid((d) => void actions.download(d));
+    withNumber((d) => void actions.download(d));
   };
   const convert = () => {
-    const number = state.convertToInvoice();
-    setNotice({
-      text: `Ahora es el Invoice ${number}.`,
-      action: { label: 'Deshacer', run: state.undoConvert },
+    void state.convertToInvoice().then((res) => {
+      setNotice(
+        res.ok
+          ? {
+              text: `Ahora es el Invoice ${res.value}.`,
+              action: { label: 'Deshacer', run: state.undoConvert },
+            }
+          : {
+              text:
+                res.reason === 'offline'
+                  ? 'Sin internet. Conéctate para convertir en Invoice.'
+                  : 'No se pudo convertir en Invoice. Inténtalo otra vez.',
+            },
+      );
     });
   };
   const startNew = () => {
@@ -98,7 +124,7 @@ export function App() {
     setScreen('form');
   };
   const openPreview = () => {
-    withValid(() => {
+    withNumber(() => {
       savedScroll.current = formScroll.current?.scrollTop ?? 0;
       setScreen('preview');
     });
@@ -124,8 +150,9 @@ export function App() {
         <div className="flex min-w-0 flex-col">
           <strong className="text-[15px]">Recuperamos tu borrador</strong>
           <span className="truncate text-sm">
-            {recovered.values.type === 'invoice' ? 'Invoice' : 'Estimate'} {recovered.values.number}{' '}
-            · {recoveredWhat} · {formatSavedAt(recovered.savedAt)}
+            {recovered.values.type === 'invoice' ? 'Invoice' : 'Estimate'}{' '}
+            {recovered.values.number || 'sin número'} · {recoveredWhat} ·{' '}
+            {formatSavedAt(recovered.savedAt)}
           </span>
         </div>
       </div>

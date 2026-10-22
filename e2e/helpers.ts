@@ -18,6 +18,44 @@ export const SAMPLE_ITEMS = [
   },
 ] as const;
 
+/** Day the fake counter stamps on numbers (the real one uses today in Pennsylvania). */
+export const DAY = '261021';
+
+/**
+ * Stand-in for the Worker's /api (e2e runs on `pnpm preview`): same routes, in memory, per page.
+ * Returns every request body, to check no customer data ever leaves the device.
+ */
+export async function mockCounter(page: Page): Promise<string[]> {
+  const bodies: string[] = [];
+  const last: Record<string, number> = {};
+  const format = (t: string) => `${t}-${DAY}-${String(last[t]).padStart(2, '0')}`;
+  await page.route('**/api/**', async (route) => {
+    const req = route.request();
+    const path = new URL(req.url()).pathname;
+    const body = (req.postDataJSON() ?? {}) as { tipo?: string; numero?: string };
+    bodies.push(req.postData() ?? '');
+    if (path === '/api/numero' && body.tipo) {
+      last[body.tipo] = (last[body.tipo] ?? 0) + 1;
+      return route.fulfill({ json: { numero: format(body.tipo) } });
+    }
+    if (path === '/api/ultimos')
+      return route.fulfill({
+        json: {
+          EST: last.EST ? format('EST') : null,
+          INV: last.INV ? format('INV') : null,
+        },
+      });
+    if (path === '/api/registrar') {
+      const m = /^(EST|INV)-\d{6}-(\d+)$/.exec(body.numero ?? '');
+      if (!m?.[1] || !m[2]) return route.fulfill({ status: 400, json: { error: 'formato' } });
+      last[m[1]] = Math.max(last[m[1]] ?? 0, Number(m[2]));
+      return route.fulfill({ json: { ok: true } });
+    }
+    return route.fulfill({ status: 404, json: { error: 'No existe' } });
+  });
+  return bodies;
+}
+
 /** Fails the test on console errors, except react-pdf's known, recovered WASM data: fetch (README). */
 export function watchConsole(page: Page): string[] {
   const errors: string[] = [];

@@ -1,8 +1,10 @@
-// Cloudflare Workers (static assets only, no Worker script). Deploy: `pnpm build && npx wrangler deploy`.
+// Cloudflare Workers: static assets + a tiny Worker for /api/* (the shared document counter, no
+// customer data). Deploy: `pnpm build && npx wrangler deploy`.
 // `name` must match the Worker name in the Cloudflare dashboard (Workers Builds requirement).
 {
   "$schema": "https://unpkg.com/wrangler/config-schema.json",
   "name": "sosas-construction",
+  "main": "src/worker.ts",
   "compatibility_date": "2026-10-01",
   "assets": {
     // Vite build output; public/_headers is copied here and applied by Cloudflare.
@@ -10,7 +12,12 @@
     "not_found_handling": "single-page-application",
     // Serve /index.html as is (no 307 to "/"): the service worker precaches it for offline use.
     "html_handling": "none",
+    // Without this, /api/* would get index.html (SPA fallback) instead of reaching the Worker.
+    "run_worker_first": ["/api/*"],
   },
+  // One instance (idFromName("sosas")) holds the EST-/INV- counters, shared by phone and PC.
+  "durable_objects": { "bindings": [{ "name": "CONTADOR", "class_name": "Contador" }] },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Contador"] }],
   "workers_dev": true,
   // Required by `npx wrangler preview`, the command Workers Builds runs for each branch / PR.
   // Empty: assets and compatibility settings at the top level apply to previews too.

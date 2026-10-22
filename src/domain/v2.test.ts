@@ -6,6 +6,7 @@ import {
   emptyForm,
   emptyStep,
   formatPhone,
+  formatPhoneAsTyped,
   toAmountOnly,
   toEstimateItem,
   toInvoiceValues,
@@ -187,6 +188,14 @@ describe('phone (SPEC §3.3)', () => {
     expect(formatPhone('6105550142')).toBe('(610) 555-0142');
     expect(formatPhone('+1 610.555.0142')).toBe('(610) 555-0142');
     expect(formatPhone('555')).toBe('555');
+  });
+  it('formats while typing, 10 digits max', () => {
+    expect(
+      ['', '6', '610', '6105', '610555', '6105550', '6105550142'].map(formatPhoneAsTyped),
+    ).toEqual(['', '(6', '(610', '(610) 5', '(610) 555', '(610) 555-0', '(610) 555-0142']);
+    expect(formatPhoneAsTyped('1058658523546')).toBe('(058) 658-5235');
+    expect(formatPhoneAsTyped('+1 610.555.0142')).toBe('(610) 555-0142');
+    expect(formatPhoneAsTyped('(610) 555-01425')).toBe('(610) 555-0142');
   });
   it('asks for 10 digits', () => {
     const v = estimate();

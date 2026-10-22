@@ -3,8 +3,10 @@
  *
  * What is stored on the device — this is NOT a history of documents (SPEC §4):
  *  - `draft`    the single document being edited, so it survives closing the app
- *  - `counters` today's sequence per prefix, for EST-/INV- numbering
+ *  - `pending`  hand-typed document numbers not yet reported to the shared counter (offline);
+ *               numbers only, never customer data
  *  - `prefs`    the last deposit percentage used
+ * Document numbers come from the shared counter (src/worker.ts), not from this device.
  *
  * Everything read back is validated with zod; corrupt data is discarded without breaking the app.
  */
@@ -15,7 +17,9 @@ const KEYS = {
   /** Schema version in the key: a new shape gets a new key plus a migration from the old one. */
   draft: 'sosa.draft.v2',
   draftV1: 'sosa.draft.v1',
-  counters: 'sosa.counters.v1',
+  /** Old per-device counter, replaced by the shared one: removed on startup. */
+  legacyCounters: 'sosa.counters.v1',
+  pending: 'sosa.pending.v1',
   prefs: 'sosa.prefs.v1',
 } as const;
 
@@ -60,8 +64,7 @@ export function migrateDraftV1(raw: unknown): unknown {
   };
 }
 
-/** Only the current day is kept: `{ "EST-20261005": 2, "INV-20261005": 1 }`. */
-const countersSchema = z.record(z.string().max(20), z.number().int().nonnegative().max(9999));
+const pendingSchema = z.array(z.string().max(30)).max(50);
 
 const prefsSchema = z.object({ depositPercent: z.string().max(10) });
 export type Prefs = z.infer<typeof prefsSchema>;
@@ -105,6 +108,7 @@ function remove(key: string): void {
 }
 
 export function loadDraft(): Draft | null {
+  remove(KEYS.legacyCounters);
   const current = read(KEYS.draft, draftSchema);
   if (current) return current;
   const old = read(KEYS.draftV1, z.unknown());
@@ -125,15 +129,14 @@ export function clearDraft(): void {
   remove(KEYS.draftV1);
 }
 
-/** Returns the next sequence for `key` (e.g. "EST-20261005") and records it. */
-export function nextSequence(key: string): number {
-  const counters = read(KEYS.counters, countersSchema) ?? {};
-  const next = (counters[key] ?? 0) + 1;
-  const day = key.slice(-8);
-  // Drop other days so the record stays tiny.
-  const kept = Object.fromEntries(Object.entries(counters).filter(([k]) => k.endsWith(day)));
-  write(KEYS.counters, { ...kept, [key]: next });
-  return next;
+/** Hand-typed numbers waiting for a connection to reach /api/registrar. */
+export function loadPending(): string[] {
+  return read(KEYS.pending, pendingSchema) ?? [];
+}
+
+export function savePending(numbers: string[]): void {
+  if (numbers.length === 0) remove(KEYS.pending);
+  else write(KEYS.pending, [...new Set(numbers)].slice(-50));
 }
 
 export function loadPrefs(): Prefs {

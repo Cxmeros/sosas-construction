@@ -77,12 +77,16 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,png,jpg,woff,webmanifest}'],
         maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
         navigateFallback: '/index.html',
+        // The counter API always goes to the network: never cached, never answered with the app.
+        navigateFallbackDenylist: [/^\/api\//],
         cleanupOutdatedCaches: true,
       },
     }),
     productionHeaders(),
   ],
   build: { assetsInlineLimit: 0 },
+  // `pnpm dev` + `npx wrangler dev` (port 8787) in another terminal gives the real counter.
+  server: { proxy: { '/api': 'http://127.0.0.1:8787' } },
   test: {
     include: ['src/**/*.test.{ts,tsx}'],
     environment: 'node',

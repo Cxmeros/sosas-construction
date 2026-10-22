@@ -1,28 +1,33 @@
 import { expect, test } from '@playwright/test';
 import {
   addItem,
+  DAY,
   expectNoErrors,
   fillSample,
   isMobile,
   item,
+  mockCounter,
   pdfText,
   watchConsole,
 } from './helpers';
 
-const today = () => {
-  const d = new Date();
-  return `${String(d.getFullYear())}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
-};
+let apiBodies: string[] = [];
 
 test.beforeEach(async ({ page }) => {
+  apiBodies = await mockCounter(page);
   await page.goto('/');
 });
 
 test('full flow: estimate → PDF → convert to invoice → new document', async ({ page }, info) => {
   const mobile = isMobile(info);
   const errors = watchConsole(page);
-  const number = `EST-${today()}-01`;
-  await expect(page.getByLabel('Número')).toHaveValue(number);
+  // No number until the first preview: the shared counter assigns it then (SPEC §5).
+  const number = `EST-${DAY}-01`;
+  await expect(page.getByLabel('Número')).toHaveValue('');
+  await expect(page.getByLabel('Número')).toHaveAttribute(
+    'placeholder',
+    'Se asigna en la vista previa',
+  );
 
   await fillSample(page, mobile);
   // SPEC §6: total, 30 % deposit (the default) and balance.
@@ -68,11 +73,11 @@ test('full flow: estimate → PDF → convert to invoice → new document', asyn
   // Convert (SPEC §3.9): keeps customer, items and deposit (now "received"); new INV number,
   // invoice terms, estimate reference. "Deshacer" brings the estimate back untouched.
   await page.getByRole('button', { name: 'Convertir en Invoice' }).click();
-  await expect(page.getByRole('status').getByText(`INV-${today()}-01`)).toBeVisible();
+  await expect(page.getByRole('status').getByText(`INV-${DAY}-01`)).toBeVisible();
   await page.getByRole('button', { name: 'Deshacer' }).click();
   await expect(preview.getByText('WORK ESTIMATE')).toBeVisible();
   await page.getByRole('button', { name: 'Convertir en Invoice' }).click();
-  await expect(page.getByRole('status').getByText(`INV-${today()}-02`)).toBeVisible();
+  await expect(page.getByRole('status').getByText(`INV-${DAY}-02`)).toBeVisible();
   await expect(preview.getByText('INVOICE', { exact: true })).toBeVisible();
   await expect(preview.getByText('ESTIMATE REF.')).toBeVisible();
   await expect(preview.getByText(number).first()).toBeVisible();
@@ -82,7 +87,8 @@ test('full flow: estimate → PDF → convert to invoice → new document', asyn
   await expect(page.getByRole('button', { name: 'Convertir en Invoice' })).toHaveCount(0);
   if (mobile) await page.getByRole('button', { name: 'Editar' }).click();
   await expect(page.getByLabel('Nombre')).toHaveValue('Margaret Kelly');
-  await expect(page.getByLabel('Número')).toHaveValue(`INV-${today()}-02`);
+  await expect(page.getByLabel('Número')).toHaveValue(`INV-${DAY}-02`);
+  await expect(page.getByText(`Último: INV-${DAY}-02`)).toBeAttached();
   if (mobile) await page.getByRole('button', { name: 'Vista previa' }).click();
 
   // New document asks first (focus on the safe choice), then clears.
@@ -93,8 +99,11 @@ test('full flow: estimate → PDF → convert to invoice → new document', asyn
   await page.getByRole('button', { name: 'Nuevo documento' }).click();
   await page.getByRole('button', { name: 'Sí, empezar nuevo' }).click();
   await expect(page.getByLabel('Nombre')).toHaveValue('');
-  await expect(page.getByLabel('Número')).toHaveValue(`EST-${today()}-02`);
+  await expect(page.getByLabel('Número')).toHaveValue('');
   await expect(page.getByText('Aún no hay trabajos')).toBeVisible();
+
+  // Only a type or a number ever goes to the server (SPEC §4).
+  for (const body of apiBodies) expect(body).toMatch(/^$|^\{"(tipo|numero)":"[A-Z0-9-]+"\}$/);
 
   await expectNoErrors(errors);
 });
@@ -172,7 +181,7 @@ test('draft survives a reload and can be discarded', async ({ page }, info) => {
 
   await page.reload();
   await expect(page.getByText('Recuperamos tu borrador')).toBeVisible();
-  await expect(page.getByText(/Estimate EST-\d{8}-01 · Margaret Kelly · hoy/)).toBeVisible();
+  await expect(page.getByText(/Estimate sin número · Margaret Kelly · hoy/)).toBeVisible();
   await page.getByRole('button', { name: 'Seguir editando' }).click();
   await expect(page.getByLabel('Nombre')).toHaveValue('Margaret Kelly');
   await expect(item(page, 1, mobile).description).toHaveValue('Install and refinish');
@@ -192,7 +201,7 @@ test('corrupt saved data is ignored', async ({ page }) => {
   });
   await page.reload();
   await expect(page.getByLabel('Nombre')).toHaveValue('');
-  await expect(page.getByLabel('Número')).toHaveValue(/^EST-\d{8}-01$/);
+  await expect(page.getByLabel('Número')).toHaveValue('');
 });
 
 test('share uses the Web Share API with the PDF file', async ({ page }, info) => {
@@ -224,7 +233,7 @@ test('share uses the Web Share API with the PDF file', async ({ page }, info) =>
     .poll(() => page.evaluate(() => (window as unknown as { shared: unknown[] }).shared))
     .toEqual([
       {
-        name: expect.stringMatching(/^EST-\d{8}-01-Kelly\.pdf$/),
+        name: expect.stringMatching(/^EST-\d{6}-01-Kelly\.pdf$/),
         type: 'application/pdf',
       },
     ]);
@@ -249,7 +258,7 @@ test('without file sharing, the panel offers WhatsApp, email and download', asyn
   ).toBeVisible();
   const download = page.waitForEvent('download');
   await dialog.getByRole('button', { name: 'Descargar PDF' }).click();
-  expect((await download).suggestedFilename()).toMatch(/^EST-\d{8}-01-Kelly\.pdf$/);
+  expect((await download).suggestedFilename()).toMatch(/^EST-\d{6}-01-Kelly\.pdf$/);
   await dialog.getByRole('button', { name: 'Cancelar' }).click();
   await expect(dialog).toBeHidden();
 });

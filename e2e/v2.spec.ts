@@ -1,7 +1,15 @@
 import { expect, test, type Page } from '@playwright/test';
-import { expectNoErrors, fillSample, isMobile, pdfText, watchConsole } from './helpers';
+import {
+  expectNoErrors,
+  fillSample,
+  isMobile,
+  mockCounter,
+  pdfText,
+  watchConsole,
+} from './helpers';
 
 test.beforeEach(async ({ page }) => {
+  await mockCounter(page);
   await page.goto('/');
 });
 

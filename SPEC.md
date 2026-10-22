@@ -37,7 +37,8 @@ Quiere llenar campos y obtener un PDF listo para mandar al cliente.
 ## 3. Alcance
 ### MVP
 1. Tipo de documento: Estimate | Invoice.
-2. Número de documento autogenerado y editable; fecha (hoy por defecto). El PDF usa **siempre** la
+2. Número de documento asignado por el contador central al abrir la vista previa (§5), editable;
+   fecha (hoy por defecto, independiente del número). El PDF usa **siempre** la
    fecha del formulario, en formato **MM/DD/YYYY**; el input de la app sigue el formato del teléfono.
 3. Datos del cliente: nombre (requerido), dirección, teléfono, email (opcionales). Teléfono: 10
    dígitos ("Faltan dígitos: usa 10 números."); en la app y el PDF se muestra `(XXX) XXX-XXXX`.
@@ -66,8 +67,8 @@ Quiere llenar campos y obtener un PDF listo para mandar al cliente.
    como wa.me y mailto no adjuntan archivos, primero descarga el PDF y el mensaje dice "adjunta el
    PDF descargado".
 9. **"Convertir en Invoice"** (solo estimates; vista previa y barra de escritorio): copia cliente,
-   descripción, trabajos y anticipo; la etiqueta pasa a "recibido", genera un número INV- nuevo y
-   guarda el EST- como "Estimate ref.". El Work Process no pasa.
+   descripción, trabajos y anticipo; la etiqueta pasa a "recibido", pide un número INV- nuevo al
+   contador (necesita internet) y guarda el EST- como "Estimate ref.". El Work Process no pasa.
 10. **Borrador automático** cada ~2 s con indicador "Guardado"; al abrir con borrador pendiente,
     aviso "Recuperamos tu borrador" con "Seguir editando" / "Descartar" (diálogo propio, no
     `confirm()`). El schema está versionado y tiene migración; si un borrador viejo no se puede
@@ -110,19 +111,37 @@ Quiere llenar campos y obtener un PDF listo para mandar al cliente.
 - Datos de empresa editables desde la app.
 
 ### Fuera de alcance
-Cuentas, base de datos, historial, envío de correo desde servidor, pagos en línea, impuestos.
+Cuentas, base de datos de clientes o documentos, historial, envío de correo desde servidor, pagos en
+línea, impuestos. (Lo único en servidor es el contador de números, §5.)
 
 ## 4. Datos que sí se guardan en el dispositivo
 Esto **no** es historial y debe quedar claro en el código:
 - `draft` — documento en curso (uno solo).
-- `counters` — secuencia diaria para la numeración.
+- `pending` — números escritos a mano sin internet, para avisar al contador cuando vuelva la
+  conexión (solo números).
 - `prefs` — último porcentaje de depósito usado.
 El borrador incluye Work Process y cargos extra aunque estén apagados.
 Todo validado con Zod al leer; si falla, se descarta sin romper la app.
 
 ## 5. Numeración
-Formato: `EST-YYYYMMDD-NN` / `INV-YYYYMMDD-NN` (NN = secuencia del día en ese dispositivo).
-Se basa en fecha para minimizar choques si usa celular y computadora. Siempre editable.
+Formato: `EST-AAMMDD-NN` / `INV-AAMMDD-NN`, ej. `EST-261021-01` (oct 2026: antes YYYYMMDD por
+aparato). NN = secuencia del día por tipo, en un **contador central** compartido por celular y
+computadora: Worker `src/worker.ts` + Durable Object SQLite `Contador` (una instancia,
+`idFromName("sosas")`). Guarda solo tipo, día y último número; nunca datos del cliente. El día se
+cuenta en America/New_York.
+- API (solo `/api/*` llega al Worker, `run_worker_first`):
+  `POST /api/numero {tipo}` siguiente número (queda usado) · `GET /api/ultimos` último de cada tipo ·
+  `POST /api/registrar {numero}` número escrito a mano, solo sube el contador ·
+  `POST /api/fijar {tipo, fecha, ultimo}` ajuste manual (puede bajar) · `POST /api/borrar-todo`.
+- El número se pide al tocar "Vista previa" (o Compartir/Descargar en escritorio) la primera vez y
+  queda en el borrador; mientras tanto el campo dice "Se asigna en la vista previa". Bajo el campo:
+  "Último: INV-261021-03".
+- Cambiar de tipo sin número no gasta nada; con número del contador, pide uno del tipo nuevo en la
+  siguiente vista previa (si ese tipo ya tenía número en este documento, vuelve ese).
+- Número a mano: se registra al generar la vista previa; sin internet queda pendiente y se registra
+  al volver la conexión. Números en otro formato no se registran.
+- Sin internet y sin número: "Sin internet. Conéctate para asignar el número o escríbelo a mano."
+  Nunca se inventa un número. "Nuevo" borra el borrador, incluido el número.
 
 ## 6. Cálculos (src/domain)
 - `lineAmountCents` según §CLAUDE.md principio 3; `lump sum` = monto ingresado.
@@ -175,7 +194,9 @@ Basado en el formato actual de Danilo, con correcciones:
 - El diseño visual final sale del entregable de Claude Design (ver DESIGN_BRIEF.md).
 
 ## 8. Seguridad
-- Superficie de ataque mínima: sitio estático, sin servidor ni datos en la nube.
+- Superficie de ataque mínima: sitio estático más un contador de números (sin datos del cliente).
+- **Pendiente antes de entregar:** `/api/fijar` y `/api/borrar-todo` no tienen protección propia:
+  proteger todo el sitio con Cloudflare Access o quitar esas rutas.
 - Acceso restringido con **Cloudflare Access** (OTP por email, solo los correos de Danilo):
   evita que extraños generen documentos con su logo y datos.
 - CSP estricta y headers en `public/_headers` (ver CLAUDE.md).

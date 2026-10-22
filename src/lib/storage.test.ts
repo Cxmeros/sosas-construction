@@ -1,6 +1,14 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { emptyForm } from '../domain/form';
-import { clearDraft, loadDraft, loadPrefs, nextSequence, saveDraft, savePrefs } from './storage';
+import {
+  clearDraft,
+  loadDraft,
+  loadPending,
+  loadPrefs,
+  saveDraft,
+  savePending,
+  savePrefs,
+} from './storage';
 
 class MemoryStorage {
   data = new Map<string, string>();
@@ -57,21 +65,21 @@ describe('draft', () => {
   });
 });
 
-describe('counters', () => {
-  it('counts per prefix and day, dropping old days', () => {
-    expect(nextSequence('EST-20261004')).toBe(1);
-    expect(nextSequence('EST-20261005')).toBe(1);
-    expect(nextSequence('EST-20261005')).toBe(2);
-    expect(nextSequence('INV-20261005')).toBe(1);
-    expect(JSON.parse(memory.getItem('sosa.counters.v1') ?? '')).toEqual({
-      'EST-20261005': 2,
-      'INV-20261005': 1,
-    });
+describe('pending numbers', () => {
+  it('keeps unique numbers and clears when empty', () => {
+    expect(loadPending()).toEqual([]);
+    savePending(['EST-261021-04', 'EST-261021-04', 'INV-261021-01']);
+    expect(loadPending()).toEqual(['EST-261021-04', 'INV-261021-01']);
+    savePending([]);
+    expect(memory.getItem('sosa.pending.v1')).toBeNull();
   });
 
-  it('restarts from corrupt data', () => {
-    memory.setItem('sosa.counters.v1', JSON.stringify({ 'EST-20261005': -4 }));
-    expect(nextSequence('EST-20261005')).toBe(1);
+  it('drops corrupt data, and the old per-device counter on startup', () => {
+    memory.setItem('sosa.pending.v1', JSON.stringify([42]));
+    expect(loadPending()).toEqual([]);
+    memory.setItem('sosa.counters.v1', JSON.stringify({ 'EST-20261005': 2 }));
+    loadDraft();
+    expect(memory.getItem('sosa.counters.v1')).toBeNull();
   });
 });
 

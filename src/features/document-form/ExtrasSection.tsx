@@ -102,7 +102,7 @@ export function ExtrasSection({ form, desktop, n }: { form: Form; desktop: boole
                   inputMode="decimal"
                   autoComplete="off"
                   maxLength={LIMITS.numericInput}
-                  placeholder="ej. 240.00"
+                  placeholder="ej. 150.00"
                   className="field num"
                   {...invalidProps(`extras.${String(i)}.amount`, err(i, 'amount'))}
                   {...register(`extras.${i}.amount`)}

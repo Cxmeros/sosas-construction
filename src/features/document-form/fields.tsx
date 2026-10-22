@@ -90,7 +90,7 @@ export function Section({ desktop, children }: { desktop: boolean; children: Rea
 
 /**
  * Mobile card that folds to a one-line summary once filled, so the work items come sooner.
- * `forceOpen` (empty or with errors) keeps it open; inputs stay mounted while folded.
+ * `forceOpen` (empty or with errors) opens it; inputs stay mounted while folded.
  */
 export function FoldSection({
   n,
@@ -109,8 +109,12 @@ export function FoldSection({
 }) {
   const [open, setOpen] = useState(defaultOpen);
   const id = useId();
-  // Once forced open it stays open, so it doesn't fold mid-typing when the name gets its first letter.
-  if (forceOpen && !open) setOpen(true);
+  // Opens when forceOpen turns on (an error, a new blank document) but can always be closed.
+  const [wasForced, setWasForced] = useState(forceOpen);
+  if (forceOpen !== wasForced) {
+    setWasForced(forceOpen);
+    if (forceOpen) setOpen(true);
+  }
 
   return (
     <section className="flex flex-col border border-line bg-surface">
@@ -120,7 +124,7 @@ export function FoldSection({
           aria-expanded={open}
           aria-controls={id}
           onClick={() => {
-            setOpen(!open || forceOpen);
+            setOpen(!open);
           }}
           className="flex min-h-12 w-full items-center gap-2 p-4 text-left"
         >

@@ -240,8 +240,8 @@ export function validateForm(values: FormValues): Issue[] {
   const issues: Issue[] = [];
   const add = (path: Issue['path'], message: string) => issues.push({ path, message });
 
-  if (!values.number.trim()) add(['number'], 'Escribe el número del documento.');
-  else if (!/^[A-Za-z0-9-]+$/.test(values.number.trim()))
+  // Empty is fine: the shared counter assigns it when the preview opens (SPEC §5).
+  if (values.number.trim() && !/^[A-Za-z0-9-]+$/.test(values.number.trim()))
     add(['number'], 'Usa solo letras, números y guiones.');
 
   if (!isRealDate(values.date)) add(['date'], 'Elige una fecha.');
@@ -348,6 +348,18 @@ export function toInvoiceValues(est: FormValues, number: string, today: string):
     processNote: '',
     steps: [],
   };
+}
+
+/**
+ * Formats while typing: "(610", "(610) 555", "(610) 555-0142". A leading 1 (country code) is
+ * dropped and extra digits are cut, so the field never holds more than 10 digits.
+ */
+export function formatPhoneAsTyped(raw: string): string {
+  const d = raw.replace(/\D/g, '').replace(/^1/, '').slice(0, 10);
+  if (d.length === 0) return '';
+  if (d.length <= 3) return `(${d}`;
+  if (d.length <= 6) return `(${d.slice(0, 3)}) ${d.slice(3)}`;
+  return `(${d.slice(0, 3)}) ${d.slice(3, 6)}-${d.slice(6)}`;
 }
 
 /** "6105550142" / "1 610 555 0142" → "(610) 555-0142"; anything else is left as typed. */

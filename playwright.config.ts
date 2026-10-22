@@ -14,6 +14,9 @@ export default defineConfig({
   use: {
     baseURL: externalBaseURL ?? 'http://localhost:4173',
     trace: 'retain-on-failure',
+    // page.route (the fake /api counter) can't see requests that go through a service worker;
+    // pwa.spec.ts turns it back on to test offline use.
+    serviceWorkers: 'block',
     launchOptions: executablePath ? { executablePath } : {},
   },
   projects: [

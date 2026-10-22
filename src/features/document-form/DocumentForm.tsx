@@ -1,8 +1,8 @@
 import type { FieldErrors } from 'react-hook-form';
-import { formatPhone, type FormValues } from '../../domain/form';
+import { formatPhoneAsTyped, type FormValues } from '../../domain/form';
 import { LIMITS } from '../../domain/limits';
 import { formatCents } from '../../domain/money';
-import { formatDateUS } from '../../domain/numbering';
+import { formatDateUS, PREFIX } from '../../domain/numbering';
 import type { DocType, Totals } from '../../domain/types';
 import { AlertIcon } from '../../ui/Icons';
 import type { DocumentState } from './useDocument';
@@ -73,6 +73,7 @@ export function DocumentForm({
   const err = (path: string) => errorAt(errors, path);
   const errorCount = formState.isSubmitted ? countErrors(errors) : 0;
   const isBlank = !values.customer.name.trim() && values.items.length === 0;
+  const lastNumber = state.latest?.[PREFIX[values.type]];
 
   const typeSwitch = (
     <Segmented
@@ -91,11 +92,14 @@ export function DocumentForm({
         autoComplete="off"
         autoCapitalize="characters"
         maxLength={LIMITS.number}
+        placeholder="Se asigna en la vista previa"
         className="field tabular-nums"
         {...invalidProps('number', err('number'))}
         {...register('number')}
       />
-      <span className="text-sm font-normal text-ink-muted">Se llena solo; puedes cambiarlo.</span>
+      {lastNumber && (
+        <span className="text-sm font-normal text-ink-muted">Último: {lastNumber}</span>
+      )}
     </Field>
   );
   const dateField = (
@@ -130,7 +134,7 @@ export function DocumentForm({
         <input
           autoComplete="street-address"
           maxLength={LIMITS.address}
-          placeholder="ej. 29 E Providence Rd, Lansdowne, PA 19050"
+          placeholder="ej. 142 Maple Ave, West Chester, PA"
           className="field"
           {...register('customer.address')}
         />
@@ -145,9 +149,11 @@ export function DocumentForm({
           className="field"
           {...invalidProps('customer.phone', err('customer.phone'))}
           {...register('customer.phone', {
-            // Shown as (XXX) XXX-XXXX once typed (SPEC §3.3).
-            onBlur: (e: { target: HTMLInputElement }) => {
-              form.setValue('customer.phone', formatPhone(e.target.value));
+            // (XXX) XXX-XXXX as it's typed, 10 digits max (SPEC §3.3).
+            onChange: (e: { target: HTMLInputElement }) => {
+              form.setValue('customer.phone', formatPhoneAsTyped(e.target.value), {
+                shouldValidate: form.formState.isSubmitted,
+              });
             },
           })}
         />
@@ -158,7 +164,7 @@ export function DocumentForm({
           inputMode="email"
           autoComplete="email"
           maxLength={LIMITS.email}
-          placeholder="ej. email@gmail.com"
+          placeholder="ej. margaret@email.com"
           className="field"
           {...invalidProps('customer.email', err('customer.email'))}
           {...register('customer.email')}

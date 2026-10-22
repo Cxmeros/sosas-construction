@@ -8,9 +8,10 @@ PWA (web instalable) para que un contratista llene un formulario desde el celula
 computadora y obtenga un PDF de Work Estimate o Invoice listo para enviar.
 
 ## Principios no negociables
-1. **100 % client-side.** Sin backend, sin base de datos, sin cuentas, sin APIs propias.
-   Los datos del cliente final nunca salen del dispositivo salvo dentro del PDF que el
-   usuario decide compartir.
+1. **Client-side salvo el contador de números.** El único código de servidor es
+   `src/worker.ts` (Durable Object `Contador`, SPEC §5), que recibe solo tipo y número. Sin base
+   de datos de clientes ni documentos, sin cuentas. Los datos del cliente final nunca salen del
+   dispositivo salvo dentro del PDF que el usuario decide compartir.
 2. **Cero código de terceros en runtime.** Sin analytics, sin CDNs, sin Google Fonts
    remotas. Fuentes y logo van empaquetados en el build.
 3. **Dinero en centavos enteros.** Nunca floats para montos. Formatear solo al mostrar con
@@ -31,7 +32,9 @@ computadora y obtenga un PDF de Work Estimate o Invoice listo para enviar.
 - vite-plugin-pwa (instalable, funciona offline)
 - Vitest (unit) + Playwright (e2e, viewports 375px y 1280px)
 - ESLint + Prettier
-- Deploy: Cloudflare Workers (solo archivos estáticos, `wrangler.jsonc`) detrás de Cloudflare Access
+- Deploy: Cloudflare Workers (archivos estáticos + Worker solo en `/api/*`, Durable Object SQLite,
+  `wrangler.jsonc`) detrás de Cloudflare Access. Wrangler se usa con `npx wrangler@4.151.3` (no es
+  dependencia); `npx wrangler types` regenera `worker-configuration.d.ts` tras cambiar la config.
 
 No agregues dependencias fuera de esta lista sin explicar por qué y pedir confirmación.
 
@@ -43,13 +46,17 @@ src/
   pdf/                     DocumentPdf.tsx, estilos, registro de fuentes
   features/document-form/  formulario, partidas, depósito, términos
   features/preview/        vista previa + compartir/descargar
-  lib/storage.ts           borrador, contador, preferencias
+  lib/storage.ts           borrador, números pendientes, preferencias
+  lib/api.ts               llamadas al contador (/api/*)
+  worker.ts                contador central de números (Worker + Durable Object)
   assets/                  logo (PNG alta resolución o SVG), fuentes .ttf
 public/_headers            headers de seguridad (Cloudflare los aplica a dist/)
 ```
 
 ## Comandos
 `pnpm dev` · `pnpm build` · `pnpm test` · `pnpm test:e2e` · `pnpm lint` · `pnpm typecheck`
+Con el contador real: `pnpm build && npx wrangler@4.151.3 dev` (app + /api en :8787). Con
+`pnpm dev`, Vite reenvía `/api` a :8787. Los e2e usan un contador falso (`mockCounter`).
 
 ## Headers de seguridad (`public/_headers`)
 ```

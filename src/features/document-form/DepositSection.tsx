@@ -91,7 +91,7 @@ export function DepositSection({
             inputMode="decimal"
             autoComplete="off"
             maxLength={20}
-            placeholder="ej. 1,500.00"
+            placeholder="ej. 1500.00"
             className="field num"
             {...invalidProps('depositFixed', fixedError)}
             {...register('depositFixed')}
