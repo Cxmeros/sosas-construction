@@ -88,6 +88,9 @@ export default defineConfig({
   build: { assetsInlineLimit: 0 },
   // `pnpm dev` + `npx wrangler dev` (port 8787) in another terminal gives the real counter.
   server: { proxy: { '/api': 'http://127.0.0.1:8787' } },
+  // Preview would inherit that proxy; without the Worker every /api call becomes a 502 (CI e2e).
+  // There, /api gets the SPA page and the app treats the counter as unavailable.
+  preview: { proxy: {} },
   test: {
     include: ['src/**/*.test.{ts,tsx}'],
     environment: 'node',
