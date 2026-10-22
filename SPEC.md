@@ -37,7 +37,8 @@ Quiere llenar campos y obtener un PDF listo para mandar al cliente.
 ## 3. Alcance
 ### MVP
 1. Tipo de documento: Estimate | Invoice.
-2. Número de documento asignado por el contador central al abrir la vista previa (§5), editable;
+2. Número de documento asignado por el contador central al compartir o descargar (§5); **no hay
+   campo para editarlo** (oct 2026: así no hay números repetidos entre aparatos);
    fecha (hoy por defecto, independiente del número). El PDF usa **siempre** la
    fecha del formulario, en formato **MM/DD/YYYY**; el input de la app sigue el formato del teléfono.
 3. Datos del cliente: nombre (requerido), dirección, teléfono, email (opcionales). Teléfono: 10
@@ -67,8 +68,8 @@ Quiere llenar campos y obtener un PDF listo para mandar al cliente.
    como wa.me y mailto no adjuntan archivos, primero descarga el PDF y el mensaje dice "adjunta el
    PDF descargado".
 9. **"Convertir en Invoice"** (solo estimates; vista previa y barra de escritorio): copia cliente,
-   descripción, trabajos y anticipo; la etiqueta pasa a "recibido", pide un número INV- nuevo al
-   contador (necesita internet) y guarda el EST- como "Estimate ref.". El Work Process no pasa.
+   descripción, trabajos y anticipo; la etiqueta pasa a "recibido", queda sin número
+   (el INV- se asigna al compartir) y guarda el EST- como "Estimate ref.". El Work Process no pasa.
 10. **Borrador automático** cada ~2 s con indicador "Guardado"; al abrir con borrador pendiente,
     aviso "Recuperamos tu borrador" con "Seguir editando" / "Descartar" (diálogo propio, no
     `confirm()`). El schema está versionado en la clave; un borrador que no encaja se descarta sin
@@ -117,8 +118,6 @@ línea, impuestos. (Lo único en servidor es el contador de números, §5.)
 ## 4. Datos que sí se guardan en el dispositivo
 Esto **no** es historial y debe quedar claro en el código:
 - `draft` — documento en curso (uno solo).
-- `pending` — números escritos a mano sin internet, para avisar al contador cuando vuelva la
-  conexión (solo números).
 - `prefs` — último porcentaje de depósito usado.
 El borrador incluye Work Process y cargos extra aunque estén apagados.
 Todo validado con Zod al leer; si falla, se descarta sin romper la app.
@@ -131,17 +130,18 @@ computadora: Worker `src/worker.ts` + Durable Object SQLite `Contador` (una inst
 cuenta en America/New_York.
 - API (solo `/api/*` llega al Worker, `run_worker_first`):
   `POST /api/numero {tipo}` siguiente número (queda usado) · `GET /api/ultimos` último de cada tipo ·
-  `POST /api/registrar {numero}` número escrito a mano, solo sube el contador ·
   `POST /api/fijar {tipo, fecha, ultimo}` ajuste manual (puede bajar) · `POST /api/borrar-todo`.
-- El número se pide al tocar "Vista previa" (o Compartir/Descargar en escritorio) la primera vez y
-  queda en el borrador; mientras tanto el campo dice "Se asigna en la vista previa". Bajo el campo:
-  "Último: INV-261021-03".
-- Cambiar de tipo sin número no gasta nada; con número del contador, pide uno del tipo nuevo en la
-  siguiente vista previa (si ese tipo ya tenía número en este documento, vuelve ese).
-- Número a mano: se registra al generar la vista previa; sin internet queda pendiente y se registra
-  al volver la conexión. Números en otro formato no se registran.
-- Sin internet y sin número: "Sin internet. Conéctate para asignar el número o escríbelo a mano."
-  Nunca se inventa un número. "Nuevo" borra el borrador, incluido el número.
+- El número se pide la primera vez que se toca **Compartir** o **Descargar** y queda en el
+  borrador. La vista previa no gasta número (muestra "—"). En "Documento" no hay campo: se lee
+  "Se asigna al compartir" o el número, y debajo "Último: INV-261021-03".
+- Editar el documento no cambia el número; solo **Nuevo** lo borra (junto con el borrador).
+- Cambiar de tipo sin número no gasta nada; con número, el tipo nuevo pide el suyo al compartir (si
+  ese tipo ya tenía número en este documento, vuelve ese). Igual "Convertir en Invoice".
+- Un borrador con un número que no es del contador (el viejo `EST-YYYYMMDD-NN` por aparato) lo
+  pierde al abrir y pide uno nuevo al compartir.
+- Sin internet y sin número: "Sin internet. Conéctate para asignar el número." Nunca se inventa un
+  número: la vista previa funciona sin internet, pero un documento nuevo necesita conexión una vez
+  para compartir o descargar; uno que ya tiene número genera su PDF sin internet.
 - Sesión de Access vencida (redirect/401 en `/api`): "Tu sesión venció…" con botón **Entrar**
   (guarda el borrador y abre `/entrar`, que el service worker no sirve de caché).
 

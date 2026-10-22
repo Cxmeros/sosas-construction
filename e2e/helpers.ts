@@ -23,16 +23,17 @@ export const DAY = '261021';
 
 /**
  * Stand-in for the Worker's /api (e2e runs on `pnpm preview`): same routes, in memory, per page.
- * Returns every request body, to check no customer data ever leaves the device.
+ * Returns every request body, to check no customer data ever leaves the device. Pass the
+ * context (not the page) when a service worker is on: only context routes see its requests.
  */
-export async function mockCounter(page: Page): Promise<string[]> {
+export async function mockCounter(target: Pick<Page, 'route'>): Promise<string[]> {
   const bodies: string[] = [];
   const last: Record<string, number> = {};
   const format = (t: string) => `${t}-${DAY}-${String(last[t]).padStart(2, '0')}`;
-  await page.route('**/api/**', async (route) => {
+  await target.route('**/api/**', async (route) => {
     const req = route.request();
     const path = new URL(req.url()).pathname;
-    const body = (req.postDataJSON() ?? {}) as { tipo?: string; numero?: string };
+    const body = (req.postDataJSON() ?? {}) as { tipo?: string };
     bodies.push(req.postData() ?? '');
     if (path === '/api/numero' && body.tipo) {
       last[body.tipo] = (last[body.tipo] ?? 0) + 1;
@@ -45,12 +46,6 @@ export async function mockCounter(page: Page): Promise<string[]> {
           INV: last.INV ? format('INV') : null,
         },
       });
-    if (path === '/api/registrar') {
-      const m = /^(EST|INV)-\d{6}-(\d+)$/.exec(body.numero ?? '');
-      if (!m?.[1] || !m[2]) return route.fulfill({ status: 400, json: { error: 'formato' } });
-      last[m[1]] = Math.max(last[m[1]] ?? 0, Number(m[2]));
-      return route.fulfill({ json: { ok: true } });
-    }
     return route.fulfill({ status: 404, json: { error: 'No existe' } });
   });
   return bodies;

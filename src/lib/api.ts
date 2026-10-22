@@ -15,7 +15,6 @@ export type ApiResult<T> = { ok: true; value: T } | { ok: false; reason: ApiProb
 const numberText = z.string().max(30);
 const numeroResponse = z.object({ numero: numberText });
 const latestResponse = z.object({ EST: numberText.nullable(), INV: numberText.nullable() });
-const okResponse = z.object({ ok: z.literal(true) });
 export type Latest = z.infer<typeof latestResponse>;
 
 async function call<T>(path: string, schema: z.ZodType<T>, body?: unknown): Promise<ApiResult<T>> {
@@ -60,6 +59,3 @@ export async function requestNumber(tipo: Prefix): Promise<ApiResult<string>> {
 }
 
 export const fetchLatest = () => call('/api/ultimos', latestResponse);
-
-/** A hand-typed number: the counter only moves up to it. */
-export const registerNumber = (numero: string) => call('/api/registrar', okResponse, { numero });

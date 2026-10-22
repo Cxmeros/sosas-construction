@@ -9,7 +9,7 @@ computadora y obtenga un PDF de Work Estimate o Invoice listo para enviar.
 
 ## Principios no negociables
 1. **Client-side salvo el contador de números.** El único código de servidor es
-   `src/worker.ts` (Durable Object `Contador`, SPEC §5), que recibe solo tipo y número. Sin base
+   `src/worker.ts` (Durable Object `Contador`, SPEC §5), que recibe solo el tipo (EST/INV). Sin base
    de datos de clientes ni documentos, sin cuentas. Los datos del cliente final nunca salen del
    dispositivo salvo dentro del PDF que el usuario decide compartir.
 2. **Cero código de terceros en runtime.** Sin analytics, sin CDNs, sin Google Fonts

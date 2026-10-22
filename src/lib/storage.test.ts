@@ -1,14 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { emptyForm } from '../domain/form';
-import {
-  clearDraft,
-  loadDraft,
-  loadPending,
-  loadPrefs,
-  saveDraft,
-  savePending,
-  savePrefs,
-} from './storage';
+import { clearDraft, loadDraft, loadPrefs, saveDraft, savePrefs } from './storage';
 
 class MemoryStorage {
   data = new Map<string, string>();
@@ -65,21 +57,13 @@ describe('draft', () => {
   });
 });
 
-describe('pending numbers', () => {
-  it('keeps unique numbers and clears when empty', () => {
-    expect(loadPending()).toEqual([]);
-    savePending(['EST-261021-04', 'EST-261021-04', 'INV-261021-01']);
-    expect(loadPending()).toEqual(['EST-261021-04', 'INV-261021-01']);
-    savePending([]);
-    expect(memory.getItem('sosa.pending.v1')).toBeNull();
-  });
-
-  it('drops corrupt data, and the old per-device counter on startup', () => {
-    memory.setItem('sosa.pending.v1', JSON.stringify([42]));
-    expect(loadPending()).toEqual([]);
+describe('old keys', () => {
+  it('drops the per-device counter and the hand-typed numbers queue on startup', () => {
     memory.setItem('sosa.counters.v1', JSON.stringify({ 'EST-20261005': 2 }));
+    memory.setItem('sosa.pending.v1', JSON.stringify(['EST-261021-04']));
     loadDraft();
     expect(memory.getItem('sosa.counters.v1')).toBeNull();
+    expect(memory.getItem('sosa.pending.v1')).toBeNull();
   });
 });
 

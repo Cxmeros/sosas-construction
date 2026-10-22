@@ -3,8 +3,6 @@
  *
  * What is stored on the device — this is NOT a history of documents (SPEC §4):
  *  - `draft`    the single document being edited, so it survives closing the app
- *  - `pending`  hand-typed document numbers not yet reported to the shared counter (offline);
- *               numbers only, never customer data
  *  - `prefs`    the last deposit percentage used
  * Document numbers come from the shared counter (src/worker.ts), not from this device.
  *
@@ -16,16 +14,14 @@ import { formValuesSchema, type FormValues } from '../domain/form';
 const KEYS = {
   /** Schema version in the key: a new shape gets a new key; a draft that doesn't fit is dropped. */
   draft: 'sosa.draft.v2',
-  /** Old per-device counter, replaced by the shared one: removed on startup. */
+  /** Left by earlier versions (per-device counter, hand-typed numbers queue): removed on startup. */
   legacyCounters: 'sosa.counters.v1',
-  pending: 'sosa.pending.v1',
+  legacyPending: 'sosa.pending.v1',
   prefs: 'sosa.prefs.v1',
 } as const;
 
 const draftSchema = z.object({ savedAt: z.number().int().nonnegative(), values: formValuesSchema });
 export type Draft = z.infer<typeof draftSchema>;
-
-const pendingSchema = z.array(z.string().max(30)).max(50);
 
 const prefsSchema = z.object({ depositPercent: z.string().max(10) });
 type Prefs = z.infer<typeof prefsSchema>;
@@ -70,6 +66,7 @@ function remove(key: string): void {
 
 export function loadDraft(): Draft | null {
   remove(KEYS.legacyCounters);
+  remove(KEYS.legacyPending);
   return read(KEYS.draft, draftSchema);
 }
 
@@ -79,16 +76,6 @@ export function saveDraft(values: FormValues, now = Date.now()): void {
 
 export function clearDraft(): void {
   remove(KEYS.draft);
-}
-
-/** Hand-typed numbers waiting for a connection to reach /api/registrar. */
-export function loadPending(): string[] {
-  return read(KEYS.pending, pendingSchema) ?? [];
-}
-
-export function savePending(numbers: string[]): void {
-  if (numbers.length === 0) remove(KEYS.pending);
-  else write(KEYS.pending, [...new Set(numbers)].slice(-50));
 }
 
 export function loadPrefs(): Prefs {

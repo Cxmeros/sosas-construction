@@ -75,7 +75,8 @@ export function buildPdfModel(doc: DocumentData): PdfModel {
 
   return {
     title: invoice ? 'INVOICE' : 'WORK ESTIMATE',
-    number: doc.number,
+    // Only the preview lacks it: sharing or downloading asks the counter first (SPEC §5).
+    number: doc.number || '—',
     date: formatDateUS(doc.date),
     estimateRef: invoice ? doc.estimateRef : '',
     customer: {

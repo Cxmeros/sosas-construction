@@ -13,22 +13,8 @@ import {
 import { parseDocNumber, PREFIX, toIsoDate } from '../../domain/numbering';
 import { DEFAULT_TERMS } from '../../domain/terms';
 import type { DocType, DocumentData } from '../../domain/types';
-import {
-  fetchLatest,
-  registerNumber,
-  requestNumber,
-  type ApiResult,
-  type Latest,
-} from '../../lib/api';
-import {
-  clearDraft,
-  loadDraft,
-  loadPending,
-  loadPrefs,
-  savePending,
-  saveDraft,
-  type Draft,
-} from '../../lib/storage';
+import { fetchLatest, requestNumber, type ApiResult, type Latest } from '../../lib/api';
+import { clearDraft, loadDraft, loadPrefs, saveDraft, type Draft } from '../../lib/storage';
 
 /** No number yet: the shared counter assigns it on the first preview (SPEC §5). */
 function freshForm(): FormValues {
@@ -38,22 +24,6 @@ function freshForm(): FormValues {
 /** A number the counter handed out for `type` (so switching type must not keep it). */
 const isCounterNumber = (number: string, type: DocType) =>
   parseDocNumber(number)?.prefix === PREFIX[type];
-
-/**
- * Reports hand-typed numbers so the counter never hands them out again. Offline ones wait in
- * storage until the connection is back. Numbers in another format are not the counter's business.
- */
-async function flushPending(extra?: string): Promise<boolean> {
-  const queue = [...loadPending(), ...(extra && parseDocNumber(extra) ? [extra] : [])];
-  if (queue.length === 0) return false;
-  const left: string[] = [];
-  for (const number of new Set(queue)) {
-    const res = await registerNumber(number);
-    if (!res.ok && res.reason !== 'rejected') left.push(number);
-  }
-  savePending(left);
-  return left.length < queue.length;
-}
 
 /** Something the user actually typed; a blank item row alone doesn't count. */
 function hasContent(values: FormValues): boolean {
@@ -74,11 +44,19 @@ interface Initial {
 
 function initialState(): Initial {
   const loaded = loadDraft();
-  // Invoice drafts from before amount-only items get their items collapsed too.
-  const draft =
-    loaded?.values.type === 'invoice'
-      ? { ...loaded, values: { ...loaded.values, items: loaded.values.items.map(toAmountOnly) } }
-      : loaded;
+  // Invoice drafts from before amount-only items get their items collapsed too. A number that
+  // isn't the counter's (old per-device EST-YYYYMMDD-NN) is dropped: the next preview asks for one.
+  const draft = loaded && {
+    ...loaded,
+    values: {
+      ...loaded.values,
+      number: parseDocNumber(loaded.values.number) ? loaded.values.number : '',
+      items:
+        loaded.values.type === 'invoice'
+          ? loaded.values.items.map(toAmountOnly)
+          : loaded.values.items,
+    },
+  };
   if (draft) return { values: draft.values, recovered: hasContent(draft.values) ? draft : null };
   return { values: freshForm(), recovered: null };
 }
@@ -113,13 +91,10 @@ export function useDocument() {
   }, []);
 
   useEffect(() => {
-    const sync = () => {
-      void flushPending().then(refreshLatest);
-    };
-    sync();
-    window.addEventListener('online', sync);
+    refreshLatest();
+    window.addEventListener('online', refreshLatest);
     return () => {
-      window.removeEventListener('online', sync);
+      window.removeEventListener('online', refreshLatest);
     };
   }, [refreshLatest]);
 
@@ -175,35 +150,23 @@ export function useDocument() {
     null,
   );
 
-  /** SPEC §3.9 (rules in `toInvoiceValues`): needs a new INV- number, so it needs the network. */
-  const convertToInvoice = useCallback(async (): Promise<ApiResult<string>> => {
-    const res = await requestNumber('INV');
-    if (!res.ok) return res;
+  /** SPEC §3.9 (rules in `toInvoiceValues`). The INV- number comes on the first share. */
+  const convertToInvoice = useCallback(() => {
     const current = getValues();
     beforeConvert.current = { values: current, numbers: { ...numbers.current } };
-    numbers.current = { invoice: res.value };
-    const values = toInvoiceValues(current, res.value, toIsoDate(new Date()));
+    numbers.current = {};
+    const values = toInvoiceValues(current, '', toIsoDate(new Date()));
     reset(values);
     persist(values);
-    refreshLatest();
-    return res;
-  }, [getValues, reset, persist, refreshLatest]);
+  }, [getValues, reset, persist]);
 
-  /** One request at a time: a double tap on "Vista previa" must not take two numbers. */
+  /** One request at a time: a double tap on "Compartir" must not take two numbers. */
   const inFlight = useRef<Promise<ApiResult<string>> | null>(null);
 
-  /**
-   * The document's number, asking the shared counter the first time. A number already in the
-   * field (assigned before or typed by hand) is reused and reported to the counter.
-   */
+  /** The document's number: the one it has, or the next from the shared counter (SPEC §5). */
   const ensureNumber = useCallback((): Promise<ApiResult<string>> => {
-    const typed = getValues('number').trim();
-    if (typed) {
-      void flushPending(typed).then((changed) => {
-        if (changed) refreshLatest();
-      });
-      return Promise.resolve({ ok: true, value: typed });
-    }
+    const assigned = getValues('number').trim();
+    if (assigned) return Promise.resolve({ ok: true, value: assigned });
     inFlight.current ??= (async () => {
       const type = getValues('type');
       const res = await requestNumber(PREFIX[type]);

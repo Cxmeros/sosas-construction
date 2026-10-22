@@ -21,13 +21,11 @@ test.beforeEach(async ({ page }) => {
 test('full flow: estimate → PDF → convert to invoice → new document', async ({ page }, info) => {
   const mobile = isMobile(info);
   const errors = watchConsole(page);
-  // No number until the first preview: the shared counter assigns it then (SPEC §5).
+  // No number field: the shared counter assigns it on the first share or download (SPEC §5).
   const number = `EST-${DAY}-01`;
-  await expect(page.getByLabel('Número')).toHaveValue('');
-  await expect(page.getByLabel('Número')).toHaveAttribute(
-    'placeholder',
-    'Se asigna en la vista previa',
-  );
+  await expect(page.getByLabel('Número')).toHaveText('Se asigna al compartir');
+  await expect(page.getByRole('textbox', { name: 'Número' })).toHaveCount(0);
+  const numberRequests = () => apiBodies.filter((b) => b.includes('tipo')).length;
 
   await fillSample(page, mobile);
   // SPEC §6: total, 30 % deposit (the default) and balance.
@@ -48,12 +46,16 @@ test('full flow: estimate → PDF → convert to invoice → new document', asyn
   await expect(preview.getByText('WORK ESTIMATE')).toBeVisible();
   await expect(preview.getByText('CUSTOMER INFORMATION')).toBeVisible();
   await expect(preview.getByText('Page 1 of 1')).toBeVisible();
+  // Previewing spends no number.
+  expect(numberRequests()).toBe(0);
 
   // Download the real PDF and check its text.
+  const downloadButton = page.getByRole('button', { name: mobile ? 'Descargar' : 'Descargar PDF' });
   const download = page.waitForEvent('download');
-  await page.getByRole('button', { name: mobile ? 'Descargar' : 'Descargar PDF' }).click();
+  await downloadButton.click();
   const file = await download;
   expect(file.suggestedFilename()).toBe(`${number}-Kelly.pdf`);
+  expect(numberRequests()).toBe(1);
   const path = info.outputPath('estimate.pdf');
   await file.saveAs(path);
   const text = pdfText(path);
@@ -70,15 +72,27 @@ test('full flow: estimate → PDF → convert to invoice → new document', asyn
     expect(text).toContain(s);
   }
 
-  // Convert (SPEC §3.9): keeps customer, items and deposit (now "received"); new INV number,
-  // invoice terms, estimate reference. "Deshacer" brings the estimate back untouched.
+  // An edit keeps the number: the same document downloads again as EST-…-01.
+  if (mobile) await page.getByRole('button', { name: 'Editar' }).click();
+  await page.getByLabel('Descripción del trabajo').fill('Refinish, second visit');
+  if (mobile) await page.getByRole('button', { name: 'Vista previa' }).click();
+  const again = page.waitForEvent('download');
+  await downloadButton.click();
+  expect((await again).suggestedFilename()).toBe(`${number}-Kelly.pdf`);
+  expect(numberRequests()).toBe(1);
+
+  // Convert (SPEC §3.9): keeps customer, items and deposit (now "received"); invoice terms,
+  // estimate reference; its INV number comes on the first share. "Deshacer" undoes it.
   await page.getByRole('button', { name: 'Convertir en Invoice' }).click();
-  await expect(page.getByRole('status').getByText(`INV-${DAY}-01`)).toBeVisible();
+  await expect(page.getByRole('status').getByText('Ahora es un Invoice.')).toBeVisible();
   await page.getByRole('button', { name: 'Deshacer' }).click();
   await expect(preview.getByText('WORK ESTIMATE')).toBeVisible();
   await page.getByRole('button', { name: 'Convertir en Invoice' }).click();
-  await expect(page.getByRole('status').getByText(`INV-${DAY}-02`)).toBeVisible();
   await expect(preview.getByText('INVOICE', { exact: true })).toBeVisible();
+  expect(numberRequests()).toBe(1);
+  const invoiceDownload = page.waitForEvent('download');
+  await downloadButton.click();
+  expect((await invoiceDownload).suggestedFilename()).toBe(`INV-${DAY}-01-Kelly.pdf`);
   await expect(preview.getByText('ESTIMATE REF.')).toBeVisible();
   await expect(preview.getByText(number).first()).toBeVisible();
   await expect(preview.getByText(/Please reference the invoice number/)).toBeVisible();
@@ -87,8 +101,8 @@ test('full flow: estimate → PDF → convert to invoice → new document', asyn
   await expect(page.getByRole('button', { name: 'Convertir en Invoice' })).toHaveCount(0);
   if (mobile) await page.getByRole('button', { name: 'Editar' }).click();
   await expect(page.getByLabel('Nombre')).toHaveValue('Margaret Kelly');
-  await expect(page.getByLabel('Número')).toHaveValue(`INV-${DAY}-02`);
-  await expect(page.getByText(`Último: INV-${DAY}-02`)).toBeAttached();
+  await expect(page.getByLabel('Número')).toHaveText(`INV-${DAY}-01`);
+  await expect(page.getByText(`Último: INV-${DAY}-01`)).toBeAttached();
   if (mobile) await page.getByRole('button', { name: 'Vista previa' }).click();
 
   // New document asks first (focus on the safe choice), then clears.
@@ -99,11 +113,11 @@ test('full flow: estimate → PDF → convert to invoice → new document', asyn
   await page.getByRole('button', { name: 'Nuevo documento' }).click();
   await page.getByRole('button', { name: 'Sí, empezar nuevo' }).click();
   await expect(page.getByLabel('Nombre')).toHaveValue('');
-  await expect(page.getByLabel('Número')).toHaveValue('');
+  await expect(page.getByLabel('Número')).toHaveText('Se asigna al compartir');
   await expect(page.getByText('Aún no hay trabajos')).toBeVisible();
 
-  // Only a type or a number ever goes to the server (SPEC §4).
-  for (const body of apiBodies) expect(body).toMatch(/^$|^\{"(tipo|numero)":"[A-Z0-9-]+"\}$/);
+  // Only the type ever goes to the server (SPEC §4).
+  for (const body of apiBodies) expect(body).toMatch(/^$|^\{"tipo":"(EST|INV)"\}$/);
 
   await expectNoErrors(errors);
 });
@@ -194,6 +208,21 @@ test('draft survives a reload and can be discarded', async ({ page }, info) => {
   await expect(page.getByText('Recuperamos tu borrador')).toBeHidden();
 });
 
+test('a draft with an old per-device number gets a counter number instead', async ({ page }) => {
+  await page.getByLabel('Nombre').fill('Margaret Kelly');
+  await expect(page.getByText(/guardado/i)).toBeVisible();
+  await page.evaluate(() => {
+    const draft = JSON.parse(window.localStorage.getItem('sosa.draft.v2') ?? '{}') as {
+      values: { number: string };
+    };
+    draft.values.number = 'EST-20261021-05';
+    window.localStorage.setItem('sosa.draft.v2', JSON.stringify(draft));
+  });
+  await page.reload();
+  await page.getByRole('button', { name: 'Seguir editando' }).click();
+  await expect(page.getByLabel('Número')).toHaveText('Se asigna al compartir');
+});
+
 test('corrupt saved data is ignored', async ({ page }) => {
   await page.evaluate(() => {
     window.localStorage.setItem('sosa.draft.v2', '{"savedAt":1,"values":{"type":"hack"}}');
@@ -201,7 +230,7 @@ test('corrupt saved data is ignored', async ({ page }) => {
   });
   await page.reload();
   await expect(page.getByLabel('Nombre')).toHaveValue('');
-  await expect(page.getByLabel('Número')).toHaveValue('');
+  await expect(page.getByLabel('Número')).toHaveText('Se asigna al compartir');
 });
 
 test('share uses the Web Share API with the PDF file', async ({ page }, info) => {
@@ -291,9 +320,11 @@ test('expired Access login: says so and offers to log in, not "no internet"', as
       headers: { Location: 'https://sosas.cloudflareaccess.com/cdn-cgi/access/login' },
     }),
   );
-  await page.getByRole('button', { name: mobile ? 'Vista previa' : 'Descargar PDF' }).click();
+  if (mobile) await page.getByRole('button', { name: 'Vista previa' }).click();
+  await page.getByRole('button', { name: mobile ? 'Descargar' : 'Descargar PDF' }).click();
   await expect(page.getByText('Tu sesión venció.', { exact: false })).toBeVisible();
   await expect(page.getByText(/Sin internet/)).toBeHidden();
   await expect(page.getByRole('button', { name: 'Entrar' })).toBeVisible();
-  await expect(page.getByLabel('Número')).toHaveValue('');
+  if (mobile) await page.getByRole('button', { name: 'Editar' }).click();
+  await expect(page.getByLabel('Número')).toHaveText('Se asigna al compartir');
 });

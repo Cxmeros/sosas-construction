@@ -68,10 +68,10 @@ export function App() {
   };
 
   /**
-   * The counter couldn't answer, said for `what` ("asignar el número"); `hint` is the way out
-   * without it. An expired Access login saves the draft and goes to log in again.
+   * The counter couldn't answer, said for `what` ("asignar el número"). An expired Access login
+   * saves the draft and goes to log in again.
    */
-  const counterProblem = (reason: ApiProblem, what: string, hint = ''): Notice =>
+  const counterProblem = (reason: ApiProblem, what: string): Notice =>
     reason === 'session'
       ? {
           text: `Tu sesión venció. Entra otra vez con tu correo para ${what}.`,
@@ -84,15 +84,15 @@ export function App() {
           },
         }
       : reason === 'offline'
-        ? { text: `Sin internet. Conéctate para ${what}${hint}.` }
-        : { text: `No se pudo ${what}. Inténtalo otra vez${hint}.` };
+        ? { text: `Sin internet. Conéctate para ${what}.` }
+        : { text: `No se pudo ${what}. Inténtalo otra vez.` };
 
   /** Validated document with its number, asked from the shared counter the first time. */
   const withNumber = (fn: (d: DocumentData) => void) => {
     withValid((d) => {
       void state.ensureNumber().then((res) => {
         if (res.ok) fn({ ...d, number: res.value });
-        else setNotice(counterProblem(res.reason, 'asignar el número', ' o escríbelo a mano'));
+        else setNotice(counterProblem(res.reason, 'asignar el número'));
       });
     });
   };
@@ -115,15 +115,10 @@ export function App() {
     withNumber((d) => void actions.download(d));
   };
   const convert = () => {
-    void state.convertToInvoice().then((res) => {
-      setNotice(
-        res.ok
-          ? {
-              text: `Ahora es el Invoice ${res.value}.`,
-              action: { label: 'Deshacer', run: state.undoConvert },
-            }
-          : counterProblem(res.reason, 'convertir en Invoice'),
-      );
+    state.convertToInvoice();
+    setNotice({
+      text: 'Ahora es un Invoice. Su número se asigna al compartir.',
+      action: { label: 'Deshacer', run: state.undoConvert },
     });
   };
   const startNew = () => {
@@ -133,8 +128,9 @@ export function App() {
     savedScroll.current = 0;
     setScreen('form');
   };
+  // Previewing spends no number (and works offline); sharing or downloading assigns it.
   const openPreview = () => {
-    withNumber(() => {
+    withValid(() => {
       savedScroll.current = formScroll.current?.scrollTop ?? 0;
       setScreen('preview');
     });

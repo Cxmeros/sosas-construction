@@ -86,21 +86,23 @@ export function DocumentForm({
       itemClassName={`btn-cond ${desktop ? 'min-h-12 text-[19px]' : 'min-h-[52px] text-xl'}`}
     />
   );
+  // Not a field: only the shared counter sets it, on the first share or download, and it stays
+  // until "Nuevo" (no repeats across devices, no new number for an edit). SPEC §5.
   const numberField = (
-    <Field label="Número" path="number" error={err('number')}>
-      <input
-        autoComplete="off"
-        autoCapitalize="characters"
-        maxLength={LIMITS.number}
-        placeholder="Se asigna en la vista previa"
-        className="field tabular-nums"
-        {...invalidProps('number', err('number'))}
-        {...register('number')}
-      />
+    <div className="label">
+      <span id="number-label">Número</span>
+      <output
+        aria-labelledby="number-label"
+        className="flex min-h-12 items-center text-[17px] tabular-nums"
+      >
+        {values.number || (
+          <span className="font-normal text-ink-muted">Se asigna al compartir</span>
+        )}
+      </output>
       {lastNumber && (
         <span className="text-sm font-normal text-ink-muted">Último: {lastNumber}</span>
       )}
-    </Field>
+    </div>
   );
   const dateField = (
     <Field label="Fecha" path="date" error={err('date')}>
@@ -281,10 +283,11 @@ export function DocumentForm({
         title="Documento"
         summary={`${invoice ? 'Invoice' : 'Estimate'} · ${values.number}${values.date ? ` · ${formatDateUS(values.date)}` : ''}`}
         defaultOpen={isBlank}
-        forceOpen={Boolean(errors.number ?? errors.date)}
+        forceOpen={Boolean(errors.date)}
       >
         {typeSwitch}
-        <div className="grid grid-cols-1 gap-3 min-[420px]:grid-cols-[1fr_1.3fr]">
+        {/* One per row: "Se asigna en la vista previa" doesn't fit half a phone. */}
+        <div className="flex flex-col gap-3">
           {numberField}
           {dateField}
         </div>

@@ -5,7 +5,7 @@
  */
 import { DurableObject } from 'cloudflare:workers';
 import { z } from 'zod';
-import { counterDay, formatDocNumber, parseDocNumber, type Prefix } from './domain/numbering';
+import { counterDay, formatDocNumber, type Prefix } from './domain/numbering';
 
 const PREFIXES = ['EST', 'INV'] as const satisfies readonly Prefix[];
 type Latest = Record<Prefix, string | null>;
@@ -54,17 +54,6 @@ export class Contador extends DurableObject<Env> {
     return latest;
   }
 
-  /** A hand-typed number: only ever raises that day's counter. */
-  registrar(tipo: Prefix, fecha: string, secuencia: number): void {
-    this.sql.exec(
-      `INSERT INTO contador (tipo, fecha, ultimo) VALUES (?, ?, ?)
-       ON CONFLICT (tipo, fecha) DO UPDATE SET ultimo = MAX(ultimo, excluded.ultimo)`,
-      tipo,
-      fecha,
-      secuencia,
-    );
-  }
-
   /** Manual fix for one day; may lower it. */
   fijar(tipo: Prefix, fecha: string, ultimo: number): void {
     this.sql.exec(
@@ -82,7 +71,6 @@ export class Contador extends DurableObject<Env> {
 
 const tipoSchema = z.enum(PREFIXES);
 const numeroBody = z.object({ tipo: tipoSchema });
-const registrarBody = z.object({ numero: z.string().max(30) });
 const fijarBody = z.object({
   tipo: tipoSchema,
   fecha: z.string().regex(/^\d{6}$/),
@@ -118,13 +106,6 @@ export default {
       }
       case 'GET /api/ultimos':
         return json(await contador.ultimos());
-      case 'POST /api/registrar': {
-        const body = await readBody(request, registrarBody);
-        const parsed = body && parseDocNumber(body.numero);
-        if (!parsed) return fail('numero debe ser EST-AAMMDD-NN o INV-AAMMDD-NN', 400);
-        await contador.registrar(parsed.prefix, parsed.day, parsed.sequence);
-        return json({ ok: true });
-      }
       case 'POST /api/fijar': {
         const body = await readBody(request, fijarBody);
         if (!body) return fail('tipo, fecha (AAMMDD) y ultimo son obligatorios', 400);

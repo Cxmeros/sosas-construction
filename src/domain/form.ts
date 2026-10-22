@@ -240,10 +240,6 @@ function validateForm(values: FormValues): Issue[] {
   const issues: Issue[] = [];
   const add = (path: Issue['path'], message: string) => issues.push({ path, message });
 
-  // Empty is fine: the shared counter assigns it when the preview opens (SPEC §5).
-  if (values.number.trim() && !/^[A-Za-z0-9-]+$/.test(values.number.trim()))
-    add(['number'], 'Usa solo letras, números y guiones.');
-
   if (!isRealDate(values.date)) add(['date'], 'Elige una fecha.');
 
   if (!values.customer.name.trim()) add(['customer', 'name'], 'Escribe el nombre del cliente.');
