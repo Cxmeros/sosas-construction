@@ -78,7 +78,8 @@ export default defineConfig({
         maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
         navigateFallback: '/index.html',
         // The counter API always goes to the network: never cached, never answered with the app.
-        navigateFallbackDenylist: [/^\/api\//],
+        // /entrar too: it must reach Cloudflare Access to renew an expired login (src/lib/api.ts).
+        navigateFallbackDenylist: [/^\/api\//, /^\/entrar/],
         cleanupOutdatedCaches: true,
       },
     }),

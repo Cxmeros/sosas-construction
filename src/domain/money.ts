@@ -16,13 +16,8 @@ function parseHundredths(raw: string): number | null {
   return Number.isSafeInteger(result) ? result : null;
 }
 
-export function parseMoneyToCents(raw: string): number | null {
-  return parseHundredths(raw);
-}
-
-export function parseQtyToHundredths(raw: string): number | null {
-  return parseHundredths(raw);
-}
+export const parseMoneyToCents = parseHundredths;
+export const parseQtyToHundredths = parseHundredths;
 
 export function formatCents(cents: number): string {
   return usd.format(cents / 100);

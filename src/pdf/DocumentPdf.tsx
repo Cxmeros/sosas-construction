@@ -34,7 +34,7 @@ type Style = Styles[string];
 /** Design px (96 dpi) → PDF points (72 dpi). */
 const pt = (px: number) => px * 0.75;
 
-export interface FontSources {
+interface FontSources {
   barlow: readonly { src: string; fontWeight: number }[];
   condensed: readonly { src: string; fontWeight: number }[];
 }

@@ -69,7 +69,7 @@ const CUSTOMER_INNER = PAGE.contentWidth - 2 * CUSTOMER.padX - 3 - CUSTOMER.colG
 const CUSTOMER_LEFT = (CUSTOMER_INNER * 1.3) / 2.3;
 const CUSTOMER_RIGHT = CUSTOMER_INNER - CUSTOMER_LEFT;
 
-export function customerHeight(model: PdfModel): number {
+function customerHeight(model: PdfModel): number {
   const c = model.customer;
   const lines = Math.max(
     countLines(c.address, CUSTOMER_LEFT, TYPE.body),
@@ -86,12 +86,12 @@ export function customerHeight(model: PdfModel): number {
   );
 }
 
-export const descWidth = (simple: boolean) =>
+const descWidth = (simple: boolean) =>
   simple
     ? PAGE.contentWidth - COLS.simpleAmount - 8
     : PAGE.contentWidth - COLS.qty - COLS.unit - COLS.unitPrice - COLS.amount - 8;
 
-export function rowHeight(row: PdfRow, simple: boolean): number {
+function rowHeight(row: PdfRow, simple: boolean): number {
   const width = descWidth(simple);
   const main = Math.max(1, countLines(row.description, width, TYPE.body, true)) * lh(TYPE.body);
   const note = countLines(row.note, width, TYPE.note) * lh(TYPE.note);

@@ -71,8 +71,8 @@ Quiere llenar campos y obtener un PDF listo para mandar al cliente.
    contador (necesita internet) y guarda el EST- como "Estimate ref.". El Work Process no pasa.
 10. **Borrador automático** cada ~2 s con indicador "Guardado"; al abrir con borrador pendiente,
     aviso "Recuperamos tu borrador" con "Seguir editando" / "Descartar" (diálogo propio, no
-    `confirm()`). El schema está versionado y tiene migración; si un borrador viejo no se puede
-    migrar, se descarta sin error.
+    `confirm()`). El schema está versionado en la clave; un borrador que no encaja se descarta sin
+    error (sin migraciones: la app aún no tiene borradores de versiones viejas en uso).
 12. **Cargos extra** (solo invoice), opcional con interruptor. Apagado: no salen ni suman, pero lo
     escrito se guarda. Líneas: descripción + monto. El encabezado de la sección muestra la suma.
     PDF: bloque "ADDITIONAL CHARGES" con borde punteado y la nota "Not included in the original
@@ -142,6 +142,8 @@ cuenta en America/New_York.
   al volver la conexión. Números en otro formato no se registran.
 - Sin internet y sin número: "Sin internet. Conéctate para asignar el número o escríbelo a mano."
   Nunca se inventa un número. "Nuevo" borra el borrador, incluido el número.
+- Sesión de Access vencida (redirect/401 en `/api`): "Tu sesión venció…" con botón **Entrar**
+  (guarda el borrador y abre `/entrar`, que el service worker no sirve de caché).
 
 ## 6. Cálculos (src/domain)
 - `lineAmountCents` según §CLAUDE.md principio 3; `lump sum` = monto ingresado.

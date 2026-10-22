@@ -81,7 +81,7 @@ export function buildPdfModel(doc: DocumentData): PdfModel {
     customer: {
       name: doc.customer.name,
       address: doc.customer.address,
-      phone: doc.customer.phone ? formatPhone(doc.customer.phone) : '',
+      phone: formatPhone(doc.customer.phone),
       email: doc.customer.email,
     },
     jobDescription: doc.jobDescription,

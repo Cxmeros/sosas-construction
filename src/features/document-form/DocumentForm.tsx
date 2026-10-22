@@ -1,5 +1,5 @@
 import type { FieldErrors } from 'react-hook-form';
-import { formatPhoneAsTyped, type FormValues } from '../../domain/form';
+import { formatPhone, type FormValues } from '../../domain/form';
 import { LIMITS } from '../../domain/limits';
 import { formatCents } from '../../domain/money';
 import { formatDateUS, PREFIX } from '../../domain/numbering';
@@ -26,7 +26,7 @@ const DOC_OPTIONS: readonly { value: DocType; label: string }[] = [
 ];
 
 /** Number of fields with an error (leaves of the errors tree). */
-export function countErrors(errors: FieldErrors<FormValues>): number {
+function countErrors(errors: FieldErrors<FormValues>): number {
   let n = 0;
   const walk = (node: unknown) => {
     if (!node || typeof node !== 'object') return;
@@ -40,7 +40,7 @@ export function countErrors(errors: FieldErrors<FormValues>): number {
   return n;
 }
 
-export function ErrorSummary({ count }: { count: number }) {
+function ErrorSummary({ count }: { count: number }) {
   if (count === 0) return null;
   return (
     <div role="alert" className="flex gap-2.5 border-2 border-error bg-error-bg p-3 text-error-ink">
@@ -151,7 +151,7 @@ export function DocumentForm({
           {...register('customer.phone', {
             // (XXX) XXX-XXXX as it's typed, 10 digits max (SPEC §3.3).
             onChange: (e: { target: HTMLInputElement }) => {
-              form.setValue('customer.phone', formatPhoneAsTyped(e.target.value), {
+              form.setValue('customer.phone', formatPhone(e.target.value), {
                 shouldValidate: form.formState.isSubmitted,
               });
             },

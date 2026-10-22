@@ -16,7 +16,7 @@ export function errorAt(errors: FieldErrors<FormValues>, path: string): string |
   return undefined;
 }
 
-export const errorId = (path: string) => `err-${path.replace(/\./g, '-')}`;
+const errorId = (path: string) => `err-${path.replace(/\./g, '-')}`;
 
 export function FieldError({ path, message }: { path: string; message: string | undefined }) {
   if (!message) return null;

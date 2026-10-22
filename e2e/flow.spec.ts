@@ -196,7 +196,7 @@ test('draft survives a reload and can be discarded', async ({ page }, info) => {
 
 test('corrupt saved data is ignored', async ({ page }) => {
   await page.evaluate(() => {
-    window.localStorage.setItem('sosa.draft.v1', '{"savedAt":1,"values":{"type":"hack"}}');
+    window.localStorage.setItem('sosa.draft.v2', '{"savedAt":1,"values":{"type":"hack"}}');
     window.localStorage.setItem('sosa.counters.v1', 'not json');
   });
   await page.reload();
@@ -277,4 +277,23 @@ test('touch targets are at least 48 px', async ({ page }, info) => {
       .filter((x) => x.h < 47.5),
   );
   expect(small).toEqual([]);
+});
+
+test('expired Access login: says so and offers to log in, not "no internet"', async ({
+  page,
+}, info) => {
+  const mobile = isMobile(info);
+  await fillSample(page, mobile);
+  // Registered after mockCounter, so it wins: with the session gone, Access redirects to its login.
+  await page.route('**/api/numero', (route) =>
+    route.fulfill({
+      status: 302,
+      headers: { Location: 'https://sosas.cloudflareaccess.com/cdn-cgi/access/login' },
+    }),
+  );
+  await page.getByRole('button', { name: mobile ? 'Vista previa' : 'Descargar PDF' }).click();
+  await expect(page.getByText('Tu sesión venció.', { exact: false })).toBeVisible();
+  await expect(page.getByText(/Sin internet/)).toBeHidden();
+  await expect(page.getByRole('button', { name: 'Entrar' })).toBeVisible();
+  await expect(page.getByLabel('Número')).toHaveValue('');
 });

@@ -1,7 +1,7 @@
 import { EMAIL } from '../domain/form';
 
 /** Web Share API with a file (WhatsApp, Messages, Mail…), when the device supports it. */
-export function canShareFile(file: File): boolean {
+function canShareFile(file: File): boolean {
   try {
     return typeof navigator.canShare === 'function' && navigator.canShare({ files: [file] });
   } catch {
@@ -9,7 +9,7 @@ export function canShareFile(file: File): boolean {
   }
 }
 
-export type ShareResult = 'shared' | 'cancelled' | 'unsupported';
+type ShareResult = 'shared' | 'cancelled' | 'unsupported';
 
 export async function shareFile(file: File, title: string): Promise<ShareResult> {
   if (!canShareFile(file)) return 'unsupported';

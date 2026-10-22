@@ -14,7 +14,7 @@ import {
   type WorkProcess,
 } from './types';
 
-export const DEPOSIT_MODES = ['none', '20', '30', 'percent', 'fixed'] as const;
+const DEPOSIT_MODES = ['none', '20', '30', 'percent', 'fixed'] as const;
 export type DepositMode = (typeof DEPOSIT_MODES)[number];
 
 const text = (max: number) => z.string().max(max);
@@ -236,7 +236,7 @@ export const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 type Issue = { path: (string | number)[]; message: string };
 
 /** Spanish messages, next to each field (SPEC §9). */
-export function validateForm(values: FormValues): Issue[] {
+function validateForm(values: FormValues): Issue[] {
   const issues: Issue[] = [];
   const add = (path: Issue['path'], message: string) => issues.push({ path, message });
 
@@ -351,21 +351,13 @@ export function toInvoiceValues(est: FormValues, number: string, today: string):
 }
 
 /**
- * Formats while typing: "(610", "(610) 555", "(610) 555-0142". A leading 1 (country code) is
+ * (XXX) XXX-XXXX, also while typing: "(610", "(610) 555", "(610) 555-0142". A leading 1 (country code) is
  * dropped and extra digits are cut, so the field never holds more than 10 digits.
  */
-export function formatPhoneAsTyped(raw: string): string {
+export function formatPhone(raw: string): string {
   const d = raw.replace(/\D/g, '').replace(/^1/, '').slice(0, 10);
   if (d.length === 0) return '';
   if (d.length <= 3) return `(${d}`;
   if (d.length <= 6) return `(${d.slice(0, 3)}) ${d.slice(3)}`;
   return `(${d.slice(0, 3)}) ${d.slice(3, 6)}-${d.slice(6)}`;
-}
-
-/** "6105550142" / "1 610 555 0142" → "(610) 555-0142"; anything else is left as typed. */
-export function formatPhone(raw: string): string {
-  const digits = raw.replace(/\D/g, '').replace(/^1(?=\d{10}$)/, '');
-  return digits.length === 10
-    ? `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`
-    : raw.trim();
 }

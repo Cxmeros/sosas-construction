@@ -14,9 +14,8 @@ import { z } from 'zod';
 import { formValuesSchema, type FormValues } from '../domain/form';
 
 const KEYS = {
-  /** Schema version in the key: a new shape gets a new key plus a migration from the old one. */
+  /** Schema version in the key: a new shape gets a new key; a draft that doesn't fit is dropped. */
   draft: 'sosa.draft.v2',
-  draftV1: 'sosa.draft.v1',
   /** Old per-device counter, replaced by the shared one: removed on startup. */
   legacyCounters: 'sosa.counters.v1',
   pending: 'sosa.pending.v1',
@@ -26,48 +25,10 @@ const KEYS = {
 const draftSchema = z.object({ savedAt: z.number().int().nonnegative(), values: formValuesSchema });
 export type Draft = z.infer<typeof draftSchema>;
 
-const record = (v: unknown): Record<string, unknown> =>
-  v && typeof v === 'object' ? (v as Record<string, unknown>) : {};
-
-/**
- * v1 → v2: items gain `detail` (taken from the old "description — detail" convention), and the
- * new extras / work-process fields start empty. Also accepts the short-lived 1–3 options shape
- * (keeps the first option). Anything that still doesn't validate is dropped by `read`.
- */
-export function migrateDraftV1(raw: unknown): unknown {
-  const draft = record(raw);
-  const values = record(draft.values);
-  const options = Array.isArray(values.options) ? values.options : null;
-  const items: unknown[] = options
-    ? ((record(options[0]).items as unknown[] | undefined) ?? [])
-    : Array.isArray(values.items)
-      ? values.items
-      : [];
-  const rest = { ...values };
-  delete rest.options;
-  return {
-    ...draft,
-    values: {
-      ...rest,
-      items: items.map((item) => {
-        const i = record(item);
-        const text = typeof i.description === 'string' ? i.description : '';
-        const [description = '', detail = ''] = text.split(/\s+(?:—|–|--)\s+/);
-        return { ...i, description, detail };
-      }),
-      extrasOn: false,
-      extras: [],
-      processOn: false,
-      processNote: '',
-      steps: [],
-    },
-  };
-}
-
 const pendingSchema = z.array(z.string().max(30)).max(50);
 
 const prefsSchema = z.object({ depositPercent: z.string().max(10) });
-export type Prefs = z.infer<typeof prefsSchema>;
+type Prefs = z.infer<typeof prefsSchema>;
 const DEFAULT_PREFS: Prefs = { depositPercent: '30' };
 
 function store(): Storage | null {
@@ -109,15 +70,7 @@ function remove(key: string): void {
 
 export function loadDraft(): Draft | null {
   remove(KEYS.legacyCounters);
-  const current = read(KEYS.draft, draftSchema);
-  if (current) return current;
-  const old = read(KEYS.draftV1, z.unknown());
-  if (old === null) return null;
-  remove(KEYS.draftV1);
-  const parsed = draftSchema.safeParse(migrateDraftV1(old));
-  if (!parsed.success) return null;
-  write(KEYS.draft, parsed.data);
-  return parsed.data;
+  return read(KEYS.draft, draftSchema);
 }
 
 export function saveDraft(values: FormValues, now = Date.now()): void {
@@ -126,7 +79,6 @@ export function saveDraft(values: FormValues, now = Date.now()): void {
 
 export function clearDraft(): void {
   remove(KEYS.draft);
-  remove(KEYS.draftV1);
 }
 
 /** Hand-typed numbers waiting for a connection to reach /api/registrar. */

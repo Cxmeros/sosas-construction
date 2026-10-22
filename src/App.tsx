@@ -10,6 +10,7 @@ import { MobilePreview } from './features/preview/MobilePreview';
 import { pageCountOf, PdfPreview } from './features/preview/PdfPreview';
 import { SharePanel } from './features/preview/SharePanel';
 import { usePdfActions } from './features/preview/usePdfActions';
+import { LOGIN_PATH, type ApiProblem } from './lib/api';
 import { formatSavedAt } from './lib/format';
 import { saveDraft } from './lib/storage';
 import { ConfirmDialog } from './ui/Dialog';
@@ -66,18 +67,32 @@ export function App() {
     })();
   };
 
+  /**
+   * The counter couldn't answer, said for `what` ("asignar el número"); `hint` is the way out
+   * without it. An expired Access login saves the draft and goes to log in again.
+   */
+  const counterProblem = (reason: ApiProblem, what: string, hint = ''): Notice =>
+    reason === 'session'
+      ? {
+          text: `Tu sesión venció. Entra otra vez con tu correo para ${what}.`,
+          action: {
+            label: 'Entrar',
+            run: () => {
+              saveDraft(form.getValues());
+              window.location.assign(LOGIN_PATH);
+            },
+          },
+        }
+      : reason === 'offline'
+        ? { text: `Sin internet. Conéctate para ${what}${hint}.` }
+        : { text: `No se pudo ${what}. Inténtalo otra vez${hint}.` };
+
   /** Validated document with its number, asked from the shared counter the first time. */
   const withNumber = (fn: (d: DocumentData) => void) => {
     withValid((d) => {
       void state.ensureNumber().then((res) => {
         if (res.ok) fn({ ...d, number: res.value });
-        else
-          setNotice({
-            text:
-              res.reason === 'offline'
-                ? 'Sin internet. Conéctate para asignar el número o escríbelo a mano.'
-                : 'No se pudo asignar el número. Inténtalo otra vez o escríbelo a mano.',
-          });
+        else setNotice(counterProblem(res.reason, 'asignar el número', ' o escríbelo a mano'));
       });
     });
   };
@@ -107,12 +122,7 @@ export function App() {
               text: `Ahora es el Invoice ${res.value}.`,
               action: { label: 'Deshacer', run: state.undoConvert },
             }
-          : {
-              text:
-                res.reason === 'offline'
-                  ? 'Sin internet. Conéctate para convertir en Invoice.'
-                  : 'No se pudo convertir en Invoice. Inténtalo otra vez.',
-            },
+          : counterProblem(res.reason, 'convertir en Invoice'),
       );
     });
   };
