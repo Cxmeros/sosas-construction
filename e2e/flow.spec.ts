@@ -102,7 +102,6 @@ test('full flow: estimate → PDF → convert to invoice → new document', asyn
   if (mobile) await page.getByRole('button', { name: 'Editar' }).click();
   await expect(page.getByLabel('Nombre')).toHaveValue('Margaret Kelly');
   await expect(page.getByLabel('Número')).toHaveText(`INV-${DAY}-01`);
-  await expect(page.getByText(`Último: INV-${DAY}-01`)).toBeAttached();
   if (mobile) await page.getByRole('button', { name: 'Vista previa' }).click();
 
   // New document asks first (focus on the safe choice), then clears.

@@ -2,7 +2,7 @@ import type { FieldErrors } from 'react-hook-form';
 import { formatPhone, type FormValues } from '../../domain/form';
 import { LIMITS } from '../../domain/limits';
 import { formatCents } from '../../domain/money';
-import { formatDateUS, PREFIX } from '../../domain/numbering';
+import { formatDateUS } from '../../domain/numbering';
 import type { DocType, Totals } from '../../domain/types';
 import { AlertIcon } from '../../ui/Icons';
 import type { DocumentState } from './useDocument';
@@ -73,7 +73,6 @@ export function DocumentForm({
   const err = (path: string) => errorAt(errors, path);
   const errorCount = formState.isSubmitted ? countErrors(errors) : 0;
   const isBlank = !values.customer.name.trim() && values.items.length === 0;
-  const lastNumber = state.latest?.[PREFIX[values.type]];
 
   const typeSwitch = (
     <Segmented
@@ -99,9 +98,6 @@ export function DocumentForm({
           <span className="font-normal text-ink-muted">Se asigna al compartir</span>
         )}
       </output>
-      {lastNumber && (
-        <span className="text-sm font-normal text-ink-muted">Último: {lastNumber}</span>
-      )}
     </div>
   );
   const dateField = (

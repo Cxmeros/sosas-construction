@@ -14,8 +14,6 @@ export type ApiResult<T> = { ok: true; value: T } | { ok: false; reason: ApiProb
 
 const numberText = z.string().max(30);
 const numeroResponse = z.object({ numero: numberText });
-const latestResponse = z.object({ EST: numberText.nullable(), INV: numberText.nullable() });
-export type Latest = z.infer<typeof latestResponse>;
 
 async function call<T>(path: string, schema: z.ZodType<T>, body?: unknown): Promise<ApiResult<T>> {
   if (!navigator.onLine) return { ok: false, reason: 'offline' };
@@ -57,5 +55,3 @@ export async function requestNumber(tipo: Prefix): Promise<ApiResult<string>> {
   const res = await call('/api/numero', numeroResponse, { tipo });
   return res.ok ? { ok: true, value: res.value.numero } : res;
 }
-
-export const fetchLatest = () => call('/api/ultimos', latestResponse);

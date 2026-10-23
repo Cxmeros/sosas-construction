@@ -133,7 +133,8 @@ cuenta en America/New_York.
   `POST /api/fijar {tipo, fecha, ultimo}` ajuste manual (puede bajar) · `POST /api/borrar-todo`.
 - El número se pide la primera vez que se toca **Compartir** o **Descargar** y queda en el
   borrador. La vista previa no gasta número (muestra "—"). En "Documento" no hay campo: se lee
-  "Se asigna al compartir" o el número, y debajo "Último: INV-261021-03".
+  "Se asigna al compartir" o el número. La app no llama al contador al abrir: el único request
+  normal es `POST /api/numero` al compartir (`/api/ultimos` queda solo para revisar a mano).
 - Editar el documento no cambia el número; solo **Nuevo** lo borra (junto con el borrador).
 - Cambiar de tipo sin número no gasta nada; con número, el tipo nuevo pide el suyo al compartir (si
   ese tipo ya tenía número en este documento, vuelve ese). Igual "Convertir en Invoice".

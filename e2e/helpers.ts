@@ -39,13 +39,6 @@ export async function mockCounter(target: Pick<Page, 'route'>): Promise<string[]
       last[body.tipo] = (last[body.tipo] ?? 0) + 1;
       return route.fulfill({ json: { numero: format(body.tipo) } });
     }
-    if (path === '/api/ultimos')
-      return route.fulfill({
-        json: {
-          EST: last.EST ? format('EST') : null,
-          INV: last.INV ? format('INV') : null,
-        },
-      });
     return route.fulfill({ status: 404, json: { error: 'No existe' } });
   });
   return bodies;

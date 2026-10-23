@@ -13,7 +13,7 @@ import {
 import { parseDocNumber, PREFIX, toIsoDate } from '../../domain/numbering';
 import { DEFAULT_TERMS } from '../../domain/terms';
 import type { DocType, DocumentData } from '../../domain/types';
-import { fetchLatest, requestNumber, type ApiResult, type Latest } from '../../lib/api';
+import { requestNumber, type ApiResult } from '../../lib/api';
 import { clearDraft, loadDraft, loadPrefs, saveDraft, type Draft } from '../../lib/storage';
 
 /** No number yet: the shared counter assigns it on the first preview (SPEC §5). */
@@ -81,22 +81,6 @@ export function useDocument() {
   const numbers = useRef<Partial<Record<DocType, string>>>(
     initial.values.number ? { [initial.values.type]: initial.values.number } : {},
   );
-
-  /** Last numbers on the shared counter ("Último: INV-261021-03"); null offline. */
-  const [latest, setLatest] = useState<Latest | null>(null);
-  const refreshLatest = useCallback(() => {
-    void fetchLatest().then((res) => {
-      setLatest(res.ok ? res.value : null);
-    });
-  }, []);
-
-  useEffect(() => {
-    refreshLatest();
-    window.addEventListener('online', refreshLatest);
-    return () => {
-      window.removeEventListener('online', refreshLatest);
-    };
-  }, [refreshLatest]);
 
   // Autosave the draft (the document in progress — not a history, SPEC §4).
   useEffect(() => {
@@ -174,13 +158,12 @@ export function useDocument() {
         numbers.current[type] = res.value;
         setValue('number', res.value, { shouldDirty: true });
         persist(getValues());
-        refreshLatest();
       }
       inFlight.current = null;
       return res.ok ? { ok: true as const, value: getValues('number').trim() || res.value } : res;
     })();
     return inFlight.current;
-  }, [getValues, setValue, persist, refreshLatest]);
+  }, [getValues, setValue, persist]);
 
   const undoConvert = useCallback(() => {
     const before = beforeConvert.current;
@@ -214,7 +197,6 @@ export function useDocument() {
       setRecovered(null);
     },
     setType,
-    latest,
     ensureNumber,
     convertToInvoice,
     undoConvert,
